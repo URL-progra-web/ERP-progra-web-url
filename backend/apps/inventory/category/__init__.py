@@ -1,0 +1,1 @@
+# Category aggregate (models only)

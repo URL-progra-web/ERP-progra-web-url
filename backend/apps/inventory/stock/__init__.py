@@ -1,0 +1,1 @@
+# Stock aggregate (models only)

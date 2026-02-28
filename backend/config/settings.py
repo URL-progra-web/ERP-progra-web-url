@@ -183,4 +183,4 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-AUTH_USER_MODEL = 'auth.User' # Change this if you implement a custom user model in apps.users
+AUTH_USER_MODEL = "users.User"
