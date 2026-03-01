@@ -16,6 +16,7 @@ class Stock(models.Model):
         related_name="stocks",
     )
     quantity = models.IntegerField("cantidad", default=0)
+    transit_quantity = models.IntegerField("cantidad en tránsito", default=0)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

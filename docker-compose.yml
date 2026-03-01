@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d erp_db"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d erp_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -27,6 +27,8 @@ services:
       db:
         condition: service_healthy
     environment:
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
       DEBUG: "True"
       SECRET_KEY: "django-insecure-local"
       DB_NAME: erp_db
@@ -35,7 +37,7 @@ services:
       DB_HOST: db
       DB_PORT: "5432"
     volumes:
-      - ./backend:/app
+      - ./backend:/app:z
       - /app/venv/
     ports:
       - "8000:8000"
@@ -48,7 +50,7 @@ services:
     container_name: erp_frontend
     restart: always
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app:z
       - /app/node_modules
     ports:
       - "5173:5173"

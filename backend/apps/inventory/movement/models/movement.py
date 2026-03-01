@@ -5,6 +5,20 @@ from apps.inventory.product.models import Product
 from apps.inventory.warehouse.models import Warehouse
 
 
+class MovementStatus(models.Model):
+    name = models.CharField("nombre", max_length=50)
+    description = models.TextField("descripción", blank=True)
+
+    class Meta:
+        db_table = '"inventory"."movement_status"'
+        verbose_name = "estado de movimiento"
+        verbose_name_plural = "estados de movimiento"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class MovementType(models.Model):
     class Direction(models.TextChoices):
         IN = "IN", "Entrada"
@@ -29,11 +43,7 @@ class MovementType(models.Model):
 
 
 class Movement(models.Model):
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.PROTECT,
-        related_name="movements",
-    )
+
     from_warehouse = models.ForeignKey(
         Warehouse,
         on_delete=models.PROTECT,
@@ -55,8 +65,16 @@ class Movement(models.Model):
         on_delete=models.PROTECT,
         related_name="movements",
     )
-    quantity = models.PositiveIntegerField("cantidad")
+    status = models.ForeignKey(
+        MovementStatus,
+        on_delete=models.PROTECT,
+        related_name="movements",
+        verbose_name="estado",
+        null=True,
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
+    movement_date = models.DateField("fecha del movimiento", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -76,4 +94,28 @@ class Movement(models.Model):
     def __str__(self):
         orig = getattr(self.from_warehouse, "code", None) or "—"
         dest = getattr(self.to_warehouse, "code", None) or "—"
-        return f"{self.movement_type} {self.quantity} {self.product} ({orig} → {dest})"
+        return f"{self.movement_type} ({orig} → {dest})"
+
+
+class MovementDetail(models.Model):
+    movement = models.ForeignKey(
+        Movement,
+        on_delete=models.CASCADE,
+        related_name="details",
+        verbose_name="movimiento",
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="movement_details",
+        verbose_name="producto",
+    )
+    quantity = models.PositiveIntegerField("cantidad")
+
+    class Meta:
+        db_table = '"inventory"."movement_detail"'
+        verbose_name = "detalle de movimiento"
+        verbose_name_plural = "detalles de movimiento"
+
+    def __str__(self):
+        return f"{self.movement} - {self.product}: {self.quantity}"
