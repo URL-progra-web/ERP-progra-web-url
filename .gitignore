@@ -205,5 +205,7 @@ frontend/dist/
 
 # Marimo
 marimo/_static/
-marimo/_lsp/
 __marimo__/
+
+# Un-ignore frontend lib which gets caught by the python lib/ rule
+!frontend/src/lib/

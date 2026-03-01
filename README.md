@@ -21,6 +21,7 @@ Requiere Docker y Docker Compose.
 4. La UI del frontend está en `http://localhost:5173`
 
 *(Nota: Ejecuta `docker-compose exec backend python manage.py migrate` la primera vez para configurar la base de datos.)*
+*(Nota: Ejecuta `docker compose exec frontend npx shadcn@latest init` para inicializar shadcn/ui en el frontend.)*
 
 ---
 
