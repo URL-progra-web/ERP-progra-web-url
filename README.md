@@ -101,3 +101,59 @@ Usamos **Screaming Architecture**. Tanto el frontend como el backend están divi
 - `users` (Usuarios y Auth)
 
 Dentro de cada característica encontrarás `models`, `repositories`, `services`, `routers/components`.
+
+---
+
+## Autenticación y Pruebas API (Swagger)
+
+El proyecto cuenta con un módulo de Usuarios configurado y expuesto en `/api/v1/users/`.
+Además, incluye documentación Swagger instalada (mediante `drf_spectacular`) para probar la API visualmente.
+
+1. Ingresa a la interfaz de Swagger en [http://localhost:8000/api/v1/docs/](http://localhost:8000/api/v1/docs/)
+2. Todos los endpoints de usuarios requieren permisos de Administrador (`is_staff`). Puedes crear un superusuario si aún no lo tienes:
+   ```bash
+   docker compose exec backend python manage.py createsuperuser
+   ```
+3. Para obtener el Token de acceso JWT en **Postman** (o crear un request de cURL), realiza un `POST` a `/api/v1/token/` con tu email y contraseña:
+   
+   **Usando cURL**:
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/token/ \
+        -H "Content-Type: application/json" \
+        -d '{"email": "tuemail@admin.com", "password": "tusuperpassword"}'
+   ```
+   
+   **Usando Postman**:
+   Crea un nuevo request tipo `POST` hacia `http://localhost:8000/api/v1/token/`. En la pestaña **Body** selecciona *raw -> JSON* y usa:
+   ```json
+   {
+     "email": "tuemail@admin.com",
+     "password": "tusuperpassword"
+   }
+   ```
+
+4. Copia el token de `"access"` y colócalo en tu request usando el Authorization header (`Bearer <tu-token>`). 
+   - **Para Swagger:** Dale clic al botón **Authorize** en la esquina superior derecha y pégalo allí.
+   - **Para Postman:** Ve a la pestaña **Auth**, elige el tipo **Bearer Token**, y pega el token de acceso.
+   - **Para cURL:**
+     ```bash
+     curl -X GET http://localhost:8000/api/v1/users/ \
+          -H "Authorization: Bearer <TU-TOKEN-AQUI>"
+     ```
+
+**Paginación (Aplica para todo el proyecto)**
+Todos los endpoints que devuelven listados (ej. `GET /api/v1/users/`, `GET /api/v1/products/`, etc.) auto-aplican paginación siguiendo un patrón estandarizado (10 ítems por página por defecto). 
+
+Para navegar por los resultados, simplemente añade y modifica la query param `page`:
+- `GET /api/v1/users/?page=1` (Página 1)
+- `GET /api/v1/users/?page=2` (Página 2)
+
+Las respuestas de los listados siempre tendrán la misma estructura:
+```json
+{
+  "count": 55,
+  "next": "http://localhost:8000/api/v1/users/?page=2",
+  "previous": null,
+  "results": [ ... ]
+}
+```
