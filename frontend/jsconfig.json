@@ -4,6 +4,21 @@
         "paths": {
             "@/*": [
                 "./src/*"
+            ],
+            "@core/*": [
+                "./src/core/*"
+            ],
+            "@users/*": [
+                "./src/features/users/*"
+            ],
+            "@pos/*": [
+                "./src/features/pos/*"
+            ],
+            "@inventory/*": [
+                "./src/features/inventory/*"
+            ],
+            "@hr/*": [
+                "./src/features/hr/*"
             ]
         }
     }

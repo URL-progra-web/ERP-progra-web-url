@@ -6,6 +6,6 @@ export const usersMenu = [
         label: 'Gestión de Usuarios',
         icon: UserCog,
         // Require specific roles to see this menu item if you want to filter in the UI
-        roles: ['admin', 'staff']
-    }
+        roles: ['admin', 'staff'],
+    },
 ];

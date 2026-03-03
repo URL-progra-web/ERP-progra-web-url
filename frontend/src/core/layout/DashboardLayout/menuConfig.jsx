@@ -1,7 +1,7 @@
-import { posMenu } from '@/features/pos/posMenu';
-import { inventoryMenu } from '@/features/inventory/inventoryMenu';
-import { hrMenu } from '@/features/hr/hrMenu';
-import { usersMenu } from '@/features/users/usersMenu';
+import { posMenu } from '~pos/posMenu';
+import { inventoryMenu } from '~inventory/inventoryMenu';
+import { hrMenu } from '~hr/hrMenu';
+import { usersMenu } from '~users/usersMenu';
 
 export const menuConfig = [
     ...posMenu,
