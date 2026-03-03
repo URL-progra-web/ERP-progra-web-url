@@ -1,25 +1,5 @@
-import axios from 'axios';
+import api from '@/shared/api_client';
 
-import { API_URL } from '@/core/config';
-
-// Create an Axios instance
-const apiClient = axios.create({
-    baseURL: API_URL,
-});
-
-// Request interceptor to attach token
-apiClient.interceptors.request.use((config) => {
-    // Check localStorage for the token
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
-
-// For this MVP we will rely on this configured instance
 export const userFrontendService = {
     getUsers: async ({ page = 1, is_active, search } = {}) => {
         const params = new URLSearchParams();
@@ -29,27 +9,22 @@ export const userFrontendService = {
         }
         if (search) params.append('search', search);
 
-        const response = await apiClient.get(`users/?${params.toString()}`);
-        return response.data;
+        return await api.get(`users/?${params.toString()}`);
     },
 
     createUser: async (userData) => {
-        const response = await apiClient.post(`users/`, userData);
-        return response.data;
+        return await api.post(`users/`, userData);
     },
 
     getUserById: async (id) => {
-        const response = await apiClient.get(`users/${id}/`);
-        return response.data;
+        return await api.get(`users/${id}/`);
     },
 
     updateUser: async (id, userData) => {
-        const response = await apiClient.patch(`users/${id}/`, userData);
-        return response.data;
+        return await api.patch(`users/${id}/`, userData);
     },
 
     deleteUser: async (id) => {
-        const response = await apiClient.delete(`users/${id}/`);
-        return response.data; // Usually 204 No Content
+        return await api.delete(`users/${id}/`);
     }
 };
