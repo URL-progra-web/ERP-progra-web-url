@@ -68,10 +68,9 @@ class UserService:
         
         UserService._validate_admin_privileges(request_user, data)
         
-        email = data.get('email')
-        if email and email != user.email:
-            if User.objects.filter(email=email).exists():
-                raise ValidationError("User with this email already exists.")
+        # Enforce email immutability on updates
+        if 'email' in data:
+            del data['email']
                 
         updated_user = UserRepository.update_user(user, data)
         return updated_user, "User updated successfully"

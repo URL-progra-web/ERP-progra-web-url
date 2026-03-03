@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,10 +15,25 @@ import { Building2 } from 'lucide-react';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleFakeLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        navigate('/app/pos');
+        setError('');
+        setLoading(true);
+
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+
+        try {
+            await authService.login(email, password);
+            navigate('/app/pos');
+        } catch (err) {
+            setError('Credenciales inválidas. Por favor, intenta de nuevo.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -43,7 +59,12 @@ const Login = () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleFakeLogin} className="space-y-4">
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            {error && (
+                                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                                    {error}
+                                </div>
+                            )}
                             <div className="space-y-1.5">
                                 <Label htmlFor="email">Correo electrónico</Label>
                                 <Input
@@ -70,8 +91,8 @@ const Login = () => {
                                     defaultValue="password"
                                 />
                             </div>
-                            <Button type="submit" className="w-full mt-2">
-                                Iniciar sesión
+                            <Button type="submit" className="w-full mt-2" disabled={loading}>
+                                {loading ? 'Iniciando...' : 'Iniciar sesión'}
                             </Button>
                         </form>
                     </CardContent>

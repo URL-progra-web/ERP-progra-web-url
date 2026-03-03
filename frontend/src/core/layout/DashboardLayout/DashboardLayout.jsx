@@ -3,20 +3,65 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import {
-    ShoppingCart,
-    Package,
-    Users,
-    Building2,
-    LogOut,
-} from 'lucide-react';
+import { Building2, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { menuConfig } from './menuConfig';
 
-const navItems = [
-    { to: '/app/pos', label: 'Punto de Venta', icon: ShoppingCart },
-    { to: '/app/inventory', label: 'Inventario', icon: Package },
-    { to: '/app/hr', label: 'Recursos Humanos', icon: Users },
-];
+const SidebarMenuItem = ({ item, level = 0 }) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const hasChildren = item.children && item.children.length > 0;
+    const Icon = item.icon;
+
+    if (hasChildren) {
+        return (
+            <div className="flex flex-col">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={cn(
+                        'flex items-center justify-between w-full rounded-md px-3 py-2 text-sm transition-colors duration-200',
+                        'text-sidebar-fg/70 hover:bg-black/5 hover:text-sidebar-fg'
+                    )}
+                    style={{ paddingLeft: `${(level + 1) * 0.75}rem` }}
+                >
+                    <div className="flex items-center gap-3">
+                        {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                        {item.label}
+                    </div>
+                    {isOpen ? (
+                        <ChevronDown className="h-4 w-4 opacity-50" />
+                    ) : (
+                        <ChevronRight className="h-4 w-4 opacity-50" />
+                    )}
+                </button>
+                {isOpen && (
+                    <div className="mt-0.5 space-y-0.5">
+                        {item.children.map((child, index) => (
+                            <SidebarMenuItem key={child.to || index} item={child} level={level + 1} />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <NavLink
+            to={item.to}
+            className={({ isActive }) =>
+                cn(
+                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200',
+                    isActive
+                        ? 'bg-black/10 text-sidebar-fg font-medium'
+                        : 'text-sidebar-fg/70 hover:bg-black/5 hover:text-sidebar-fg'
+                )
+            }
+            style={{ paddingLeft: `${(level + 1) * 0.75}rem` }}
+        >
+            {Icon && <Icon className="h-4 w-4 shrink-0" />}
+            {item.label}
+        </NavLink>
+    );
+};
 
 const DashboardLayout = () => {
     const navigate = useNavigate();
@@ -40,23 +85,9 @@ const DashboardLayout = () => {
                 <Separator className="bg-black/10" />
 
                 {/* Navigation */}
-                <nav className="flex-1 px-3 py-4 space-y-0.5">
-                    {navItems.map(({ to, label, icon: Icon }) => (
-                        <NavLink
-                            key={to}
-                            to={to}
-                            className={({ isActive }) =>
-                                cn(
-                                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200',
-                                    isActive
-                                        ? 'bg-black/10 text-sidebar-fg font-medium'
-                                        : 'text-sidebar-fg/70 hover:bg-black/5 hover:text-sidebar-fg'
-                                )
-                            }
-                        >
-                            <Icon className="h-4 w-4 shrink-0" />
-                            {label}
-                        </NavLink>
+                <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+                    {menuConfig.map((item, index) => (
+                        <SidebarMenuItem key={item.to || index} item={item} />
                     ))}
                 </nav>
 

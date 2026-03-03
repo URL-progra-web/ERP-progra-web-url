@@ -5,6 +5,7 @@ import DashboardLayout from './core/layout/DashboardLayout/DashboardLayout';
 import PosDashboard from './features/pos/pages/PosDashboard';
 import InventoryDashboard from './features/inventory/pages/InventoryDashboard';
 import HrDashboard from './features/hr/pages/HrDashboard';
+import UsersDashboard from './features/users/pages/UsersDashboard';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="pos" element={<PosDashboard />} />
           <Route path="inventory" element={<InventoryDashboard />} />
           <Route path="hr" element={<HrDashboard />} />
+          <Route path="users" element={<UsersDashboard />} />
         </Route>
 
         {/* Redirect unknown routes to login for now */}
