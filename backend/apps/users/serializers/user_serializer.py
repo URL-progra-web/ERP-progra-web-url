@@ -50,3 +50,44 @@ class UserWriteSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
             'email': {'required': True}
         }
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer para el endpoint /me/ - Devuelve datos del usuario autenticado.
+    """
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'phone',
+            'is_active',
+            'is_staff',
+            'date_joined',
+        ]
+        read_only_fields = fields
+
+
+class LoginSerializer(serializers.Serializer):
+    """
+    Serializer para validar credenciales de login.
+    No está ligado a un modelo, solo valida email y password.
+    """
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(
+        required=True,
+        write_only=True,
+        style={'input_type': 'password'}
+    )
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if not email or not password:
+            raise serializers.ValidationError("Email y password son requeridos.")
+
+        return attrs
