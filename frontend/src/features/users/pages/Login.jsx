@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '~core/services/authService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useAuth } from '~users/context/AuthContext';
+import { LoginForm } from '~users/components/LoginForm';
 import {
     Card,
     CardContent,
@@ -11,30 +9,30 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Building2 } from 'lucide-react';
+import { Building2, Loader2 } from 'lucide-react';
 
 const Login = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const { isAuthenticated, isLoading } = useAuth();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-
-        try {
-            await authService.login(email, password);
+    // Redirigir si ya está autenticado
+    useEffect(() => {
+        if (isAuthenticated && !isLoading) {
             navigate('/app/pos');
-        } catch (err) {
-            setError('Credenciales inválidas. Por favor, intenta de nuevo.');
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [isAuthenticated, isLoading, navigate]);
+
+    // Mostrar loading mientras verifica la sesión
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Verificando sesión...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-200 relative">
@@ -59,42 +57,7 @@ const Login = () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleLogin} className="space-y-4">
-                            {error && (
-                                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                                    {error}
-                                </div>
-                            )}
-                            <div className="space-y-1.5">
-                                <Label htmlFor="email">Correo electrónico</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="admin@erp.com"
-                                    defaultValue="admin@erp.com"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="password">Contraseña</Label>
-                                    <a
-                                        href="#"
-                                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                        ¿Olvidaste tu contraseña?
-                                    </a>
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    defaultValue="password"
-                                />
-                            </div>
-                            <Button type="submit" className="w-full mt-2" disabled={loading}>
-                                {loading ? 'Iniciando...' : 'Iniciar sesión'}
-                            </Button>
-                        </form>
+                        <LoginForm />
                     </CardContent>
                 </Card>
 
