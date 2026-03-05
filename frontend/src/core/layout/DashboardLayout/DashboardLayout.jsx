@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '~users/context/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -65,10 +66,25 @@ const SidebarMenuItem = ({ item, level = 0 }) => {
 
 const DashboardLayout = () => {
     const navigate = useNavigate();
+    const { user, logout } = useAuth();
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
+
+    // Obtener iniciales del usuario para el avatar
+    const getInitials = () => {
+        if (!user) return 'U';
+        if (user.first_name && user.last_name) {
+            return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+        }
+        return user.email?.[0]?.toUpperCase() || 'U';
+    };
+
+    const displayName = user?.first_name && user?.last_name 
+        ? `${user.first_name} ${user.last_name}`
+        : user?.email || 'Usuario';
 
     return (
         <div className="flex h-screen bg-background font-sans transition-colors duration-200">
@@ -98,12 +114,12 @@ const DashboardLayout = () => {
                     <div className="flex items-center gap-3 px-1">
                         <Avatar className="h-7 w-7">
                             <AvatarFallback className="bg-black/10 text-sidebar-fg text-xs">
-                                A
+                                {getInitials()}
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-sidebar-fg truncate">Admin</p>
-                            <p className="text-xs text-sidebar-fg/70 truncate">admin@erp.com</p>
+                            <p className="text-sm font-medium text-sidebar-fg truncate">{displayName}</p>
+                            <p className="text-xs text-sidebar-fg/70 truncate">{user?.email}</p>
                         </div>
                     </div>
                     <Button
@@ -125,10 +141,10 @@ const DashboardLayout = () => {
                     <div /> {/* Left placeholder for breadcrumbs in future */}
                     <div className="flex items-center gap-3">
                         <span className="text-sm text-muted-foreground">Bienvenido,</span>
-                        <span className="text-sm font-medium text-foreground">Admin</span>
+                        <span className="text-sm font-medium text-foreground">{user?.first_name || user?.email}</span>
                         <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                                A
+                                {getInitials()}
                             </AvatarFallback>
                         </Avatar>
                     </div>

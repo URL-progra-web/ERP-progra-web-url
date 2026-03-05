@@ -66,6 +66,7 @@ class UserSerializer(serializers.ModelSerializer):
             'phone',
             'is_active',
             'is_staff',
+            'is_superuser',
             'date_joined',
         ]
         read_only_fields = fields
