@@ -47,7 +47,7 @@ const AUTH_ROUTES = [
     '/users/auth/login/',
     '/users/auth/refresh/',
     '/users/auth/logout/',
-    '/users/auth/me/', 
+    '/users/auth/me/',
 ];
 
 const isAuthRoute = (url) => {
@@ -119,7 +119,7 @@ apiClient.interceptors.response.use(
 
             // Redirigir a login solo si no estamos ya en /login
             if (!window.location.pathname.includes('/login')) {
-                window.location.href = '/login';
+                window.dispatchEvent(new Event('auth-expired'));
             }
 
             return Promise.reject(refreshError);

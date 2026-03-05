@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '~users/context/AuthContext';
 import Spinner from '~shared/components/Spinner';
@@ -11,16 +11,27 @@ import Spinner from '~shared/components/Spinner';
  * @param {boolean} props.requireAdmin - Si true, requiere que el usuario sea superuser
  * @param {string} props.redirectTo - Ruta de redirección si no está autenticado (default: /login)
  */
-export default function ProtectedRoute({ 
-  children, 
+export default function ProtectedRoute({
+  children,
   requireAdmin = false,
-  redirectTo = '/login' 
+  redirectTo = '/login'
 }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (isLoading) {
+      timer = setTimeout(() => setShowSpinner(true), 400); // 400ms delay to avoid flicker
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   // Mostrar spinner mientras se verifica la autenticación
   if (isLoading) {
+    if (!showSpinner) return null; // Evitar flicker si carga rápido
+
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
