@@ -1,25 +1,33 @@
-class HasRole(BasePermission):
+from rest_framework.permissions import BasePermission
 
-    def __init__(self, roles=None):
-        self.roles = roles or []
 
-    def has_permission(self, request, view):
-        user = request.user
-        if not user or not user.is_authenticated:
+def HasRole(roles):
+    """
+    Factory que retorna una clase de permiso para DRF.
+    Uso: permission_classes = [HasRole(['admin'])]
+    
+    Roles soportados:
+    - 'admin': requiere is_superuser
+    - 'staff': requiere is_staff
+    - 'user': solo requiere estar autenticado
+    """
+    class _HasRolePermission(BasePermission):
+        def has_permission(self, request, view):
+            user = request.user
+            if not user or not user.is_authenticated:
+                return False
+
+            for role in roles:
+                if role == 'admin' and user.is_superuser:
+                    return True
+                if role == 'staff' and user.is_staff:
+                    return True
+                if role == 'user' and user.is_authenticated:
+                    return True
             return False
-
-        # Regla de negocio actual
-        for role in self.roles:
-            if role == 'admin' and user.is_superuser:
-                return True
-            if role == 'user' and user.is_authenticated:
-                return True
-        return False
-
-    @classmethod
-    def as_permission(cls, roles):
-        """Permite usar HasRole.as_permission(['admin']) en CBV/FBV"""
-        return cls(roles)
+    
+    _HasRolePermission.__name__ = f"HasRole_{'_'.join(roles)}"
+    return _HasRolePermission
 
 
 def get_user_or_403(request, required_role=None):
