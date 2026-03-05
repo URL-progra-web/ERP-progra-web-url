@@ -1,19 +1,19 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
 from django.core.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from apps.users.services.user_service import UserService
 from apps.users.serializers.user_serializer import UserReadSerializer, UserWriteSerializer
+from apps.users.permissions import HasRole
 
 class UserViewSet(viewsets.ViewSet):
     """
     ViewSet para manejar el CRUD de usuarios.
-    Solo accesible para administradores (is_staff=True o is_superuser=True).
+    Solo accesible para administradores (rol 'admin').
     """
-    permission_classes = [IsAdminUser]
+    permission_classes = [HasRole(['admin'])]
 
     @extend_schema(
         summary="List users",
