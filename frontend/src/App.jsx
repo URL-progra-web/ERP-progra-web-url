@@ -6,6 +6,7 @@ import PosDashboard from '~pos/pages/PosDashboard';
 import InventoryDashboard from '~inventory/pages/InventoryDashboard';
 import HrDashboard from '~hr/pages/HrDashboard';
 import UsersDashboard from '~users/pages/UsersDashboard';
+import WarehousesPage from "./features/inventory/warehouses/WarehousesPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/app" element={<DashboardLayout />}>
           <Route path="pos" element={<PosDashboard />} />
           <Route path="inventory" element={<InventoryDashboard />} />
+          <Route path="inventory/warehouses" element={<WarehousesPage />} />
           <Route path="hr" element={<HrDashboard />} />
           <Route path="users" element={<UsersDashboard />} />
         </Route>

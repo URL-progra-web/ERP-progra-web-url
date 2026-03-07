@@ -1,0 +1,1 @@
+export { default as WarehousesPage } from "./warehouses/WarehousesPage";
