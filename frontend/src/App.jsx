@@ -9,7 +9,7 @@ import HrDashboard from '~hr/pages/HrDashboard';
 import Spinner from '~shared/components/Spinner';
 
 // Paginas con Lazy Loading (Mejora de Rendimiento)
-const InventoryDashboard = React.lazy(() => import('~inventory/pages/InventoryDashboard'));
+const InventoryRoutes = React.lazy(() => import('~inventory/InventoryRoutes'));
 const UsersDashboard = React.lazy(() => import('~users/pages/UsersDashboard'));
 
 // Componente para escuchar expiración de sesión (Evita Hard Reload)
@@ -52,7 +52,7 @@ function App() {
               }
             >
               <Route path="pos" element={<PosDashboard />} />
-              <Route path="inventory" element={<InventoryDashboard />} />
+              <Route path="inventory/*" element={<InventoryRoutes />} />
               <Route path="hr" element={<HrDashboard />} />
               {/* Users management - requires admin */}
               <Route
