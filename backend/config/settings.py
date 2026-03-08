@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.users.middleware.JWTAuthMiddleware', 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -157,13 +158,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom Settings
 
 # CORS setup
-CORS_ALLOW_ALL_ORIGINS = True # Change to False in production and set CORS_ALLOWED_ORIGINS
+CORS_ALLOW_ALL_ORIGINS = True  
+CORS_ALLOW_CREDENTIALS = True  
 # CORS_ALLOWED_ORIGINS = [ "http://localhost:5173", ]
 
 # REST Framework Setup
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # Autenticación por cookies HttpOnly (principal)
+        'apps.users.authentication.CookieJWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -179,10 +182,17 @@ SPECTACULAR_SETTINGS = {
 }
 
 from datetime import timedelta
+
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),   
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       
+    'ROTATE_REFRESH_TOKENS': True,                     
+    'BLACKLIST_AFTER_ROTATION': True,                  
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
 AUTH_USER_MODEL = "users.User"
+
+BYPASS_AUTH = os.getenv('BYPASS_AUTH', 'False') == 'True'
