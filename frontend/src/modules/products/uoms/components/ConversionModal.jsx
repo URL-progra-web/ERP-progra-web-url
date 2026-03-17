@@ -9,6 +9,12 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (fromUomId === toUomId && parseFloat(multiplier) !== 1) {
+            setError('Si las unidades son iguales, el multiplicador debe ser 1.');
+            return;
+        }
+
         setSaving(true);
         setError(null);
         try {

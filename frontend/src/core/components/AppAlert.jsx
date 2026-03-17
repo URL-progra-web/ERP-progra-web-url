@@ -14,10 +14,10 @@ import React from 'react';
  */
 
 const TYPE_MAP = {
-    info:    { headerBg: 'bg-info',    icon: 'ℹ️',  btnClass: 'btn-info'    },
-    warning: { headerBg: 'bg-warning', icon: '⚠️',  btnClass: 'btn-warning' },
-    danger:  { headerBg: 'bg-danger',  icon: '🗑️', btnClass: 'btn-danger'  },
-    success: { headerBg: 'bg-success', icon: '✅',  btnClass: 'btn-success' },
+    info:    { headerBg: 'bg-info',    icon: 'ℹ️',  btnClass: 'btn-info',    textClass: 'text-white' },
+    warning: { headerBg: '',           icon: '⚠️',  btnClass: 'btn-warning', textClass: 'text-dark',  headerStyle: { backgroundColor: '#e1ad01' } },
+    danger:  { headerBg: 'bg-danger',  icon: '🗑️', btnClass: 'btn-danger',  textClass: 'text-white' },
+    success: { headerBg: 'bg-success', icon: '✅',  btnClass: 'btn-success', textClass: 'text-white' },
 };
 
 const AppAlert = ({
@@ -28,25 +28,28 @@ const AppAlert = ({
     onConfirm,
     onClose,
 }) => {
-    const { headerBg, icon, btnClass } = TYPE_MAP[type] ?? TYPE_MAP.info;
+    const { headerBg, icon, btnClass, textClass, headerStyle } = TYPE_MAP[type] ?? TYPE_MAP.info;
 
     return (
         <div
             className="modal show d-block"
-            style={{ background: 'rgba(0,0,0,0.45)' }}
+            style={{ background: 'rgba(0,0,0,0.45)', zIndex: 1100 }}
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
             <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: 440 }}>
                 <div className="modal-content border-0 shadow-lg overflow-hidden">
                     {/* Header */}
-                    <div className={`modal-header ${headerBg} text-white border-0 py-3`}>
+                    <div 
+                        className={`modal-header ${headerBg} ${textClass} border-0 py-3`}
+                        style={headerStyle}
+                    >
                         <h6 className="modal-title fw-bold d-flex align-items-center gap-2 mb-0">
                             <span>{icon}</span>
                             <span>{header}</span>
                         </h6>
                         <button
                             type="button"
-                            className="btn-close btn-close-white"
+                            className={`btn-close ${textClass === 'text-white' ? 'btn-close-white' : ''}`}
                             aria-label="Cerrar"
                             onClick={onClose}
                         />
@@ -61,7 +64,7 @@ const AppAlert = ({
                     <div className="modal-footer border-0 pt-0">
                         <button
                             type="button"
-                            className="btn btn-light fw-semibold"
+                            className="btn btn-outline-secondary fw-semibold"
                             onClick={onClose}
                         >
                             Cancelar
@@ -69,7 +72,8 @@ const AppAlert = ({
                         {onConfirm && (
                             <button
                                 type="button"
-                                className={`btn ${btnClass} fw-semibold text-white`}
+                                className={`btn ${btnClass} fw-semibold ${textClass}`}
+                                style={type === 'warning' ? headerStyle : {}}
                                 onClick={onConfirm}
                             >
                                 {confirmLabel}

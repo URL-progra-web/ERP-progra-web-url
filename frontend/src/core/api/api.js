@@ -19,10 +19,16 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        const isLoginRequest = error.config?.url?.includes('/users/login/');
+        const isAlreadyOnLogin = window.location.pathname === '/login';
+
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            window.location.href = '/login';
+            // Only redirect if NOT a login attempt and NOT already on the login page
+            if (!isLoginRequest && !isAlreadyOnLogin) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

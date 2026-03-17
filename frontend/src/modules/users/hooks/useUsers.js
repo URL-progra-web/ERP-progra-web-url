@@ -59,13 +59,12 @@ export function useUsers() {
     // Reset to page 1 when filters change
     useEffect(() => { setPage(1); }, [debouncedSearch, roleFilter, statusFilter]);
 
-    const toggleStatus = async (user) => {
-        if (!window.confirm(`¿Estás seguro de ${user.is_active ? 'bloquear' : 'desbloquear'} a ${user.name}?`)) return;
+    const toggleStatus = async (userId) => {
         try {
-            await userService.toggleActiveStatus(user.id);
+            await userService.toggleActiveStatus(userId);
             fetchUsers();
         } catch {
-            alert('Error al cambiar el estado del usuario');
+            setError('Error al cambiar el estado del usuario');
         }
     };
 

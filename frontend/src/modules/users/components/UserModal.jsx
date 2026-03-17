@@ -63,16 +63,14 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
     };
 
     return (
-        <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+        <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1050 }}>
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '12px' }}>
-                    <div className="modal-header bg-light border-0 pb-0" style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
-                        <h5 className="modal-title font-weight-bold text-dark">
+                    <div className="modal-header border-bottom-0 pb-0" style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+                        <h5 className="modal-title fw-bold">
                             {isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}
                         </h5>
-                        <button type="button" className="btn btn-sm btn-light text-secondary rounded-circle" onClick={onClose}>
-                            <FiX size={20} />
-                        </button>
+                        <button type="button" className="btn-close" onClick={onClose} aria-label="Close"></button>
                     </div>
                     
                     <div className="modal-body p-4 pt-3">
@@ -80,11 +78,11 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
                         
                         <form onSubmit={handleSubmit} id="userForm">
                             <div className="form-group mb-3">
-                                <label className="small font-weight-bold text-secondary text-uppercase mb-1">Nombre Completo</label>
+                                <label className="small fw-bold text-secondary text-uppercase mb-1">Nombre Completo</label>
                                 <input 
                                     type="text" 
                                     name="name"
-                                    className="form-control bg-light border-0 bg-light" 
+                                    className="form-control" 
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Ej. Juan Pérez"
@@ -92,11 +90,11 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
                             </div>
                             
                             <div className="form-group mb-3">
-                                <label className="small font-weight-bold text-secondary text-uppercase mb-1">Correo Electrónico</label>
+                                <label className="small fw-bold text-secondary text-uppercase mb-1">Correo Electrónico</label>
                                 <input 
                                     type="email" 
                                     name="email"
-                                    className="form-control bg-light border-0" 
+                                    className="form-control" 
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="usuario@erp.com"
@@ -104,10 +102,10 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
                             </div>
                             
                             <div className="form-group mb-3">
-                                <label className="small font-weight-bold text-secondary text-uppercase mb-1">Rol de Acceso</label>
+                                <label className="small fw-bold text-secondary text-uppercase mb-1">Rol de Acceso</label>
                                 <select 
                                     name="role_id"
-                                    className="form-control bg-light border-0 custom-select" 
+                                    className="form-select" 
                                     value={formData.role_id}
                                     onChange={handleChange}
                                 >
@@ -119,13 +117,13 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
                             </div>
                             
                             <div className="form-group mb-0">
-                                <label className="small font-weight-bold text-secondary text-uppercase mb-1">
-                                    Contraseña {isEditing && <span className="text-muted font-weight-normal text-lowercase">(dejar en blanco para mantener actual)</span>}
+                                <label className="small fw-bold text-secondary text-uppercase mb-1">
+                                    Contraseña {isEditing && <span className="text-muted fw-normal text-lowercase">(dejar en blanco para mantener actual)</span>}
                                 </label>
                                 <input 
                                     type="password" 
                                     name="password"
-                                    className="form-control bg-light border-0" 
+                                    className="form-control" 
                                     value={formData.password}
                                     onChange={handleChange}
                                     placeholder="••••••••"
@@ -134,11 +132,11 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
                         </form>
                     </div>
                     
-                    <div className="modal-footer border-0 pt-0 pb-4 px-4 bg-white" style={{ borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
-                        <button type="button" className="btn btn-light px-4 font-weight-bold shadow-sm" onClick={onClose} disabled={isSubmitting}>
+                    <div className="modal-footer border-0 pt-0 pb-4 px-4" style={{ borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
+                        <button type="button" className="btn btn-outline-secondary px-4 fw-bold shadow-sm" onClick={onClose} disabled={isSubmitting}>
                             Cancelar
                         </button>
-                        <button type="submit" form="userForm" className="btn btn-primary px-4 font-weight-bold shadow-sm" disabled={isSubmitting}>
+                        <button type="submit" form="userForm" className="btn btn-primary px-4 fw-bold shadow-sm" disabled={isSubmitting}>
                             {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
                         </button>
                     </div>

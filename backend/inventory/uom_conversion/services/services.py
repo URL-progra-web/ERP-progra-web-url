@@ -17,8 +17,8 @@ class UomConversionService:
         return self.repository.get_by_id(conversion_id)
 
     def create_conversion(self, from_uom_id: int, to_uom_id: int, multiplier) -> UoMConversion:
-        if int(from_uom_id) == int(to_uom_id):
-            raise ValueError("La UOM origen y destino no pueden ser la misma.")
+        if int(from_uom_id) == int(to_uom_id) and float(multiplier) != 1.0:
+            raise ValueError("Si la UOM origen y destino son la misma, el multiplicador debe ser 1.")
         if self.repository.pair_exists(from_uom_id, to_uom_id):
             raise ValueError("Ya existe una conversión para este par de UOMs.")
         return self.repository.create(
@@ -31,10 +31,14 @@ class UomConversionService:
         conversion = self.repository.get_by_id(conversion_id)
         if not conversion:
             raise ValueError(f"Conversión con id {conversion_id} no encontrada.")
+        
         from_id = int(kwargs.get('from_uom_id', conversion.from_uom_id))
         to_id = int(kwargs.get('to_uom_id', conversion.to_uom_id))
-        if from_id == to_id:
-            raise ValueError("La UOM origen y destino no pueden ser la misma.")
+        multiplier = kwargs.get('multiplier', conversion.multiplier)
+
+        if from_id == to_id and float(multiplier) != 1.0:
+            raise ValueError("Si la UOM origen y destino son la misma, el multiplicador debe ser 1.")
+            
         if self.repository.pair_exists(from_id, to_id, exclude_id=int(conversion_id)):
             raise ValueError("Ya existe una conversión para este par de UOMs.")
         return self.repository.update(conversion, **kwargs)
