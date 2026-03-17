@@ -5,9 +5,9 @@ from users.user.repositories.repositories import UserRepository
 from users.role.services.services import RoleService
 
 class UserService:
-    def __init__(self):
-        self.repository = UserRepository()
-        self.role_service = RoleService()
+    def __init__(self, repository: UserRepository = None, role_service: RoleService = None):
+        self.repository = repository or UserRepository()
+        self.role_service = role_service or RoleService()
 
     def get_user(self, user_id: int) -> Optional[User]:
         return self.repository.get_by_id(user_id)

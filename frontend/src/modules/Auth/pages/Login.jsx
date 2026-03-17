@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../core/auth/AuthContext';
-import { useTheme } from '../../../core/theme/ThemeContext';
-import { getDashboardPath } from '../../../core/registry/dashboardPaths';
+import { useAuth } from '~/core/auth/AuthContext';
+import { useTheme } from '~/core/theme/ThemeContext';
+import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import { FiMail, FiLock, FiTerminal, FiSun, FiMoon } from 'react-icons/fi';
 import { FaApple, FaGoogle, FaXTwitter } from 'react-icons/fa6';
 

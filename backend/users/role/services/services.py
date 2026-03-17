@@ -3,8 +3,8 @@ from users.role.models.models import Role
 from users.role.repositories.repositories import RoleRepository
 
 class RoleService:
-    def __init__(self):
-        self.repository = RoleRepository()
+    def __init__(self, repository: RoleRepository = None):
+        self.repository = repository or RoleRepository()
 
     def get_role(self, role_id: int) -> Optional[Role]:
         return self.repository.get_by_id(role_id)

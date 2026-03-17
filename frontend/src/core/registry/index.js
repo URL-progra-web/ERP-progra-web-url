@@ -1,4 +1,5 @@
 import { usersFeature } from '../../modules/users/users.config';
+import { productsFeature } from '../../modules/products/products.config';
 
 /**
  * Los 28 programadores solo tocarán este archivo una vez:
@@ -7,6 +8,7 @@ import { usersFeature } from '../../modules/users/users.config';
  */
 export const REGISTERED_FEATURES = [
     usersFeature,
+    productsFeature,
     // Inventario: inventoryFeature,
     // Ventas: salesFeature,
 ];

@@ -1,3 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 
-urlpatterns = []  # Inventory routes will be added here
+urlpatterns = [
+    path('uoms/', include('inventory.uom.urls')),
+    path('uom-conversions/', include('inventory.uom_conversion.urls')),
+]
