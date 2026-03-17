@@ -1,0 +1,31 @@
+/* DashboardLayout.css */
+.sidebar-container {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* On Desktop: Always show sidebar */
+@media (min-width: 768px) {
+    .sidebar-container {
+        position: static;
+        transform: translateX(0) !important;
+    }
+}
+
+/* On Mobile: Hide sidebar by default, overlay it when .show is applied */
+@media (max-width: 767.98px) {
+    .sidebar-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+    }
+
+    .sidebar-container.show {
+        transform: translateX(0);
+    }
+
+    .main-content-area {
+        width: 100% !important;
+    }
+}
