@@ -1,0 +1,124 @@
+import React from 'react';
+import { FiEdit2, FiTrash2, FiRefreshCw, FiArrowRight } from 'react-icons/fi';
+
+/**
+ * Tab completa de Conversiones: filtros + tabla.
+ */
+export function ConversionsTab({
+    conversions, isLoading,
+    uoms,
+    fromUomFilter, setFromUomFilter,
+    toUomFilter, setToUomFilter,
+    onEdit, onDelete,
+}) {
+    const hasFilter = fromUomFilter || toUomFilter;
+
+    return (
+        <div>
+            {/* Filters */}
+            <div className="px-4 py-3 border-bottom d-flex gap-3 flex-wrap align-items-end">
+                <div style={{ minWidth: 200 }}>
+                    <label className="form-label small fw-semibold mb-1">UOM Origen</label>
+                    <select
+                        className="form-select form-select-sm"
+                        value={fromUomFilter}
+                        onChange={e => setFromUomFilter(e.target.value)}
+                    >
+                        <option value="">Todas</option>
+                        {uoms.map(u => (
+                            <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
+                        ))}
+                    </select>
+                </div>
+                <div style={{ minWidth: 200 }}>
+                    <label className="form-label small fw-semibold mb-1">UOM Destino</label>
+                    <select
+                        className="form-select form-select-sm"
+                        value={toUomFilter}
+                        onChange={e => setToUomFilter(e.target.value)}
+                    >
+                        <option value="">Todas</option>
+                        {uoms.map(u => (
+                            <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
+                        ))}
+                    </select>
+                </div>
+                {hasFilter && (
+                    <button
+                        className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                        onClick={() => { setFromUomFilter(''); setToUomFilter(''); }}
+                    >
+                        <FiRefreshCw size={13} /> Limpiar filtros
+                    </button>
+                )}
+            </div>
+
+            {/* Table */}
+            <div className="table-responsive">
+                <table className="table table-hover mb-0 align-middle">
+                    <thead className="bg-body-tertiary text-muted small text-uppercase">
+                        <tr>
+                            <th className="border-0 px-4 py-3">Desde</th>
+                            <th className="border-0 py-3 text-center" style={{ width: 40 }}></th>
+                            <th className="border-0 py-3">Hasta</th>
+                            <th className="border-0 py-3">Multiplicador</th>
+                            <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={5} className="text-center py-5 text-muted">
+                                    <div className="spinner-border spinner-border-sm me-2" /> Cargando...
+                                </td>
+                            </tr>
+                        ) : conversions.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="text-center py-5 text-muted">
+                                    No hay conversiones{hasFilter ? ' para los filtros seleccionados' : ''}. Crea la primera.
+                                </td>
+                            </tr>
+                        ) : (
+                            conversions.map(conv => (
+                                <tr key={conv.id}>
+                                    <td className="px-4">
+                                        <span className="fw-semibold">{conv.from_uom_name}</span>
+                                        <span className="text-muted ms-1 small">({conv.from_uom_code})</span>
+                                    </td>
+                                    <td className="text-center text-muted">
+                                        <FiArrowRight />
+                                    </td>
+                                    <td>
+                                        <span className="fw-semibold">{conv.to_uom_name}</span>
+                                        <span className="text-muted ms-1 small">({conv.to_uom_code})</span>
+                                    </td>
+                                    <td>
+                                        <code className="bg-body-secondary px-2 py-1 rounded small">
+                                            × {conv.multiplier}
+                                        </code>
+                                    </td>
+                                    <td className="px-4 text-end">
+                                        <button
+                                            className="btn btn-sm btn-outline-secondary me-2"
+                                            title="Editar"
+                                            onClick={() => onEdit(conv)}
+                                        >
+                                            <FiEdit2 />
+                                        </button>
+                                        <button
+                                            className="btn btn-sm btn-outline-danger"
+                                            title="Eliminar"
+                                            onClick={() => onDelete(conv)}
+                                        >
+                                            <FiTrash2 />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}

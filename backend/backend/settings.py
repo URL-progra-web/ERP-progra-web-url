@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     # Local
+    'core',
     'users',
     'crm',
     'products',
@@ -61,6 +62,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+
+GLOBAL_SEEDERS = [
+    'users.seeds.UserSeeder',
+    'inventory.uom.seeds.UomSeeder',
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

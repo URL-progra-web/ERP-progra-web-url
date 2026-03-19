@@ -1,4 +1,4 @@
-import api from '../../../core/api/api';
+import api from '~/core/api/api';
 
 export const userService = {
     getUsers: async ({ search, role_id, is_active, page = 1, page_size = 20 } = {}) => {

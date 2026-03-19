@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from users.role.models.models import Role
 from users.role.serializers.serializers import RoleSerializer
-from users.role.services.services import RoleService
+from users.container import user_container
 from users.permissions import HasRole
 from rest_framework.permissions import IsAuthenticated
 
@@ -12,7 +12,7 @@ class RoleViewSet(viewsets.ViewSet):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.service = RoleService()
+        self.service = user_container.role_service
 
     def list(self, request):
         roles = self.service.list_roles()

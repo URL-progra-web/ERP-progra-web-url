@@ -5,6 +5,7 @@ import UsersFilters from '../components/UsersFilters';
 import UsersTable from '../components/UsersTable';
 import UsersPagination from '../components/UsersPagination';
 import UserModal from '../components/UserModal';
+import AppAlert from '~/core/components/AppAlert';
 
 const UsersList = () => {
     const {
@@ -18,6 +19,7 @@ const UsersList = () => {
 
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [alertConfig, setAlertConfig] = useState(null);
 
     const handleOpenModal = (user = null) => { setSelectedUser(user); setIsModalOpen(true); };
     const handleCloseModal = () => { setSelectedUser(null); setIsModalOpen(false); };
@@ -25,6 +27,20 @@ const UsersList = () => {
     const handleSave = async (userData) => {
         await saveUser(userData, selectedUser?.id);
         handleCloseModal();
+    };
+
+    const handleConfirmToggle = (user) => {
+        const action = user.is_active ? 'bloquear' : 'activar';
+        setAlertConfig({
+            type: user.is_active ? 'warning' : 'info',
+            header: `¿Confirmas ${action} al usuario?`,
+            content: `El usuario "${user.name}" ${user.is_active ? 'perderá acceso' : 'recuperará acceso'} al sistema de inmediato.`,
+            confirmLabel: `Sí, ${action}`,
+            onConfirm: async () => {
+                await toggleStatus(user.id);
+                setAlertConfig(null);
+            }
+        });
     };
 
     return (
@@ -73,7 +89,7 @@ const UsersList = () => {
                             users={users}
                             isLoading={isLoading}
                             onEdit={handleOpenModal}
-                            onToggleStatus={toggleStatus}
+                            onToggleStatus={handleConfirmToggle}
                         />
                     </table>
                 </div>
@@ -94,6 +110,17 @@ const UsersList = () => {
                     roles={roles}
                     onClose={handleCloseModal}
                     onSave={handleSave}
+                />
+            )}
+            {/* Confirmation Alert */}
+            {alertConfig && (
+                <AppAlert
+                    type={alertConfig.type}
+                    header={alertConfig.header}
+                    content={alertConfig.content}
+                    confirmLabel={alertConfig.confirmLabel}
+                    onConfirm={alertConfig.onConfirm}
+                    onClose={() => setAlertConfig(null)}
                 />
             )}
         </div>

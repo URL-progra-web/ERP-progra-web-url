@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.user.serializers.serializers import UserSerializer, UserCreateSerializer
-from users.user.services.services import UserService
+from users.container import user_container
 from users.permissions import HasRole
 
 class UserViewSet(viewsets.ViewSet):
@@ -15,7 +15,7 @@ class UserViewSet(viewsets.ViewSet):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.service = UserService()
+        self.service = user_container.user_service
 
     def get_permissions(self):
         """Override permissions per action."""

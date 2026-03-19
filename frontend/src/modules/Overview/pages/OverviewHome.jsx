@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../../../core/auth/AuthContext';
+import { useAuth } from '~/core/auth/AuthContext';
 
 const OverviewHome = () => {
     const { user } = useAuth();

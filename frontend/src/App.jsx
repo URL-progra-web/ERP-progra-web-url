@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './core/auth/AuthContext';
-import { ThemeProvider } from './core/theme/ThemeContext';
-import ProtectedRoute from './core/auth/ProtectedRoute';
-import DashboardLayout from './core/layouts/DashboardLayout';
-import Login from './modules/Auth/pages/Login';
-import DynamicRoutes from './core/registry/DynamicRoutes';
-import ForbiddenPage from './modules/misc/pages/ForbiddenPage';
-import NotFoundPage from './modules/misc/pages/NotFoundPage';
+import { AuthProvider } from '~/core/auth/AuthContext';
+import { ThemeProvider } from '~/core/theme/ThemeContext';
+import ProtectedRoute from '~/core/auth/ProtectedRoute';
+import DashboardLayout from '~/core/layouts/DashboardLayout';
+import Login from '~/modules/Auth/pages/Login';
+import DynamicRoutes from '~/core/registry/DynamicRoutes';
+import ForbiddenPage from '~/modules/misc/pages/ForbiddenPage';
+import NotFoundPage from '~/modules/misc/pages/NotFoundPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Added for dropdowns/modals
 
