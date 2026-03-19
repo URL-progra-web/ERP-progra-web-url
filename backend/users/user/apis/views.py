@@ -64,7 +64,7 @@ class UserViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         user = self.service.get_user(pk)
         if not user:
-            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
@@ -80,11 +80,11 @@ class UserViewSet(viewsets.ViewSet):
         password = request.data.get('password')
 
         if not email or not password:
-            return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Debes proporcionar correo y contraseña'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = self.service.verify_password(email, password)
         if not user:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
 
         # Generate JWT
         refresh = RefreshToken.for_user(user) # Note: simplejwt normally expects Django Auth User model

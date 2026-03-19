@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiUsers } from 'react-icons/fi';
 import { useUsers } from '../hooks/useUsers';
 import UsersFilters from '../components/UsersFilters';
 import UsersTable from '../components/UsersTable';
-import UsersPagination from '../components/UsersPagination';
 import UserModal from '../components/UserModal';
 import AppAlert from '~/core/components/AppAlert';
+import PageHeader from '~/core/components/PageHeader';
+import AppPagination from '~/core/components/AppPagination';
 
 const UsersList = () => {
     const {
@@ -45,38 +46,40 @@ const UsersList = () => {
 
     return (
         <div className="container-fluid p-0">
-            {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 className="fw-bold mb-0">Gestión de Usuarios</h2>
-                    <small className="text-muted">{count} usuario(s) encontrado(s)</small>
-                </div>
-                <button
-                    className="btn btn-primary d-flex align-items-center fw-bold shadow-sm"
-                    onClick={() => handleOpenModal()}
-                >
-                    <FiPlus className="me-2" /> Nuevo Usuario
-                </button>
-            </div>
+            <PageHeader
+                title="Gestión de Usuarios"
+                subtitle={`${count} usuario(s) encontrado(s)`}
+                icon={FiUsers}
+                actionLabel="Nuevo Usuario"
+                actionIcon={FiPlus}
+                onAction={() => handleOpenModal()}
+                isDark
+            />
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card border-0 shadow-sm overflow-hidden bg-body border">
-                {/* Filters */}
-                <UsersFilters
-                    searchInput={searchInput}
-                    onSearchChange={setSearchInput}
-                    roleFilter={roleFilter}
-                    onRoleChange={setRoleFilter}
-                    statusFilter={statusFilter}
-                    onStatusChange={setStatusFilter}
-                    roles={roles}
-                />
+            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
+                <div className="bg-dark text-white px-4 py-3 border-bottom">
+                    <h6 className="mb-0 text-uppercase">Filtros</h6>
+                </div>
+                <div className="p-3 p-md-4 border-bottom">
+                    <UsersFilters
+                        searchInput={searchInput}
+                        onSearchChange={setSearchInput}
+                        roleFilter={roleFilter}
+                        onRoleChange={setRoleFilter}
+                        statusFilter={statusFilter}
+                        onStatusChange={setStatusFilter}
+                        roles={roles}
+                    />
+                </div>
 
-                {/* Table */}
-                <div className="table-responsive">
+                <div className="bg-dark text-white px-4 py-3 border-bottom">
+                    <h6 className="mb-0 text-uppercase">Listado</h6>
+                </div>
+                <div className="table-responsive bg-body">
                     <table className="table table-hover mb-0 align-middle">
-                        <thead className="bg-body-tertiary text-muted small text-uppercase">
+                        <thead className="text-uppercase text-muted small">
                             <tr>
                                 <th className="border-0 px-4 py-3">Nombre</th>
                                 <th className="border-0 py-3">Email</th>
@@ -94,12 +97,12 @@ const UsersList = () => {
                     </table>
                 </div>
 
-                {/* Pagination */}
-                <UsersPagination
+                <AppPagination
                     page={page}
                     numPages={numPages}
                     count={count}
                     onPageChange={setPage}
+                    isDark
                 />
             </div>
 

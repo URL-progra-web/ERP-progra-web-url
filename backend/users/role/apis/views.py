@@ -22,7 +22,7 @@ class RoleViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         role = self.service.get_role(pk)
         if not role:
-            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Rol no encontrado'}, status=status.HTTP_404_NOT_FOUND)
         serializer = RoleSerializer(role)
         return Response(serializer.data)
 

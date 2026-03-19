@@ -20,9 +20,9 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
             return None
 
         if len(parts) == 1:
-            raise exceptions.AuthenticationFailed('Invalid token header. No credentials provided.')
+            raise exceptions.AuthenticationFailed('Encabezado de token inválido. No se enviaron credenciales.')
         elif len(parts) > 2:
-            raise exceptions.AuthenticationFailed('Invalid token header. Token string should not contain spaces.')
+            raise exceptions.AuthenticationFailed('Encabezado de token inválido. El token no debe contener espacios.')
 
         token = parts[1]
 
@@ -30,16 +30,16 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
             # Validate token using SimpleJWT UntypedToken
             validated_token = UntypedToken(token)
         except (InvalidToken, TokenError) as e:
-            raise exceptions.AuthenticationFailed(f"Token is invalid or expired: {e}")
+            raise exceptions.AuthenticationFailed(f"El token es inválido o expiró: {e}")
 
         # The payload contains 'user_id' by default
         user_id = validated_token.payload.get('user_id')
         if not user_id:
-            raise exceptions.AuthenticationFailed('Token contained no recognizable user identification')
+            raise exceptions.AuthenticationFailed('El token no contiene un identificador de usuario válido')
 
         user = self.user_service.get_user(user_id)
 
         if not user:
-            raise exceptions.AuthenticationFailed('User not found')
+            raise exceptions.AuthenticationFailed('Usuario no encontrado')
 
         return (user, validated_token)

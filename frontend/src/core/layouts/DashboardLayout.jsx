@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
@@ -6,6 +6,20 @@ import './DashboardLayout.css';
 
 const DashboardLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setIsSidebarCollapsed(false);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -13,6 +27,10 @@ const DashboardLayout = () => {
 
     const closeSidebarView = () => {
         if (isSidebarOpen) setIsSidebarOpen(false);
+    };
+
+    const toggleSidebarSize = () => {
+        setIsSidebarCollapsed((prev) => !prev);
     };
 
     return (
@@ -29,18 +47,26 @@ const DashboardLayout = () => {
 
             {/* Sidebar Container */}
             <div 
-                className={`sidebar-container ${isSidebarOpen ? 'show' : ''}`}
-                style={{ width: '260px', flexShrink: 0, zIndex: 1050 }}
+                className={`sidebar-container ${isSidebarOpen ? 'show' : ''} ${isSidebarCollapsed ? 'collapsed' : ''}`}
+                style={{ width: isSidebarCollapsed ? '88px' : '260px', flexShrink: 0, zIndex: 1050 }}
             >
-                <Sidebar onItemClick={closeSidebarView} />
+                <Sidebar 
+                    onItemClick={closeSidebarView} 
+                    isCollapsed={isSidebarCollapsed}
+                    onToggleCollapse={toggleSidebarSize}
+                />
             </div>
 
             {/* Main Content Area */}
             <div className="flex-grow-1 d-flex flex-column main-content-area" style={{ flexShrink: 1, minWidth: 0 }}>
-                <Topbar onMenuClick={toggleSidebar} />
+                <Topbar 
+                    onMenuClick={toggleSidebar} 
+                    onSidebarSizeToggle={toggleSidebarSize}
+                    isSidebarCollapsed={isSidebarCollapsed}
+                />
                 
                 {/* Fixed scrolling area for the outlet */}
-                <main className="flex-grow-1 overflow-auto p-3 p-md-4 bg-body-tertiary w-100" style={{ height: 'calc(100vh - 70px)' }}>
+                <main className="flex-grow-1 overflow-auto p-3 p-md-4 bg-body-tertiary w-100" style={{ height: 'calc(100vh - var(--topbar-height))' }}>
                     <Outlet />
                     
                     {/* Minimal Footer */}

@@ -1,6 +1,32 @@
 /* DashboardLayout.css */
+:root {
+    --topbar-height: 70px;
+}
+
 .sidebar-container {
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.sidebar {
+    transition: padding 0.3s ease-in-out;
+}
+
+.sidebar--collapsed .sidebar-brand {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    justify-content: center;
+}
+
+.sidebar--collapsed .sidebar-profile {
+    justify-content: center;
+}
+
+.sidebar--collapsed .sidebar-profile .rounded-circle {
+    margin-right: 0 !important;
+}
+
+.sidebar-container.collapsed .sidebar {
+    padding-top: 0.75rem;
 }
 
 /* On Desktop: Always show sidebar */
@@ -19,10 +45,15 @@
         left: 0;
         height: 100vh;
         transform: translateX(-100%);
+        width: min(85vw, 320px) !important;
     }
 
     .sidebar-container.show {
         transform: translateX(0);
+    }
+
+    .sidebar-container.collapsed {
+        width: min(85vw, 320px) !important;
     }
 
     .main-content-area {

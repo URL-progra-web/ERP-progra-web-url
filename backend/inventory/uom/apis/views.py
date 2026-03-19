@@ -2,12 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from core.mixins import PaginationMixin
 from inventory.container import inventory_container
 from inventory.uom.serializers.serializers import UomSerializer
 from users.permissions import HasRole
 
 
-class UomViewSet(viewsets.ViewSet):
+class UomViewSet(viewsets.ViewSet, PaginationMixin):
     permission_classes = [IsAuthenticated, HasRole]
     allowed_roles = ['ADMIN']
 
@@ -17,8 +18,7 @@ class UomViewSet(viewsets.ViewSet):
 
     def list(self, request):
         uoms = self.service.list_uoms()
-        serializer = UomSerializer(uoms, many=True)
-        return Response(serializer.data)
+        return self.paginate_queryset(uoms, UomSerializer, request)
 
     def retrieve(self, request, pk=None):
         uom = self.service.get_uom(pk)

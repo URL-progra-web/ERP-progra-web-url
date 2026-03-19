@@ -116,9 +116,9 @@ ERP-progra-web-url/
 |---------|--------|-----------|
 | `/api/users/` | Usuarios y autenticacion | `login/`, `users/`, `roles/` |
 | `/api/products/` | Productos | (en desarrollo) |
-| `/api/orders/` | Pedidos | (en desarrollo) |
+| `/api/orders/` | Pedidos | `payment-methods/`, `statuses/`, `statuses/transition/` |
 | `/api/inventory/` | Inventario | (en desarrollo) |
-| `/api/crm/` | CRM | (en desarrollo) |
+| `/api/crm/` | CRM | `customers/` |
 
 ### Endpoints de Usuarios
 
@@ -129,6 +129,28 @@ ERP-progra-web-url/
 - `PUT /api/users/users/{id}/` - Actualizar usuario
 - `PATCH /api/users/users/{id}/toggle_active/` - Activar/desactivar
 - `GET /api/users/roles/` - Listar roles
+
+### Endpoints de Pedidos
+
+- `GET /api/orders/payment-methods/` - Listar metodos de pago (`search`, `is_active`)
+- `POST /api/orders/payment-methods/` - Crear metodo de pago
+- `PUT /api/orders/payment-methods/{id}/` - Actualizar metodo de pago
+- `POST /api/orders/payment-methods/{id}/activate|deactivate/` - Cambiar estado activo
+- `DELETE /api/orders/payment-methods/{id}/` - Eliminar si no hay pedidos asociados
+- `GET /api/orders/statuses/` - Listar estatus configurados
+- `POST /api/orders/statuses/` - Crear estatus
+- `PUT /api/orders/statuses/{id}/` - Actualizar estatus
+- `DELETE /api/orders/statuses/{id}/` - Eliminar estatus no usados
+- `GET /api/orders/statuses/transitions/` - Ver flujo permitido
+- `POST /api/orders/statuses/transition/` - Avanzar pedido (`order_id`, `target_status`, `notes`)
+
+### Endpoints de CRM
+
+- `GET /api/crm/customers/` - Listar clientes invitados (`search`, `created_from`, `created_to`)
+- `POST /api/crm/customers/` - Crear cliente
+- `GET /api/crm/customers/{id}/` - Detalle
+- `PUT /api/crm/customers/{id}/` - Actualizar datos
+- `DELETE /api/crm/customers/{id}/` - Eliminar cliente
 
 ---
 

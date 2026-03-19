@@ -54,8 +54,8 @@ export function ConversionsTab({
             </div>
 
             {/* Table */}
-            <div className="table-responsive">
-                <table className="table table-hover mb-0 align-middle">
+            <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table className="table table-hover mb-0 align-middle" style={{ minWidth: '600px' }}>
                     <thead className="bg-body-tertiary text-muted small text-uppercase">
                         <tr>
                             <th className="border-0 px-4 py-3">Desde</th>
