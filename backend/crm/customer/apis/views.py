@@ -23,7 +23,7 @@ class CustomerViewSet(viewsets.ViewSet, PaginationMixin):
     def list(self, request):
         search = request.query_params.get('search') or None
         created_from = self._parse_datetime(request.query_params.get('created_from'))
-        created_to = self._parse_datetime(request.query_params.get('created_to'))
+        created_to = self._parse_datetime(request.query_params.get('created_to'), end_of_day=True)
 
         qs = self.service.list_customers(search=search, created_from=created_from, created_to=created_to)
         return self.paginate_queryset(qs, CustomerSerializer, request)
@@ -72,7 +72,7 @@ class CustomerViewSet(viewsets.ViewSet, PaginationMixin):
             raise CustomerNotFound('Identificador de cliente inválido')
 
     @staticmethod
-    def _parse_datetime(value: str):
+    def _parse_datetime(value: str, end_of_day: bool = False):
         if not value:
             return None
         parsed = parse_datetime(value)
@@ -80,5 +80,6 @@ class CustomerViewSet(viewsets.ViewSet, PaginationMixin):
             return parsed
         parsed_date = parse_date(value)
         if parsed_date:
-            return datetime.combine(parsed_date, datetime.min.time())
+            time_of_day = datetime.max.time() if end_of_day else datetime.min.time()
+            return datetime.combine(parsed_date, time_of_day)
         return None
