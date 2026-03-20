@@ -43,11 +43,15 @@ const Sidebar = ({ onItemClick, isCollapsed = false }) => {
                                             onClick={onItemClick}
                                             title={isCollapsed ? item.text : undefined}
                                         >
-                                            <Icon 
-                                                className={`${isCollapsed ? '' : 'me-3'} ${item.isActive ? 'text-primary' : 'text-secondary'}`} 
-                                                size={20} 
-                                            />
-                                            {!isCollapsed && <span style={{ fontSize: '14px' }}>{item.text}</span>}
+                                            {({ isActive }) => (
+                                                <>
+                                                    <Icon 
+                                                        className={`${isCollapsed ? '' : 'me-3'} ${isActive ? 'text-primary' : 'text-secondary'}`} 
+                                                        size={20} 
+                                                    />
+                                                    {!isCollapsed && <span style={{ fontSize: '14px' }}>{item.text}</span>}
+                                                </>
+                                            )}
                                         </NavLink>
                                     </li>
                                 );
