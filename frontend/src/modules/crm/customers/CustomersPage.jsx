@@ -78,6 +78,7 @@ const CustomersPage = () => {
                 actionLabel="Nuevo cliente"
                 actionIcon={FiPlus}
                 onAction={() => handleOpenModal()}
+                isDark
             />
 
             <div className="card border-0 shadow-lg mb-4 overflow-hidden">

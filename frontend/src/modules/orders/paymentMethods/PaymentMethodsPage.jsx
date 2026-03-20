@@ -61,6 +61,7 @@ const PaymentMethodsPage = () => {
                         Los métodos disponibles están predefinidos. Solo puedes activar o desactivar su uso.
                     </div>
                 )}
+                isDark
             />
 
             <div className="rounded-4 border shadow-sm overflow-hidden bg-body">

@@ -45,6 +45,7 @@ const UomsPage = () => {
                 actionLabel={activeTab === 'uoms' ? 'Nueva UOM' : 'Nueva Conversión'}
                 actionIcon={FiPlus}
                 onAction={() => (activeTab === 'uoms' ? setUomModal('new') : setConvModal('new'))}
+                isDark
             />
 
             {/* Global error */}
