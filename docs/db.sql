@@ -135,7 +135,7 @@ CREATE TABLE customers (
 -- 9. Pedidos / Carrito Virtual / Envíos
 CREATE TABLE order_statuses (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL, -- Ej: 'REQUESTED', 'CONFIRMED', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED'
+    name VARCHAR(50) UNIQUE NOT NULL, -- Ej: 'SOLICITADO', 'CONFIRMADO', 'PAGADO', 'ENVIADO', 'ENTREGADO', 'CANCELADO'
     description TEXT
 );
 

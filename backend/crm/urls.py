@@ -1,3 +1,5 @@
-from django.urls import path
+from django.urls import include, path
 
-urlpatterns = []  # CRM routes will be added here
+urlpatterns = [
+    path('customers/', include('crm.customer.urls')),
+]

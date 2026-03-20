@@ -2,8 +2,9 @@ import api from '~/core/api/api';
 
 export const uomService = {
     // UOMs
-    getUoms: async () => {
-        const response = await api.get('/inventory/uoms/');
+    getUoms: async ({ page, page_size } = {}) => {
+        const params = { page, page_size };
+        const response = await api.get('/inventory/uoms/', { params });
         return response.data;
     },
 
@@ -22,8 +23,8 @@ export const uomService = {
     },
 
     // UOM Conversions
-    getConversions: async ({ from_uom_id, to_uom_id } = {}) => {
-        const params = {};
+    getConversions: async ({ from_uom_id, to_uom_id, page, page_size } = {}) => {
+        const params = { page, page_size };
         if (from_uom_id) params.from_uom_id = from_uom_id;
         if (to_uom_id) params.to_uom_id = to_uom_id;
         const response = await api.get('/inventory/uom-conversions/', { params });

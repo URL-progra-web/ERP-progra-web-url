@@ -18,11 +18,11 @@ class RoleService:
     def create_role(self, name: str, description: str = "") -> Role:
         existing_role = self.repository.get_by_name(name)
         if existing_role:
-            raise ValueError(f"Role '{name}' already exists.")
+            raise ValueError(f"El rol '{name}' ya existe.")
         return self.repository.create(name=name, description=description)
 
     def update_role(self, role_id: int, **kwargs) -> Role:
         role = self.get_role(role_id)
         if not role:
-            raise ValueError(f"Role with id {role_id} not found.")
+            raise ValueError(f"No se encontró el rol con id {role_id}.")
         return self.repository.update(role, **kwargs)

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiBox } from 'react-icons/fi';
 import { useUoms } from './hooks/useUoms';
 import { useUomPageState } from './hooks/useUomPageState';
 import { UomModal } from './components/UomModal';
@@ -7,11 +7,15 @@ import { ConversionModal } from './components/ConversionModal';
 import { UomsTable } from './components/UomsTable';
 import { ConversionsTab } from './components/ConversionsTab';
 import AppAlert from '~/core/components/AppAlert';
+import PageHeader from '~/core/components/PageHeader';
+import AppPagination from '~/core/components/AppPagination';
 
 const UomsPage = () => {
     const {
-        uoms, isLoadingUoms, createUom, updateUom, deleteUom,
-        conversions, isLoadingConversions,
+        uoms, uomCount, uomNumPages, uomPage, setUomPage,
+        isLoadingUoms, createUom, updateUom, deleteUom,
+        conversions, convCount, convNumPages, convPage, setConvPage,
+        isLoadingConversions,
         fromUomFilter, setFromUomFilter,
         toUomFilter, setToUomFilter,
         createConversion, updateConversion, deleteConversion,
@@ -34,19 +38,15 @@ const UomsPage = () => {
     return (
         <div className="container-fluid p-0">
             {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 className="fw-bold mb-0">Unidades de Medida</h2>
-                    <small className="text-muted">Administra UOMs y sus conversiones</small>
-                </div>
-                <button
-                    className="btn btn-primary d-flex align-items-center fw-bold shadow-sm"
-                    onClick={() => activeTab === 'uoms' ? setUomModal('new') : setConvModal('new')}
-                >
-                    <FiPlus className="me-2" />
-                    {activeTab === 'uoms' ? 'Nueva UOM' : 'Nueva Conversión'}
-                </button>
-            </div>
+            <PageHeader
+                title="Unidades de Medida"
+                subtitle="Administra UOMs y sus conversiones"
+                icon={FiBox}
+                actionLabel={activeTab === 'uoms' ? 'Nueva UOM' : 'Nueva Conversión'}
+                actionIcon={FiPlus}
+                onAction={() => (activeTab === 'uoms' ? setUomModal('new') : setConvModal('new'))}
+                isDark
+            />
 
             {/* Global error */}
             {error && (
@@ -58,55 +58,63 @@ const UomsPage = () => {
                 />
             )}
 
-            <div className="card border-0 shadow-sm bg-body">
+            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
                 {/* Tabs */}
-                <div className="card-header bg-body border-bottom-0 pb-0">
-                    <ul className="nav nav-tabs card-header-tabs">
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link fw-semibold ${activeTab === 'uoms' ? 'active' : ''}`}
-                                onClick={() => setActiveTab('uoms')}
-                            >
-                                Unidades de Medida
-                                <span className="badge bg-secondary ms-2">{uoms.length}</span>
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link fw-semibold ${activeTab === 'conversions' ? 'active' : ''}`}
-                                onClick={() => setActiveTab('conversions')}
-                            >
-                                Conversiones
-                                <span className="badge bg-secondary ms-2">{conversions.length}</span>
-                            </button>
-                        </li>
-                    </ul>
+                <div className="bg-dark text-white px-4 py-3 d-flex flex-wrap gap-3 align-items-center">
+                    <div className="d-flex gap-2 flex-wrap">
+                        <button
+                            className={`btn btn-sm px-4 py-2 rounded-3 border-0 ${activeTab === 'uoms' ? 'bg-white text-dark fw-semibold shadow-sm' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
+                            style={activeTab === 'uoms' ? { color: '#1f1f1f' } : {}}
+                            onClick={() => setActiveTab('uoms')}
+                        >
+                            Unidades de Medida
+                            <span className="badge bg-dark-subtle text-dark ms-2">{uoms.length}</span>
+                        </button>
+                        <button
+                            className={`btn btn-sm px-4 py-2 rounded-3 ${activeTab === 'conversions' ? 'bg-white text-dark fw-semibold shadow-sm border-0' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
+                            style={activeTab === 'conversions' ? { color: '#1f1f1f' } : {}}
+                            onClick={() => setActiveTab('conversions')}
+                        >
+                            Conversiones
+                            <span className="badge bg-dark-subtle text-dark ms-2">{conversions.length}</span>
+                        </button>
+                    </div>
                 </div>
 
-                {/* Tab: UOMs */}
-                {activeTab === 'uoms' && (
-                    <UomsTable
-                        uoms={uoms}
-                        isLoading={isLoadingUoms}
-                        onEdit={setUomModal}
-                        onDelete={handleDeleteUom}
-                    />
-                )}
+                <div className="bg-body p-3 p-md-4">
+                    {/* Tab: UOMs */}
+                    {activeTab === 'uoms' && (
+                        <UomsTable
+                            uoms={uoms}
+                            isLoading={isLoadingUoms}
+                            onEdit={setUomModal}
+                            onDelete={handleDeleteUom}
+                        />
+                    )}
 
-                {/* Tab: Conversions */}
-                {activeTab === 'conversions' && (
-                    <ConversionsTab
-                        conversions={conversions}
-                        isLoading={isLoadingConversions}
-                        uoms={uoms}
-                        fromUomFilter={fromUomFilter}
-                        setFromUomFilter={setFromUomFilter}
-                        toUomFilter={toUomFilter}
-                        setToUomFilter={setToUomFilter}
-                        onEdit={setConvModal}
-                        onDelete={handleDeleteConversion}
-                    />
-                )}
+                    {/* Tab: Conversions */}
+                    {activeTab === 'conversions' && (
+                        <ConversionsTab
+                            conversions={conversions}
+                            isLoading={isLoadingConversions}
+                            uoms={uoms}
+                            fromUomFilter={fromUomFilter}
+                            setFromUomFilter={setFromUomFilter}
+                            toUomFilter={toUomFilter}
+                            setToUomFilter={setToUomFilter}
+                            onEdit={setConvModal}
+                            onDelete={handleDeleteConversion}
+                        />
+                    )}
+                </div>
+
+                <AppPagination
+                    page={activeTab === 'uoms' ? uomPage : convPage}
+                    numPages={activeTab === 'uoms' ? uomNumPages : convNumPages}
+                    count={activeTab === 'uoms' ? uomCount : convCount}
+                    onPageChange={activeTab === 'uoms' ? setUomPage : setConvPage}
+                    isDark
+                />
             </div>
 
             {/* Modals */}

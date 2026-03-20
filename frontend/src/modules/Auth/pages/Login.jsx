@@ -53,8 +53,8 @@ const Login = () => {
                     <div className="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-4" style={{ width: '64px', height: '64px' }}>
                         <FiTerminal size={32} className="text-primary" />
                     </div>
-                    <h2 className="fw-bold mb-1">Welcome Back</h2>
-                    <p className="text-secondary small mb-0">Don't have an account yet? <a href="#" className="text-primary fw-bold text-decoration-none">Sign up</a></p>
+                    <h2 className="fw-bold mb-1">Bienvenido nuevamente</h2>
+                    <p className="text-secondary small mb-0">¿Aún no tienes una cuenta? <a href="#" className="text-primary fw-bold text-decoration-none">Regístrate</a></p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -66,7 +66,7 @@ const Login = () => {
                             <input
                                 type="email"
                                 className="form-control bg-transparent border-0 text-body"
-                                placeholder="email address"
+                                placeholder="Correo electrónico"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -83,7 +83,7 @@ const Login = () => {
                             <input
                                 type="password"
                                 className="form-control bg-transparent border-0 text-body"
-                                placeholder="Password"
+                                placeholder="Contraseña"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -99,13 +99,13 @@ const Login = () => {
                     )}
 
                     <button type="submit" className="btn btn-primary btn-lg w-100 fw-bold rounded-3 mb-4 py-2 shadow-sm">
-                        Login
+                        Iniciar sesión
                     </button>
                 </form>
 
                 <div className="d-flex align-items-center mb-4">
                     <div className="flex-grow-1 border-bottom opacity-25"></div>
-                    <span className="px-3 text-secondary small text-uppercase">or</span>
+                    <span className="px-3 text-secondary small text-uppercase">o</span>
                     <div className="flex-grow-1 border-bottom opacity-25"></div>
                 </div>
 

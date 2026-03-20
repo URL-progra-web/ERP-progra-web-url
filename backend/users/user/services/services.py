@@ -23,11 +23,11 @@ class UserService:
 
     def create_user(self, name: str, role_id: int, email: str = None, password: str = None) -> User:
         if email and self.get_user_by_email(email):
-            raise ValueError(f"User with email {email} already exists.")
+            raise ValueError(f"Ya existe un usuario con el correo {email}.")
         
         role = self.role_service.get_role(role_id)
         if not role:
-            raise ValueError(f"Role with id {role_id} does not exist.")
+            raise ValueError(f"El rol con id {role_id} no existe.")
 
         password_hash = make_password(password) if password else None
         return self.repository.create(
@@ -40,11 +40,11 @@ class UserService:
     def update_user(self, user_id: int, name: str = None, role_id: int = None, email: str = None) -> User:
         user = self.get_user(user_id)
         if not user:
-            raise ValueError(f"User with id {user_id} not found.")
+            raise ValueError(f"No se encontró al usuario con id {user_id}.")
             
         if email and email != user.email:
             if self.get_user_by_email(email):
-                raise ValueError(f"User with email {email} already exists.")
+                raise ValueError(f"Ya existe un usuario con el correo {email}.")
             user.email = email
             
         if name:
@@ -53,7 +53,7 @@ class UserService:
         if role_id:
             role = self.role_service.get_role(role_id)
             if not role:
-                raise ValueError(f"Role with id {role_id} does not exist.")
+                raise ValueError(f"El rol con id {role_id} no existe.")
             user.role = role
             
         return self.repository.update(user)
@@ -61,7 +61,7 @@ class UserService:
     def toggle_active_status(self, user_id: int) -> User:
         user = self.get_user(user_id)
         if not user:
-            raise ValueError(f"User with id {user_id} not found.")
+            raise ValueError(f"No se encontró al usuario con id {user_id}.")
         
         user.is_active = not user.is_active
         return self.repository.update(user)

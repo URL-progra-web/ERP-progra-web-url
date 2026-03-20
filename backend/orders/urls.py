@@ -1,3 +1,6 @@
-from django.urls import path
+from django.urls import include, path
 
-urlpatterns = []  # Orders routes will be added here
+urlpatterns = [
+    path('payment-methods/', include('orders.payment_method.urls')),
+    path('statuses/', include('orders.order_status.urls')),
+]

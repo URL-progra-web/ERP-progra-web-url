@@ -2,12 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from core.mixins import PaginationMixin
 from inventory.container import inventory_container
 from inventory.uom.serializers.serializers import UomConversionSerializer
 from users.permissions import HasRole
 
 
-class UomConversionViewSet(viewsets.ViewSet):
+class UomConversionViewSet(viewsets.ViewSet, PaginationMixin):
     permission_classes = [IsAuthenticated, HasRole]
     allowed_roles = ['ADMIN']
 
@@ -22,8 +23,7 @@ class UomConversionViewSet(viewsets.ViewSet):
             from_uom_id=int(from_uom_id) if from_uom_id else None,
             to_uom_id=int(to_uom_id) if to_uom_id else None,
         )
-        serializer = UomConversionSerializer(conversions, many=True)
-        return Response(serializer.data)
+        return self.paginate_queryset(conversions, UomConversionSerializer, request)
 
     def retrieve(self, request, pk=None):
         conversion = self.service.get_conversion(pk)

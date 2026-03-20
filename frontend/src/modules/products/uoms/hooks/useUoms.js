@@ -3,7 +3,15 @@ import { uomService } from '../services/uomService';
 
 export function useUoms() {
     const [uoms, setUoms] = useState([]);
+    const [uomCount, setUomCount] = useState(0);
+    const [uomNumPages, setUomNumPages] = useState(1);
+    const [uomPage, setUomPage] = useState(1);
+
     const [conversions, setConversions] = useState([]);
+    const [convCount, setConvCount] = useState(0);
+    const [convNumPages, setConvNumPages] = useState(1);
+    const [convPage, setConvPage] = useState(1);
+
     const [fromUomFilter, setFromUomFilter] = useState('');
     const [toUomFilter, setToUomFilter] = useState('');
     const [isLoadingUoms, setIsLoadingUoms] = useState(true);
@@ -14,15 +22,17 @@ export function useUoms() {
     const fetchUoms = useCallback(async () => {
         try {
             setIsLoadingUoms(true);
-            const data = await uomService.getUoms();
-            setUoms(data);
+            const data = await uomService.getUoms({ page: uomPage });
+            setUoms(data.results);
+            setUomCount(data.count);
+            setUomNumPages(data.num_pages);
             setError(null);
         } catch (e) {
             setError('Error al cargar unidades de medida.');
         } finally {
             setIsLoadingUoms(false);
         }
-    }, []);
+    }, [uomPage]);
 
     useEffect(() => { fetchUoms(); }, [fetchUoms]);
 
@@ -36,7 +46,6 @@ export function useUoms() {
         fetchUoms();
     };
 
-    // Returns an error string if failed, null if ok
     const deleteUom = async (id) => {
         try {
             await uomService.deleteUom(id);
@@ -55,15 +64,18 @@ export function useUoms() {
             const data = await uomService.getConversions({
                 from_uom_id: fromUomFilter || undefined,
                 to_uom_id: toUomFilter || undefined,
+                page: convPage,
             });
-            setConversions(data);
+            setConversions(data.results);
+            setConvCount(data.count);
+            setConvNumPages(data.num_pages);
             setError(null);
         } catch (e) {
             setError('Error al cargar conversiones.');
         } finally {
             setIsLoadingConversions(false);
         }
-    }, [fromUomFilter, toUomFilter]);
+    }, [fromUomFilter, toUomFilter, convPage]);
 
     useEffect(() => { fetchConversions(); }, [fetchConversions]);
 
@@ -90,12 +102,13 @@ export function useUoms() {
 
     return {
         // UOMs
-        uoms, isLoadingUoms, createUom, updateUom, deleteUom,
+        uoms, uomCount, uomNumPages, uomPage, setUomPage,
+        isLoadingUoms, createUom, updateUom, deleteUom,
         // Conversions
-        conversions, isLoadingConversions,
+        conversions, convCount, convNumPages, convPage, setConvPage,
+        isLoadingConversions, createConversion, updateConversion, deleteConversion,
         fromUomFilter, setFromUomFilter,
         toUomFilter, setToUomFilter,
-        createConversion, updateConversion, deleteConversion,
         // Shared
         error, setError,
     };
