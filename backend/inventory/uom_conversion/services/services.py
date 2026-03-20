@@ -1,4 +1,5 @@
-from typing import Optional, List
+from typing import Optional
+from django.db.models import QuerySet
 from inventory.uom_conversion.models.models import UoMConversion
 from inventory.uom_conversion.repositories.repositories import UomConversionRepository
 
@@ -7,7 +8,7 @@ class UomConversionService:
     def __init__(self, repository: UomConversionRepository = None):
         self.repository = repository or UomConversionRepository()
 
-    def list_conversions(self, from_uom_id=None, to_uom_id=None) -> List[UoMConversion]:
+    def list_conversions(self, from_uom_id=None, to_uom_id=None) -> QuerySet:
         return self.repository.filter_by_uom(
             from_uom_id=from_uom_id,
             to_uom_id=to_uom_id
