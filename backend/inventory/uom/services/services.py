@@ -1,4 +1,5 @@
-from typing import Optional, List
+from typing import Optional
+from django.db.models import QuerySet
 from inventory.uom.models.models import UoM
 from inventory.uom.repositories.repositories import UomRepository
 
@@ -7,7 +8,7 @@ class UomService:
     def __init__(self, repository: UomRepository = None):
         self.repository = repository or UomRepository()
 
-    def list_uoms(self) -> List[UoM]:
+    def list_uoms(self) -> QuerySet['UoM']:
         return self.repository.get_all()
 
     def get_uom(self, uom_id: int) -> Optional[UoM]:
