@@ -15,13 +15,13 @@ const PageHeader = ({
     actions,
     actionLabel,
     actionIcon: ActionIcon,
-    actionVariant = 'dark',
+    actionVariant,
     isDark = false,
     onAction,
     className = '',
 }) => {
-    // Si está en modo oscuro, usar variantes de botón claras por defecto
-    const effectiveVariant = isDark && !actionVariant ? 'light' : actionVariant;
+    // When in dark mode, default to 'light' variant for contrast; otherwise default to 'dark'
+    const effectiveVariant = actionVariant ?? (isDark ? 'light' : 'dark');
     const buttonClass = BUTTON_VARIANTS[effectiveVariant] ?? BUTTON_VARIANTS.dark;
     
     return (
