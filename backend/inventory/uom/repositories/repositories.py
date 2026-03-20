@@ -1,12 +1,13 @@
-from typing import Optional, List
+from typing import Optional
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import QuerySet
 from inventory.uom.models.models import UoM
 from inventory.uom_conversion.models.models import UoMConversion
 
 
 class UomRepository:
-    def get_all(self) -> List[UoM]:
-        return list(UoM.objects.all().order_by('code'))
+    def get_all(self) -> QuerySet['UoM']:
+        return UoM.objects.all().order_by('code')
 
     def get_by_id(self, uom_id: int) -> Optional[UoM]:
         try:
