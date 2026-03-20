@@ -30,9 +30,9 @@ const PaymentMethodsPage = () => {
 
     const [alertConfig, setAlertConfig] = useState(null);
 
-    const statusSummary = useMemo(() => {
+    const pageSummary = useMemo(() => {
         const active = records.filter((r) => r.is_active).length;
-        return `${active} activo(s) / ${records.length - active} inactivo(s)`;
+        return `En esta página: ${active} activo(s) / ${records.length - active} inactivo(s)`;
     }, [records]);
 
     const handleToggle = (record) => {
@@ -54,7 +54,7 @@ const PaymentMethodsPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Métodos de Pago"
-                subtitle={`${count} registro(s) · ${statusSummary}`}
+                subtitle={`${count} registro(s) total · ${pageSummary}`}
                 icon={FiCreditCard}
                 helper={(
                     <div className="alert alert-info mb-0 py-2 px-3 shadow-sm">
