@@ -26,7 +26,6 @@ const OrderStatusesPage = () => {
                 subtitle={`${statuses.length} estado(s) definidos`}
                 icon={FiLayers}
                 helper={(<span className="badge bg-warning-subtle text-warning-emphasis">Solo lectura</span>)}
-                isDark
             />
 
             <div className="d-flex flex-column gap-4">

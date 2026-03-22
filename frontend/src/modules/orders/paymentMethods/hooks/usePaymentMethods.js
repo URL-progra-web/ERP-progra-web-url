@@ -51,6 +51,25 @@ export const usePaymentMethods = () => {
         refresh();
     };
 
+    const savePaymentMethod = async (payload, id = null) => {
+        if (id) {
+            await paymentMethodsService.updateState(id, payload);
+        } else {
+            await paymentMethodsService.create(payload);
+        }
+        refresh();
+    };
+
+    const deletePaymentMethod = async (id) => {
+        try {
+            await paymentMethodsService.delete(id);
+            refresh();
+            return null;
+        } catch (err) {
+            return err?.response?.data?.error || 'No se pudo eliminar el método de pago.';
+        }
+    };
+
     return {
         records,
         count,
@@ -65,6 +84,8 @@ export const usePaymentMethods = () => {
         error,
         setError,
         toggleActive,
+        savePaymentMethod,
+        deletePaymentMethod,
         refresh,
     };
 };

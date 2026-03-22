@@ -24,7 +24,7 @@ class CustomerService:
             raise CustomerNotFound(f'No se encontró el cliente {customer_id}')
         return customer
 
-    def create_customer(self, name: str, phone: str, email: Optional[str] = None, address: Optional[str] = None) -> Customer:
+    def create_customer(self, name: str, phone: str, email: Optional[str] = None, address: Optional[str] = None, customer_type: str = 'RETAIL') -> Customer:
         normalized_name = name.strip()
         normalized_phone = phone.strip()
         if not normalized_name:
@@ -47,6 +47,7 @@ class CustomerService:
             phone=normalized_phone,
             email=normalized_email,
             address=address,
+            customer_type=customer_type,
         )
 
     def update_customer(
@@ -56,6 +57,7 @@ class CustomerService:
         phone: Optional[str] = None,
         email: Optional[str] = None,
         address: Optional[str] = None,
+        customer_type: Optional[str] = None,
     ) -> Customer:
         customer = self.get_customer(customer_id)
         fields = {}
@@ -81,6 +83,8 @@ class CustomerService:
             fields['email'] = normalized_email
         if address is not None:
             fields['address'] = address
+        if customer_type is not None:
+            fields['customer_type'] = customer_type
         if not fields:
             return customer
         return self.repository.update(customer, **fields)

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { FiCreditCard, FiFilter } from 'react-icons/fi';
 import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { PaymentMethodsTable } from './components/PaymentMethodsTable';
+import { PaymentMethodModal } from './components/PaymentMethodModal';
 import AppAlert from '~/core/components/AppAlert';
 import PageHeader from '~/core/components/PageHeader';
 
@@ -26,9 +27,49 @@ const PaymentMethodsPage = () => {
         error,
         setError,
         toggleActive,
+        savePaymentMethod,
+        deletePaymentMethod,
     } = usePaymentMethods();
 
     const [alertConfig, setAlertConfig] = useState(null);
+    const [modalRecord, setModalRecord] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = (record = null) => {
+        setModalRecord(record);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalRecord(null);
+        setIsModalOpen(false);
+    };
+
+    const handleSave = async (payload, id) => {
+        try {
+            await savePaymentMethod(payload, id);
+            handleCloseModal();
+        } catch (err) {
+            const message = err?.response?.data?.error || 'No se pudo guardar el método.';
+            setError(message);
+        }
+    };
+
+    const handleDelete = (record) => {
+        setAlertConfig({
+            type: 'danger',
+            header: 'Eliminar método',
+            content: `¿Eliminar "${record.name}"? Esta acción no se puede deshacer.`,
+            confirmLabel: 'Eliminar',
+            onConfirm: async () => {
+                const errMsg = await deletePaymentMethod(record.id);
+                if (errMsg) {
+                    setError(errMsg);
+                }
+                setAlertConfig(null);
+            },
+        });
+    };
 
     const pageSummary = useMemo(() => {
         const active = records.filter((r) => r.is_active).length;
@@ -56,12 +97,9 @@ const PaymentMethodsPage = () => {
                 title="Métodos de Pago"
                 subtitle={`${count} registro(s) total · ${pageSummary}`}
                 icon={FiCreditCard}
-                helper={(
-                    <div className="alert alert-info mb-0 py-2 px-3 shadow-sm">
-                        Los métodos disponibles están predefinidos. Solo puedes activar o desactivar su uso.
-                    </div>
-                )}
-                isDark
+                actionLabel="Nuevo Método"
+                actionIcon={FiFilter} // wait, let's use FiCreditCard or standard Plus inside if needed. Actually there's no Plus imported.
+                onAction={() => handleOpenModal()}
             />
 
             <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
@@ -116,6 +154,8 @@ const PaymentMethodsPage = () => {
                     records={records}
                     isLoading={isLoading}
                     onToggle={handleToggle}
+                    onEdit={handleOpenModal}
+                    onDelete={handleDelete}
                 />
 
                 <div className="bg-dark text-white px-4 py-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -130,6 +170,14 @@ const PaymentMethodsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {isModalOpen && (
+                <PaymentMethodModal
+                    method={modalRecord}
+                    onSave={handleSave}
+                    onClose={handleCloseModal}
+                />
+            )}
 
             {alertConfig && (
                 <AppAlert

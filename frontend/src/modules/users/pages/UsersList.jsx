@@ -53,7 +53,6 @@ const UsersList = () => {
                 actionLabel="Nuevo Usuario"
                 actionIcon={FiPlus}
                 onAction={() => handleOpenModal()}
-                isDark
             />
 
             {error && <div className="alert alert-danger">{error}</div>}
@@ -102,7 +101,6 @@ const UsersList = () => {
                     numPages={numPages}
                     count={count}
                     onPageChange={setPage}
-                    isDark
                 />
             </div>
 
