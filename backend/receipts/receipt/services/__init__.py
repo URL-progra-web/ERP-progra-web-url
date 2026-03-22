@@ -1,1 +1,0 @@
-from orders.receipt.services.services import ReceiptService

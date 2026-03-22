@@ -1,7 +1,7 @@
 from typing import Optional
 from django.db.models import QuerySet
 from orders.receipt.models.models import Receipt
-from orders.receipt.repositories.repositories import ReceiptRepository
+from receipts.receipt.repositories.repositories import ReceiptRepository
 
 
 class ReceiptService:
@@ -14,9 +14,9 @@ class ReceiptService:
     def get_by_id(self, receipt_id: int) -> Optional[Receipt]:
         return self.repository.get_by_id(receipt_id)
 
-    def create_from_order(self, order_id: int) -> None:
-        #implementar cuando módulo de órdenes esté disponible
-        pass
+    def get_by_order(self, order_id: int) -> Optional[Receipt]:
+        return self.repository.get_by_order(order_id)
 
-    def save(self, receipt: Receipt) -> Receipt:
-        return self.repository.save(receipt)
+    def create_from_order(self, order_id: int) -> None:
+        # TODO: implementar cuando módulo de órdenes esté disponible
+        pass
