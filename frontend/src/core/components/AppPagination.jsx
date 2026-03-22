@@ -1,6 +1,10 @@
 import React from 'react';
+import { useTheme } from '../theme/ThemeContext';
 
-const AppPagination = ({ page, numPages, count, onPageChange, isDark = false }) => {
+const AppPagination = ({ page, numPages, count, onPageChange }) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     if (numPages <= 1) return null;
 
     const bgClass = isDark ? 'bg-dark text-white border-top' : 'bg-body border-top';
