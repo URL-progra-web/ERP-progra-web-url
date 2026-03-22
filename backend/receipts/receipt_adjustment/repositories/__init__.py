@@ -1,0 +1,1 @@
+from orders.receipt_adjustment.repositories.repositories import ReceiptAdjustmentRepository
