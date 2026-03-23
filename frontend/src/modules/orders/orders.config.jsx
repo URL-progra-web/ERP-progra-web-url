@@ -3,6 +3,7 @@ import { FiCreditCard, FiLayers, FiShoppingCart } from 'react-icons/fi';
 import PaymentMethodsPage from './paymentMethods/PaymentMethodsPage';
 import OrderStatusesPage from './orderStatuses/OrderStatusesPage';
 import OrdersPage from './orders/OrdersPage';
+import OrderDetailPage from './orders/OrderDetailPage';
 
 export const ordersFeature = {
     id: 'orders',
@@ -14,6 +15,14 @@ export const ordersFeature = {
             icon: FiShoppingCart,
             roles: ['MANAGER', 'ADMIN', 'USER'],
             element: <OrdersPage />,
+        },
+        {
+            text: 'Detalle Pedido',
+            path: 'orders/detail/:orderId',
+            icon: FiShoppingCart,
+            roles: ['MANAGER', 'ADMIN', 'USER'],
+            element: <OrderDetailPage />,
+            hidden: true,
         },
         {
             text: 'Métodos de Pago',

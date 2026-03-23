@@ -13,7 +13,7 @@ function useDebounce(value, delay = 400) {
 
 const PAGE_SIZE = 15;
 
-export const useOrders = () => {
+export const useOrders = ({ autoFetch = true } = {}) => {
     const [data, setData] = useState({ results: [], count: 0, num_pages: 1, page: 1 });
     const [isLoadingOrders, setIsLoadingOrders] = useState(false);
     const [error, setError] = useState(null);
@@ -92,8 +92,9 @@ export const useOrders = () => {
     };
 
     useEffect(() => {
+        if (!autoFetch) return;
         fetchOrders();
-    }, [fetchOrders]);
+    }, [autoFetch, fetchOrders]);
 
     useEffect(() => {
         setPage(1);

@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiShoppingCart } from 'react-icons/fi';
 import { useOrders } from './hooks/useOrders';
 import { OrdersTable } from './components/OrdersTable';
 import { OrderModal } from './components/OrderModal';
 import AppAlert from '~/core/components/AppAlert';
 import PageHeader from '~/core/components/PageHeader';
+import AppPagination from '~/core/components/AppPagination';
 
 const OrdersPage = () => {
     const {
         orders,
+        count,
+        numPages,
+        page,
+        setPage,
         search,
         setSearch,
         isLoadingOrders,
@@ -16,6 +22,7 @@ const OrdersPage = () => {
         setError,
         createOrder,
     } = useOrders();
+    const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +68,14 @@ const OrdersPage = () => {
                     <OrdersTable
                         orders={orders}
                         isLoading={isLoadingOrders}
+                        onViewDetail={(orderId) => navigate(`../detail/${orderId}`)}
+                    />
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
                     />
                 </div>
             </div>
