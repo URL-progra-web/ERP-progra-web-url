@@ -1,0 +1,132 @@
+import React, { useState, useEffect } from 'react';
+import AppModal from '~/core/components/AppModal';
+
+const CategoryModal = ({ category, categories, onClose, onSave }) => {
+    const isEditing = !!category;
+
+    const [formData, setFormData] = useState({
+        name: '',
+        parent: '',
+        is_leaf: false,
+    });
+
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (category) {
+            setFormData({
+                name: category.name || '',
+                parent: category.parent || '',
+                is_leaf: category.is_leaf || false,
+            });
+        }
+    }, [category]);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (!formData.name.trim()) {
+            setError('El nombre es obligatorio.');
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+            const dataToSubmit = {
+                name: formData.name,
+                parent: formData.parent || null,
+                is_leaf: formData.is_leaf,
+            };
+            await onSave(dataToSubmit);
+        } catch (err) {
+            const detail = err.response?.data;
+            if (detail && typeof detail === 'object') {
+                const messages = Object.values(detail).flat().join(' ');
+                setError(messages || 'Error al procesar la solicitud.');
+            } else {
+                setError('Error al procesar la solicitud.');
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const parentOptions = categories.filter(c => !isEditing || c.id !== category?.id);
+
+    return (
+        <AppModal
+            title={isEditing ? 'Editar Categoría' : 'Nueva Categoría'}
+            tone="dark"
+            onClose={onClose}
+            onSubmit={handleSubmit}
+            submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}
+            submitDisabled={isSubmitting}
+        >
+            {error && <div className="alert alert-danger small py-2">{error}</div>}
+
+            <form onSubmit={handleSubmit} id="categoryForm">
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">Nombre de la categoría *</label>
+                    <input
+                        type="text"
+                        name="name"
+                        className="form-control"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Ej. Frutas, Verduras, Lácteos..."
+                    />
+                    <div className="form-text">Dale un nombre claro para identificar este grupo de productos.</div>
+                </div>
+
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">Pertenece a</label>
+                    <select
+                        name="parent"
+                        className="form-select"
+                        value={formData.parent}
+                        onChange={handleChange}
+                    >
+                        <option value="">Ninguna (es una categoría principal)</option>
+                        {parentOptions.map(c => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                    </select>
+                    <div className="form-text">
+                        Si esta categoría es parte de otra, selecciónala aquí.
+                        Ej: "Cítricos" pertenece a "Frutas".
+                    </div>
+                </div>
+
+                <div className="form-check form-switch mb-3">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        name="is_leaf"
+                        id="isLeafSwitch"
+                        checked={formData.is_leaf}
+                        onChange={handleChange}
+                    />
+                    <label className="form-check-label" htmlFor="isLeafSwitch">
+                        Se pueden asignar productos a esta categoría
+                    </label>
+                    <div className="form-text">
+                        Activa esto si los productos se clasifican directamente aquí.
+                        Desactívalo si solo agrupa otras subcategorías.
+                    </div>
+                </div>
+            </form>
+        </AppModal>
+    );
+};
+
+export default CategoryModal;
