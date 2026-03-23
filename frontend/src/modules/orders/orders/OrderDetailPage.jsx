@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiSave, FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import { useOrders } from './hooks/useOrders';
+import { useOrderItems } from './hooks/useOrderItems';
 import { orderService } from './services/orderService';
+import { orderStatusesService } from '../orderStatuses/services/orderStatusesService';
 import { normalizeList } from './helpers/normalizeList';
+import { OrderItemsTable } from './components/OrderItemsTable';
+import { OrderItemModal } from './components/OrderItemModal';
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();
@@ -18,12 +22,26 @@ const OrderDetailPage = () => {
         error,
         setError,
     } = useOrders({ autoFetch: false });
+    const {
+        items,
+        isLoadingItems,
+        error: itemsError,
+        setError: setItemsError,
+        createItem,
+        updateItem,
+        deleteItem,
+    } = useOrderItems({ orderId });
 
     const [order, setOrder] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [catalogs, setCatalogs] = useState({ payment_methods: [] });
+    const [statusOptions, setStatusOptions] = useState([]);
     const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [itemToEdit, setItemToEdit] = useState(null);
+    const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+    const [isSubmittingItem, setIsSubmittingItem] = useState(false);
     const [formData, setFormData] = useState({
         payment_method_id: '',
         shipping_address: '',
@@ -34,9 +52,10 @@ const OrderDetailPage = () => {
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
-            const [detail, catalogData] = await Promise.all([
+            const [detail, catalogData, statusesData] = await Promise.all([
                 fetchOrderDetail(orderId),
                 orderService.catalogs().catch(() => ({ payment_methods: [] })),
+                orderStatusesService.list({ search: undefined }).catch(() => ({ results: [] })),
             ]);
 
             if (detail) {
@@ -49,9 +68,8 @@ const OrderDetailPage = () => {
                 });
             }
 
-            setCatalogs({
-                payment_methods: normalizeList(catalogData?.payment_methods),
-            });
+            setCatalogs({ payment_methods: normalizeList(catalogData?.payment_methods) });
+            setStatusOptions(normalizeList(statusesData));
             setIsLoading(false);
         };
 
@@ -101,6 +119,39 @@ const OrderDetailPage = () => {
             navigate('../list');
         }
         setShowDeleteAlert(false);
+    };
+
+    const handleOpenCreateItem = () => {
+        setItemToEdit(null);
+        setIsItemModalOpen(true);
+    };
+
+    const handleOpenEditItem = (item) => {
+        setItemToEdit(item);
+        setIsItemModalOpen(true);
+    };
+
+    const handleSubmitItem = async (payload, itemId) => {
+        setIsSubmittingItem(true);
+        const ok = itemId
+            ? await updateItem(itemId, payload)
+            : await createItem(payload);
+        setIsSubmittingItem(false);
+        if (ok) {
+            const refreshed = await fetchOrderDetail(orderId);
+            if (refreshed) setOrder(refreshed);
+        }
+        return ok;
+    };
+
+    const handleConfirmDeleteItem = async () => {
+        if (!itemToDelete) return;
+        const ok = await deleteItem(itemToDelete.id);
+        if (ok) {
+            const refreshed = await fetchOrderDetail(orderId);
+            if (refreshed) setOrder(refreshed);
+        }
+        setItemToDelete(null);
     };
 
     if (isLoading) {
@@ -211,6 +262,29 @@ const OrderDetailPage = () => {
                 </form>
             </div>
 
+            <div className="card border-0 shadow-sm mt-4">
+                <div className="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 className="mb-0 text-uppercase text-muted small">Items del Pedido</h6>
+                        <small className="text-muted">
+                            {items.length} item(s) • Total: ${Number(order.total_amount ?? 0).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            })}
+                        </small>
+                    </div>
+                    <button type="button" className="btn btn-sm btn-dark" onClick={handleOpenCreateItem}>
+                        <FiPlus className="me-2" />Agregar Item
+                    </button>
+                </div>
+                <OrderItemsTable
+                    items={items}
+                    isLoading={isLoadingItems}
+                    onEdit={handleOpenEditItem}
+                    onDelete={(item) => setItemToDelete(item)}
+                />
+            </div>
+
             {error && (
                 <AppAlert
                     type="danger"
@@ -228,6 +302,35 @@ const OrderDetailPage = () => {
                     confirmLabel="Sí, eliminar"
                     onConfirm={confirmDelete}
                     onClose={() => setShowDeleteAlert(false)}
+                />
+            )}
+
+            {itemsError && (
+                <AppAlert
+                    type="warning"
+                    header="Atención"
+                    content={itemsError}
+                    onClose={() => setItemsError(null)}
+                />
+            )}
+
+            <OrderItemModal
+                isOpen={isItemModalOpen}
+                onClose={() => setIsItemModalOpen(false)}
+                onSubmit={handleSubmitItem}
+                isSubmitting={isSubmittingItem}
+                item={itemToEdit}
+                statusOptions={statusOptions}
+            />
+
+            {itemToDelete && (
+                <AppAlert
+                    type="danger"
+                    header="¿Eliminar item del pedido?"
+                    content={`Se eliminará el item ${itemToDelete.variant_sku || `#${itemToDelete.id}`}.`}
+                    confirmLabel="Sí, eliminar item"
+                    onConfirm={handleConfirmDeleteItem}
+                    onClose={() => setItemToDelete(null)}
                 />
             )}
         </div>

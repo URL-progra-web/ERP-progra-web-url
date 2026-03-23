@@ -17,6 +17,8 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [items, setItems] = useState([]);
+    const [itemDraft, setItemDraft] = useState({ variant_id: '', quantity: 1 });
 
     useEffect(() => {
         if (isOpen) {
@@ -72,6 +74,7 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
         if (formData.shipping_cost) payload.shipping_cost = parseFloat(formData.shipping_cost);
         if (formData.notes) payload.notes = formData.notes;
         if (formData.short_id) payload.short_id = formData.short_id;
+        if (items.length) payload.items = items;
 
         const success = await onSubmit(payload);
         if (success) {
@@ -84,6 +87,8 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                 short_id: ''
             });
             setSelectedCustomer(null);
+            setItems([]);
+            setItemDraft({ variant_id: '', quantity: 1 });
             onClose();
         }
     };
@@ -104,6 +109,18 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
     };
 
     const submitDisabled = isSubmitting || isLoading || !formData.customer_id;
+
+    const addItemDraft = () => {
+        const variantId = Number(itemDraft.variant_id);
+        const quantity = Number(itemDraft.quantity);
+        if (!variantId || variantId <= 0 || !quantity || quantity <= 0) return;
+        setItems((prev) => ([...prev, { variant_id: variantId, quantity }]));
+        setItemDraft({ variant_id: '', quantity: 1 });
+    };
+
+    const removeDraftItem = (index) => {
+        setItems((prev) => prev.filter((_, i) => i !== index));
+    };
 
     return (
         <AppModal
@@ -154,6 +171,59 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                     onChange={handleChange}
                     rows="3"
                 ></textarea>
+            </div>
+
+            <div className="mb-0">
+                <label className="form-label">Items del Pedido (Opcional)</label>
+                <div className="row g-2 align-items-end">
+                    <div className="col-6">
+                        <label className="form-label small text-muted mb-1">Variant ID</label>
+                        <input
+                            type="number"
+                            min="1"
+                            className="form-control"
+                            value={itemDraft.variant_id}
+                            onChange={(e) => setItemDraft((prev) => ({ ...prev, variant_id: e.target.value }))}
+                            placeholder="Ej. 101"
+                        />
+                    </div>
+                    <div className="col-3">
+                        <label className="form-label small text-muted mb-1">Cantidad</label>
+                        <input
+                            type="number"
+                            min="1"
+                            className="form-control"
+                            value={itemDraft.quantity}
+                            onChange={(e) => setItemDraft((prev) => ({ ...prev, quantity: e.target.value }))}
+                        />
+                    </div>
+                    <div className="col-3">
+                        <button type="button" className="btn btn-outline-dark w-100" onClick={addItemDraft}>
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+
+                {!!items.length && (
+                    <div className="list-group mt-2">
+                        {items.map((item, index) => (
+                            <div key={`${item.variant_id}-${index}`} className="list-group-item d-flex justify-content-between align-items-center">
+                                <span className="small">
+                                    Variant #{item.variant_id} • Cantidad: {item.quantity}
+                                </span>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={() => removeDraftItem(index)}
+                                >
+                                    Quitar
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="form-text">Si agregas items aquí, se crearán de forma atómica junto con la orden.</div>
             </div>
         </AppModal>
     );
