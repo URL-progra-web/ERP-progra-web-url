@@ -9,6 +9,13 @@ from orders.order.exceptions import (
     OrderNotFound,
     OrderStatusDefaultNotConfigured,
 )
+from orders.order_item.exceptions import (
+    DuplicateOrderItemVariant,
+    InvalidOrderItemData,
+    OrderItemBusinessUnitMismatch,
+    OrderItemStatusDefaultNotConfigured,
+    OrderItemStockUnavailable,
+)
 from orders.order.serializers.serializers import (
     CustomerLookupSerializer,
     OrderCreateSerializer,
@@ -44,17 +51,47 @@ class OrderAPIView(APIView):
 
         try:
             validated_data = serializer.validated_data
-            order = self.service.create_order(
-                customer=validated_data['customer_id'],
-                status=validated_data.get('status_id'),
-                payment_method=validated_data.get('payment_method_id'),
-                short_id=validated_data.get('short_id'),
-                shipping_address=validated_data.get('shipping_address'),
-                shipping_cost=validated_data.get('shipping_cost', 0.00),
-                notes=validated_data.get('notes'),
-            )
+            items = validated_data.get('items') or []
+            if items:
+                items_payload = [
+                    {
+                        'variant_id': item['variant_id'].id,
+                        'quantity': item['quantity'],
+                        'status': item.get('status_id'),
+                    }
+                    for item in items
+                ]
+                order = self.service.create_order_with_items(
+                    customer=validated_data['customer_id'],
+                    items_payload=items_payload,
+                    status=validated_data.get('status_id'),
+                    payment_method=validated_data.get('payment_method_id'),
+                    short_id=validated_data.get('short_id'),
+                    shipping_address=validated_data.get('shipping_address'),
+                    shipping_cost=validated_data.get('shipping_cost', 0.00),
+                    notes=validated_data.get('notes'),
+                )
+            else:
+                order = self.service.create_order(
+                    customer=validated_data['customer_id'],
+                    status=validated_data.get('status_id'),
+                    payment_method=validated_data.get('payment_method_id'),
+                    short_id=validated_data.get('short_id'),
+                    shipping_address=validated_data.get('shipping_address'),
+                    shipping_cost=validated_data.get('shipping_cost', 0.00),
+                    notes=validated_data.get('notes'),
+                )
             return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
-        except (InvalidOrderData, DuplicateOrderShortId, OrderStatusDefaultNotConfigured) as exc:
+        except (
+            InvalidOrderData,
+            DuplicateOrderShortId,
+            OrderStatusDefaultNotConfigured,
+            OrderItemStockUnavailable,
+            OrderItemBusinessUnitMismatch,
+            OrderItemStatusDefaultNotConfigured,
+            DuplicateOrderItemVariant,
+            InvalidOrderItemData,
+        ) as exc:
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception:
             return Response({'error': 'No se pudo crear la orden'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -16,8 +16,9 @@ from orders.order_status.models.models import OrderStatus
 
 
 class OrderService:
-    def __init__(self, repository: Optional[OrderRepository] = None):
+    def __init__(self, repository: Optional[OrderRepository] = None, order_item_service=None):
         self.repository = repository or OrderRepository()
+        self.order_item_service = order_item_service
 
     @staticmethod
     def _generate_short_id() -> str:
@@ -86,6 +87,36 @@ class OrderService:
             shipping_cost=shipping_cost,
             notes=notes,
         )
+
+    @transaction.atomic
+    def create_order_with_items(
+        self,
+        customer,
+        items_payload: list[dict],
+        status: Optional[OrderStatus] = None,
+        payment_method=None,
+        short_id: Optional[str] = None,
+        shipping_address: Optional[str] = None,
+        shipping_cost: Decimal = Decimal('0.00'),
+        notes: Optional[str] = None,
+    ):
+        if not self.order_item_service:
+            raise InvalidOrderData('OrderItemService no está configurado para creación atómica de orden')
+        if not items_payload:
+            raise InvalidOrderData('Debes enviar al menos un item para crear la orden')
+
+        order = self.create_order(
+            customer=customer,
+            status=status,
+            payment_method=payment_method,
+            short_id=short_id,
+            shipping_address=shipping_address,
+            shipping_cost=shipping_cost,
+            notes=notes,
+        )
+
+        self.order_item_service.create_items_for_order(order_id=order.id, items_payload=items_payload)
+        return order
 
     @transaction.atomic
     def update_order(

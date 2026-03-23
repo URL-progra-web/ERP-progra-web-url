@@ -5,6 +5,7 @@ from crm.customer.models.models import Customer
 from orders.order.models.models import Order
 from orders.order_status.models.models import OrderStatus
 from orders.payment_method.models.models import PaymentMethod
+from products.variant.models.models import ProductVariant
 
 class OrderSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(source='customer.name', read_only=True)
@@ -59,6 +60,15 @@ class OrderCreateSerializer(serializers.Serializer):
     shipping_address = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     shipping_cost = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default=0.00)
     notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
+    class ItemSerializer(serializers.Serializer):
+        variant_id = serializers.PrimaryKeyRelatedField(queryset=ProductVariant.objects.all(), write_only=True)
+        quantity = serializers.IntegerField(min_value=1)
+        status_id = serializers.PrimaryKeyRelatedField(
+            queryset=OrderStatus.objects.all(), required=False, allow_null=True, write_only=True
+        )
+
+    items = ItemSerializer(many=True, required=False)
 
 
 class OrderUpdateSerializer(serializers.Serializer):
