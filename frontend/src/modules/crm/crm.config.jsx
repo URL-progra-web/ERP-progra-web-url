@@ -1,6 +1,7 @@
 import React from 'react';
-import { FiUsers } from 'react-icons/fi';
+import { FiUsers, FiBriefcase } from 'react-icons/fi';
 import CustomersPage from './customers/CustomersPage';
+import EntrepreneursPage from './entrepreneurs/EntrepreneursPage';
 
 export const crmFeature = {
     id: 'crm',
@@ -12,6 +13,13 @@ export const crmFeature = {
             icon: FiUsers,
             roles: ['MANAGER', 'ADMIN'],
             element: <CustomersPage />,
+        },
+        {
+            text: 'Emprendedores',
+            path: 'crm/entrepreneurs',
+            icon: FiBriefcase,
+            roles: ['MANAGER', 'ADMIN'],
+            element: <EntrepreneursPage />,
         },
     ],
 };
