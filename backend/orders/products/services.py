@@ -1,0 +1,134 @@
+"""
+Temporary Product Service Implementation
+This is a temporary mock service that accesses the ProductVariant ORM directly.
+When the products team completes their service, this can be replaced by just
+changing the dependency injection in the container.
+"""
+
+from typing import Optional, Dict, Any
+from orders.products.interfaces import IProductService
+from products.variant.models.models import ProductVariant
+from products.product.models.models import Product
+from django.db.models import Q
+
+
+class ProductServiceMock(IProductService):
+    """
+    Temporary mock implementation of ProductService.
+    Accesses ProductVariant ORM directly and caches basic queries.
+    
+    Usage in container:
+        self.product_service = ProductServiceMock()
+        
+    When products service is ready, simply replace with:
+        self.product_service = ProductService(repository=ProductRepository())
+    """
+
+    def get_variant_by_id(self, variant_id: int) -> Optional[Dict[str, Any]]:
+        """Get variant by ID with full details."""
+        try:
+            variant = ProductVariant.objects.select_related(
+                'product',
+                'product__business_unit'
+            ).get(id=variant_id)
+            
+            return self._variant_to_dict(variant)
+        except ProductVariant.DoesNotExist:
+            return None
+
+    def get_variant_by_sku(self, sku: str) -> Optional[Dict[str, Any]]:
+        """Get variant by SKU."""
+        try:
+            variant = ProductVariant.objects.select_related(
+                'product',
+                'product__business_unit'
+            ).get(sku=sku)
+            
+            return self._variant_to_dict(variant)
+        except ProductVariant.DoesNotExist:
+            return None
+
+    def validate_variant_availability(
+        self,
+        variant_id: int,
+        quantity: int,
+        business_unit_id: int
+    ) -> tuple[bool, Optional[str]]:
+        try:
+            variant = ProductVariant.objects.select_related(
+                'product',
+                'product__business_unit'
+            ).get(id=variant_id)
+            
+            # Check if active
+            if not variant.is_active:
+                return False, f"Product variant {variant.sku} is not active"
+            
+            # Check if belongs to business unit
+            if variant.product.business_unit_id != business_unit_id:
+                return False, f"Variant {variant.sku} does not belong to business unit {business_unit_id}"
+            
+            # Check quantity
+            if variant.quantity_available < quantity:
+                return False, f"Insufficient stock. Available: {variant.quantity_available}, Requested: {quantity}"
+            
+            return True, None
+            
+        except ProductVariant.DoesNotExist:
+            return False, f"Variant with ID {variant_id} not found"
+
+    def get_variants_by_business_unit(self, business_unit_id: int) -> list[Dict[str, Any]]:
+        """
+        Get all active variants for a business unit.
+        
+        Filters by:
+        - Product belongs to business_unit
+        - Variant is_active = True
+        - quantity_available > 0
+        """
+        variants = ProductVariant.objects.filter(
+            product__business_unit_id=business_unit_id,
+            is_active=True,
+            quantity_available__gt=0
+        ).select_related(
+            'product',
+            'product__business_unit',
+            'size',
+            'color',
+            'uom'
+        )
+        
+        return [self._variant_to_dict(v) for v in variants]
+
+    def calculate_line_total(
+        self,
+        variant_id: int,
+        quantity: int,
+        use_cost: bool = False
+    ) -> Optional[float]:
+        """Calculate total for line item."""
+        try:
+            variant = ProductVariant.objects.get(id=variant_id)
+            unit_amount = variant.cost if use_cost else variant.price
+            return float(unit_amount) * quantity
+        except ProductVariant.DoesNotExist:
+            return None
+
+    @staticmethod
+    def _variant_to_dict(variant: ProductVariant) -> Dict[str, Any]:
+        return {
+            'id': variant.id,
+            'sku'               : variant.sku,
+            'product_id'        : variant.product_id,
+            'product_name'      : variant.product.name,
+            'business_unit_id'  : variant.product.business_unit_id,
+            'size'              : variant.size.name if variant.size else None,
+            'color'             : variant.color.name if variant.color else None,
+            'uom'               : variant.uom.name if variant.uom else None,
+            'cost'              : float(variant.cost),
+            'price'             : float(variant.price),
+            'quantity_available': variant.quantity_available,
+            'is_active'         : variant.is_active,
+            'created_at'        : variant.created_at.isoformat() if variant.created_at else None,
+            'updated_at'        : variant.updated_at.isoformat() if variant.updated_at else None,
+        }
