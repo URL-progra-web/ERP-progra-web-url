@@ -9,7 +9,11 @@ from orders.payment_method.serializers.serializers import (
     PaymentMethodWriteSerializer,
 )
 from orders.payment_method.services.services import PaymentMethodService
-from orders.payment_method.exceptions import PaymentMethodNotFound
+from orders.payment_method.exceptions import (
+    PaymentMethodAlreadyExists,
+    PaymentMethodInUse,
+    PaymentMethodNotFound,
+)
 from users.permissions import HasRole
 
 
@@ -74,15 +78,8 @@ class PaymentMethodViewSet(viewsets.ViewSet, PaginationMixin):
             self.service.delete_method(method_id)
         except PaymentMethodNotFound as exc:
             return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
-        except ValueError as exc:
+        except (ValueError, PaymentMethodInUse) as exc:
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-        # Also need to catch PaymentMethodInUse!
-        # wait, let me add it.
-        except Exception as exc:
-            from orders.payment_method.exceptions import PaymentMethodInUse
-            if isinstance(exc, PaymentMethodInUse):
-                return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-            raise exc
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @staticmethod
