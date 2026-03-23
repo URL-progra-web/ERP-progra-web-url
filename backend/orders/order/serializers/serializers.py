@@ -1,3 +1,4 @@
+from django.db.models import DecimalField, F, Sum
 from rest_framework import serializers
 
 from crm.customer.models.models import Customer
@@ -6,9 +7,43 @@ from orders.order_status.models.models import OrderStatus
 from orders.payment_method.models.models import PaymentMethod
 
 class OrderSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='customer.name', read_only=True)
+    payment_method_name = serializers.CharField(source='payment_method.name', read_only=True)
+    status_name = serializers.CharField(source='status.name', read_only=True)
+    total_quantity = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
+
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = (
+            'id',
+            'short_id',
+            'customer',
+            'customer_name',
+            'payment_method',
+            'payment_method_name',
+            'status',
+            'status_name',
+            'shipping_address',
+            'shipping_cost',
+            'notes',
+            'created_at',
+            'updated_at',
+            'total_quantity',
+            'total_amount',
+        )
+
+    def get_total_quantity(self, obj):
+        return obj.items.aggregate(total=Sum('quantity')).get('total') or 0
+
+    def get_total_amount(self, obj):
+        total = obj.items.aggregate(
+            total=Sum(
+                F('quantity') * F('unit_price'),
+                output_field=DecimalField(max_digits=12, decimal_places=2),
+            )
+        ).get('total')
+        return total or 0
 
 class OrderCreateSerializer(serializers.Serializer):
     short_id = serializers.CharField(max_length=20, required=False, allow_blank=True)
@@ -23,6 +58,21 @@ class OrderCreateSerializer(serializers.Serializer):
     )
     shipping_address = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     shipping_cost = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default=0.00)
+    notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
+
+class OrderUpdateSerializer(serializers.Serializer):
+    customer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all(), required=False, allow_null=False, write_only=True
+    )
+    payment_method_id = serializers.PrimaryKeyRelatedField(
+        queryset=PaymentMethod.objects.all(), required=False, allow_null=True, write_only=True
+    )
+    status_id = serializers.PrimaryKeyRelatedField(
+        queryset=OrderStatus.objects.all(), required=False, allow_null=False, write_only=True
+    )
+    shipping_address = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    shipping_cost = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
 

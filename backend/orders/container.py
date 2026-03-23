@@ -1,5 +1,7 @@
 from orders.products.services import ProductServiceMock
 from orders.products.interfaces import IProductService
+from orders.order.repositories.repositories import OrderRepository
+from orders.order.services.services import OrderService
 
 
 class OrdersContainer:
@@ -26,6 +28,10 @@ class OrdersContainer:
         # from products.services import ProductService
         # self.product_service: IProductService = ProductService(...)
         self.product_service: IProductService = ProductServiceMock()
+
+        # Order domain dependencies
+        self.order_repository = OrderRepository()
+        self.order_service = OrderService(repository=self.order_repository)
 
 
 orders_container = OrdersContainer()
