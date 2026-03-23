@@ -45,7 +45,7 @@ export const useOrders = ({ autoFetch = true } = {}) => {
         }
     }, [debouncedSearch, page]);
 
-    const createOrder = async (payload) => {
+    const createOrder = useCallback(async (payload) => {
         try {
             setError(null);
             await orderService.create(payload);
@@ -55,9 +55,9 @@ export const useOrders = ({ autoFetch = true } = {}) => {
             setError(parseError(err, 'Error al crear el pedido'));
             return false;
         }
-    };
+    }, [fetchOrders]);
 
-    const fetchOrderDetail = async (orderId) => {
+    const fetchOrderDetail = useCallback(async (orderId) => {
         try {
             setError(null);
             return await orderService.get(orderId);
@@ -65,9 +65,9 @@ export const useOrders = ({ autoFetch = true } = {}) => {
             setError(parseError(err, 'Error al cargar el detalle del pedido'));
             return null;
         }
-    };
+    }, []);
 
-    const updateOrder = async (orderId, payload) => {
+    const updateOrder = useCallback(async (orderId, payload) => {
         try {
             setError(null);
             const updated = await orderService.update(orderId, payload);
@@ -77,9 +77,9 @@ export const useOrders = ({ autoFetch = true } = {}) => {
             setError(parseError(err, 'Error al actualizar el pedido'));
             return null;
         }
-    };
+    }, [fetchOrders]);
 
-    const deleteOrder = async (orderId) => {
+    const deleteOrder = useCallback(async (orderId) => {
         try {
             setError(null);
             await orderService.remove(orderId);
@@ -89,7 +89,7 @@ export const useOrders = ({ autoFetch = true } = {}) => {
             setError(parseError(err, 'Error al eliminar el pedido'));
             return false;
         }
-    };
+    }, [fetchOrders]);
 
     useEffect(() => {
         if (!autoFetch) return;

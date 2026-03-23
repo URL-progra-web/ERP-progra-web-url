@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
+import { useAuth } from '~/core/auth/AuthContext';
+import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import { useOrders } from './hooks/useOrders';
 import { useOrderItems } from './hooks/useOrderItems';
 import { orderService } from './services/orderService';
@@ -14,6 +16,8 @@ import { OrderItemModal } from './components/OrderItemModal';
 const OrderDetailPage = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const ordersListPath = `${getDashboardPath(user?.role?.name)}/orders/list`;
 
     const {
         fetchOrderDetail,
@@ -77,7 +81,7 @@ const OrderDetailPage = () => {
         };
 
         load();
-    }, [fetchOrderDetail, orderId]);
+    }, [fetchOrderDetail, orderId, setError]);
 
     const subtitle = useMemo(() => {
         if (!order) return 'Detalle del pedido';
@@ -120,7 +124,7 @@ const OrderDetailPage = () => {
         if (!order) return;
         const ok = await deleteOrder(order.id);
         if (ok) {
-            navigate('../list');
+            navigate(ordersListPath);
         }
         setShowDeleteAlert(false);
     };
@@ -168,7 +172,7 @@ const OrderDetailPage = () => {
         return (
             <div className="p-3">
                 <div className="alert alert-warning">No se encontró el pedido solicitado.</div>
-                <button type="button" className="btn btn-outline-dark" onClick={() => navigate('../list')}>
+                <button type="button" className="btn btn-outline-dark" onClick={() => navigate(ordersListPath)}>
                     Volver al listado
                 </button>
             </div>
@@ -183,7 +187,7 @@ const OrderDetailPage = () => {
                 icon={FiSave}
                 actionLabel="Volver"
                 actionIcon={FiArrowLeft}
-                onAction={() => navigate('../list')}
+                onAction={() => navigate(ordersListPath)}
             />
 
             {successMessage && (

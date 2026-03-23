@@ -7,6 +7,8 @@ import { OrderModal } from './components/OrderModal';
 import AppAlert from '~/core/components/AppAlert';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
+import { useAuth } from '~/core/auth/AuthContext';
+import { getDashboardPath } from '~/core/registry/dashboardPaths';
 
 const OrdersPage = () => {
     const {
@@ -23,6 +25,7 @@ const OrdersPage = () => {
         createOrder,
     } = useOrders();
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +71,10 @@ const OrdersPage = () => {
                     <OrdersTable
                         orders={orders}
                         isLoading={isLoadingOrders}
-                        onViewDetail={(orderId) => navigate(`../detail/${orderId}`)}
+                        onViewDetail={(orderId) => {
+                            const basePath = getDashboardPath(user?.role?.name);
+                            navigate(`${basePath}/orders/detail/${orderId}`);
+                        }}
                     />
 
                     <AppPagination
