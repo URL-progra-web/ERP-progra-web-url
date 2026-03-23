@@ -9,5 +9,6 @@ class ColorSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'hex_code',
+            'created_at',
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'created_at']

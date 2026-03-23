@@ -8,5 +8,6 @@ class SizeSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'created_at',
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'created_at']

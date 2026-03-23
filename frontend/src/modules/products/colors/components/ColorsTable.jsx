@@ -1,0 +1,92 @@
+import React from 'react';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+
+const getColorCode = (color) =>
+    color.code || color.hex_code || color.color_code || color.codigo || '';
+
+const ColorsTable = ({ colors, isLoading, onEdit, onDelete }) => {
+    if (isLoading) {
+        return (
+            <tbody>
+                <tr>
+                    <td colSpan="5" className="text-center py-5">
+                        <div className="spinner-border text-primary spinner-border-sm me-2"></div>
+                        <span className="text-muted">Cargando...</span>
+                    </td>
+                </tr>
+            </tbody>
+        );
+    }
+
+    return (
+        <tbody>
+            {colors.length === 0 ? (
+                <tr>
+                    <td colSpan="5" className="text-center py-5 text-muted">
+                        No se encontraron colores. Crea uno nuevo para empezar.
+                    </td>
+                </tr>
+            ) : colors.map(color => {
+                const colorCode = getColorCode(color);
+
+                return (
+                    <tr key={color.id} className="border-bottom border-light-subtle">
+                        <td className="px-4 py-3">
+                            <div className="fw-bold text-body">{color.name}</div>
+                        </td>
+
+                        <td className="py-3 text-secondary small">
+                            {colorCode || '—'}
+                        </td>
+
+                        <td className="py-3">
+                            {colorCode ? (
+                                <span
+                                    className="d-inline-block rounded border"
+                                    style={{
+                                        width: '24px',
+                                        height: '24px',
+                                        backgroundColor: colorCode,
+                                    }}
+                                    title={colorCode}
+                                />
+                            ) : (
+                                <span className="text-muted small">Sin código</span>
+                            )}
+                        </td>
+
+                        <td className="py-3 text-secondary small">
+                            {color.created_at
+                                ? new Date(color.created_at).toLocaleDateString()
+                                : color.created
+                                    ? new Date(color.created).toLocaleDateString()
+                                    : color.createdAt
+                                        ? new Date(color.createdAt).toLocaleDateString()
+                                        : '—'}
+                        </td>
+
+                        <td className="px-4 py-3 text-end">
+                            <button
+                                className="btn btn-sm btn-outline-secondary border-0 me-2"
+                                onClick={() => onEdit(color)}
+                                title="Editar"
+                            >
+                                <FiEdit2 size={14} className="text-primary" />
+                            </button>
+
+                            <button
+                                className="btn btn-sm btn-outline-secondary border-0"
+                                onClick={() => onDelete(color)}
+                                title="Eliminar"
+                            >
+                                <FiTrash2 size={14} className="text-danger" />
+                            </button>
+                        </td>
+                    </tr>
+                );
+            })}
+        </tbody>
+    );
+};
+
+export default ColorsTable;
