@@ -41,7 +41,7 @@ const OrdersPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Pedidos"
-                subtitle={`${orders.length} pedido(s) registrado(s)`}
+                subtitle={`${count} pedido(s) registrado(s)`}
                 icon={FiShoppingCart}
                 actionLabel="Nuevo Pedido"
                 actionIcon={FiShoppingCart}
@@ -54,7 +54,7 @@ const OrdersPage = () => {
                         <div className="d-flex flex-column gap-2">
                             <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                                 <h6 className="mb-0 text-uppercase text-muted small">Listado</h6>
-                                <span className="badge bg-dark-subtle text-dark-emphasis">{orders.length}</span>
+                                <span className="badge bg-dark-subtle text-dark-emphasis">{count}</span>
                             </div>
                             <input
                                 type="search"

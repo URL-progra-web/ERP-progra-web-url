@@ -42,6 +42,7 @@ const OrderDetailPage = () => {
     const [itemToEdit, setItemToEdit] = useState(null);
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [isSubmittingItem, setIsSubmittingItem] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
     const [formData, setFormData] = useState({
         payment_method_id: '',
         shipping_address: '',
@@ -66,6 +67,8 @@ const OrderDetailPage = () => {
                     shipping_cost: detail.shipping_cost ?? '',
                     notes: detail.notes || '',
                 });
+            } else {
+                setError('No se pudo cargar el detalle del pedido.');
             }
 
             setCatalogs({ payment_methods: normalizeList(catalogData?.payment_methods) });
@@ -109,6 +112,7 @@ const OrderDetailPage = () => {
 
         if (updated) {
             setOrder(updated);
+            setSuccessMessage('Pedido actualizado correctamente.');
         }
     };
 
@@ -140,6 +144,7 @@ const OrderDetailPage = () => {
         if (ok) {
             const refreshed = await fetchOrderDetail(orderId);
             if (refreshed) setOrder(refreshed);
+            setSuccessMessage(itemId ? 'Item actualizado correctamente.' : 'Item agregado correctamente.');
         }
         return ok;
     };
@@ -150,6 +155,7 @@ const OrderDetailPage = () => {
         if (ok) {
             const refreshed = await fetchOrderDetail(orderId);
             if (refreshed) setOrder(refreshed);
+            setSuccessMessage('Item eliminado correctamente.');
         }
         setItemToDelete(null);
     };
@@ -179,6 +185,21 @@ const OrderDetailPage = () => {
                 actionIcon={FiArrowLeft}
                 onAction={() => navigate('../list')}
             />
+
+            {successMessage && (
+                <div className="alert alert-success" role="alert">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <span>{successMessage}</span>
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => setSuccessMessage('')}
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className="card border-0 shadow-sm">
                 <div className="card-header bg-body py-3 d-flex justify-content-between align-items-center">

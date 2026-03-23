@@ -14,7 +14,10 @@ export const useOrderItems = ({ orderId }) => {
     );
 
     const fetchItems = useCallback(async () => {
-        if (!orderId) return;
+        if (!orderId) {
+            setItems([]);
+            return;
+        }
         setIsLoadingItems(true);
         setError(null);
         try {

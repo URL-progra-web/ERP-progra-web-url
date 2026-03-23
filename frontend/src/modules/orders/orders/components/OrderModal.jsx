@@ -19,6 +19,7 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [items, setItems] = useState([]);
     const [itemDraft, setItemDraft] = useState({ variant_id: '', quantity: 1 });
+    const [itemDraftError, setItemDraftError] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -53,6 +54,7 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                 customer_id: ''
             }));
         }
+        setItemDraftError('');
     }, [isOpen, initialCustomer]);
 
     const handleChange = (e) => {
@@ -113,13 +115,31 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
     const addItemDraft = () => {
         const variantId = Number(itemDraft.variant_id);
         const quantity = Number(itemDraft.quantity);
-        if (!variantId || variantId <= 0 || !quantity || quantity <= 0) return;
+
+        if (!variantId || variantId <= 0) {
+            setItemDraftError('Debes ingresar un Variant ID válido.');
+            return;
+        }
+
+        if (!quantity || quantity <= 0) {
+            setItemDraftError('La cantidad debe ser mayor a cero.');
+            return;
+        }
+
+        const alreadyExists = items.some((item) => Number(item.variant_id) === variantId);
+        if (alreadyExists) {
+            setItemDraftError('Ya agregaste ese Variant ID en la lista de items.');
+            return;
+        }
+
+        setItemDraftError('');
         setItems((prev) => ([...prev, { variant_id: variantId, quantity }]));
         setItemDraft({ variant_id: '', quantity: 1 });
     };
 
     const removeDraftItem = (index) => {
         setItems((prev) => prev.filter((_, i) => i !== index));
+        setItemDraftError('');
     };
 
     return (
@@ -222,6 +242,8 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                         ))}
                     </div>
                 )}
+
+                {itemDraftError && <div className="text-danger small mt-2">{itemDraftError}</div>}
 
                 <div className="form-text">Si agregas items aquí, se crearán de forma atómica junto con la orden.</div>
             </div>
