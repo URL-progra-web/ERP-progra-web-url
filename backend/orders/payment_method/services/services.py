@@ -33,11 +33,23 @@ class PaymentMethodService:
         return self.repository.create(name=normalized, is_active=is_active)
 
     def update_method(self, method_id: int, name: Optional[str] = None, is_active: Optional[bool] = None) -> PaymentMethod:
+        method = self.get_method(method_id)
+        updates = {}
         if name is not None:
-            raise ValueError('Renombrar métodos de pago no está permitido')
-        if is_active is None:
-            raise ValueError('Debe especificar el nuevo estado activo')
-        return self.set_active_state(method_id, is_active)
+            normalized = name.strip()
+            if not normalized:
+                raise ValueError('El nombre no puede estar vacío')
+            if method.is_protected and method.name != normalized:
+                raise ValueError('No se permite renombrar métodos de pago protegidos del sistema')
+            existing = self.repository.get_by_name(normalized)
+            if existing and existing.id != method.id:
+                raise PaymentMethodAlreadyExists(f"El método de pago '{normalized}' ya existe")
+            updates['name'] = normalized
+        if is_active is not None:
+            updates['is_active'] = is_active
+        if not updates:
+            return method
+        return self.repository.update(method, **updates)
 
     def set_active_state(self, method_id: int, is_active: bool) -> PaymentMethod:
         method = self.get_method(method_id)
@@ -47,6 +59,8 @@ class PaymentMethodService:
 
     def delete_method(self, method_id: int) -> None:
         method = self.get_method(method_id)
+        if method.is_protected:
+            raise ValueError('No se permite eliminar métodos de pago protegidos del sistema')
         if Order.objects.filter(payment_method=method).exists():
             raise PaymentMethodInUse('El método de pago está asociado a órdenes existentes y no puede eliminarse')
         self.repository.delete(method)

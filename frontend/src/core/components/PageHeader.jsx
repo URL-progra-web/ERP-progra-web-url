@@ -1,10 +1,11 @@
 import React from 'react';
+import { useTheme } from '../theme/ThemeContext';
 
 const BUTTON_VARIANTS = {
     dark: 'btn btn-dark fw-semibold text-white',
     primary: 'btn btn-primary fw-semibold text-white',
     secondary: 'btn btn-secondary fw-semibold text-white',
-    light: 'btn btn-outline-light fw-semibold text-white',
+    light: 'btn btn-light fw-semibold text-dark',
 };
 
 const PageHeader = ({
@@ -16,10 +17,12 @@ const PageHeader = ({
     actionLabel,
     actionIcon: ActionIcon,
     actionVariant,
-    isDark = false,
     onAction,
     className = '',
 }) => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     // When in dark mode, default to 'light' variant for contrast; otherwise default to 'dark'
     const effectiveVariant = actionVariant ?? (isDark ? 'light' : 'dark');
     const buttonClass = BUTTON_VARIANTS[effectiveVariant] ?? BUTTON_VARIANTS.dark;

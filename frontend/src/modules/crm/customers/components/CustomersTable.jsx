@@ -21,6 +21,7 @@ export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
                     <tr>
                         <th className="border-0 px-4">Cliente</th>
                         <th className="border-0">Contacto</th>
+                        <th className="border-0">Tipo</th>
                         <th className="border-0">Creado</th>
                         <th className="border-0 text-end px-4">Acciones</th>
                     </tr>
@@ -35,6 +36,11 @@ export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
                             <td>
                                 <div className="small">{customer.phone}</div>
                                 <div className="text-muted small">{customer.email || '—'}</div>
+                            </td>
+                            <td>
+                                <span className={`badge ${customer.customer_type === 'WHOLESALE' ? 'bg-warning-subtle text-warning-emphasis' : 'bg-info-subtle text-info-emphasis'}`}>
+                                    {customer.customer_type === 'WHOLESALE' ? 'Mayorista' : 'Minorista'}
+                                </span>
                             </td>
                             <td>
                                 <span className="badge bg-primary-subtle text-primary-emphasis">
