@@ -68,6 +68,14 @@ ROOT_URLCONF = 'backend.urls'
 GLOBAL_SEEDERS = [
     'users.seeds.UserSeeder',
     'inventory.uom.seeds.UomSeeder',
+    'products.color.seeds.ColorSeeder',
+    'products.size.seeds.SizeSeeder',
+    'products.category.seeds.CategorySeeder',
+    'inventory.business_unit.seeds.BusinessUnitSeeder',
+    'crm.entrepreneur.seeds.EntrepreneurSeeder',
+    'crm.customer.seeds.CustomerSeeder',
+    'products.product.seeds.ProductSeeder',
+    'products.variant.seeds.ProductVariantSeeder',
 ]
 
 REST_FRAMEWORK = {
