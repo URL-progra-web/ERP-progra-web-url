@@ -10,6 +10,7 @@ export const OrderItemModal = ({
     isSubmitting,
     item,
     statusOptions,
+    orderId,
 }) => {
     const isEdit = Boolean(item);
 
@@ -57,6 +58,7 @@ export const OrderItemModal = ({
                     search: variantSearch || undefined,
                     is_active: true,
                     in_stock: true,
+                    order_id: orderId,
                     page_size: 25,
                 });
                 if (!mounted) return;
@@ -79,7 +81,7 @@ export const OrderItemModal = ({
             mounted = false;
             clearTimeout(timer);
         };
-    }, [isOpen, isEdit, variantSearch]);
+    }, [isOpen, isEdit, variantSearch, orderId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

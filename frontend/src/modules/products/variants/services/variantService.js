@@ -1,13 +1,14 @@
 import api from '~/core/api/api';
 
 export const variantService = {
-    getVariants: async ({ search, is_active, in_stock, product, business_unit, page, page_size } = {}) => {
+    getVariants: async ({ search, is_active, in_stock, product, business_unit, order_id, page, page_size } = {}) => {
         const params = {};
         if (search) params.search = search;
         if (is_active !== undefined && is_active !== '') params.is_active = is_active;
         if (in_stock !== undefined && in_stock !== '') params.in_stock = in_stock;
         if (product !== undefined && product !== '') params.product = product;
         if (business_unit !== undefined && business_unit !== '') params.business_unit = business_unit;
+        if (order_id !== undefined && order_id !== '') params.order_id = order_id;
         if (page !== undefined && page !== '') params.page = page;
         if (page_size !== undefined && page_size !== '') params.page_size = page_size;
 

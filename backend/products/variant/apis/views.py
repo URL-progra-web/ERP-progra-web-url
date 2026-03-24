@@ -1,5 +1,6 @@
 from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
+from orders.order.models.models import Order
 from products.variant.models.models import ProductVariant
 from products.variant.serializers.serializers import ProductVariantSerializer
 
@@ -63,5 +64,20 @@ class ProductVariantViewSet(ModelViewSet):
                 queryset = queryset.filter(product__business_unit_id=int(business_unit))
             except (TypeError, ValueError):
                 return queryset.none()
+
+        order_id = params.get('order_id')
+        if order_id not in (None, ''):
+            try:
+                parsed_order_id = int(order_id)
+            except (TypeError, ValueError):
+                return queryset.none()
+
+            order = Order.objects.filter(id=parsed_order_id).first()
+            if not order:
+                return queryset.none()
+
+            first_item = order.items.select_related('variant__product').first()
+            if first_item:
+                queryset = queryset.filter(product__business_unit_id=first_item.variant.product.business_unit_id)
 
         return queryset

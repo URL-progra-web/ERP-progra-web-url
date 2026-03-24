@@ -346,6 +346,7 @@ const OrderDetailPage = () => {
                 isSubmitting={isSubmittingItem}
                 item={itemToEdit}
                 statusOptions={statusOptions}
+                orderId={order?.id}
             />
 
             {itemToDelete && (
