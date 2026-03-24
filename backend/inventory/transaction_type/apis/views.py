@@ -1,11 +1,13 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from users.permissions import HasRole
 from inventory.transaction_type.serializers.serializers import TransactionTypeSerializer, TransactionTypeCreateSerializer
 from inventory.transaction_type.services.services import TransactionTypeService
 
 class TransactionTypeViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasRole]
+    allowed_roles = ['ADMIN']
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

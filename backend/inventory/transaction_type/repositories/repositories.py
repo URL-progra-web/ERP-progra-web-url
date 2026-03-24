@@ -1,6 +1,7 @@
-from typing import Optional, List
+from typing import Optional
 from django.core.exceptions import ObjectDoesNotExist
 from inventory.transaction_type.models.models import TransactionType
+from django.db.models import QuerySet
 
 class TransactionTypeRepository:
     def get_by_id(self, name: str) -> Optional[TransactionType]:
@@ -9,8 +10,8 @@ class TransactionTypeRepository:
         except ObjectDoesNotExist:
             return None
 
-    def get_all(self) -> List[TransactionType]:
-        return list(TransactionType.objects.all())
+    def get_all(self) -> QuerySet[TransactionType]:
+        return TransactionType.objects.all()
 
     def create(self, name: str, factor: int, description: str = None) -> TransactionType:
         return TransactionType.objects.create(

@@ -1,6 +1,7 @@
 from typing import Optional, List
 from inventory.transaction_type.models.models import TransactionType
 from inventory.transaction_type.repositories.repositories import TransactionTypeRepository
+from django.db.models import QuerySet
 
 class TransactionTypeService:
     def __init__(self, repository: TransactionTypeRepository = None):
@@ -9,7 +10,7 @@ class TransactionTypeService:
     def get_transaction_type(self, name: str) -> Optional[TransactionType]:
         return self.repository.get_by_id(name)
 
-    def list_transaction_types(self) -> List[TransactionType]:
+    def list_transaction_types(self) -> QuerySet[TransactionType]:
         return self.repository.get_all()
 
     def create_transaction_type(self, name: str, factor: int, description: str = None) -> TransactionType:

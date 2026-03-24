@@ -1,5 +1,6 @@
-from typing import Optional, List
+from typing import Optional
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import QuerySet
 from inventory.transaction.models.models import InventoryTransaction
 from products.variant.models.models import ProductVariant
 from users.user.models.models import User
@@ -12,8 +13,8 @@ class InventoryTransactionRepository:
         except ObjectDoesNotExist:
             return None
 
-    def get_all(self) -> List[InventoryTransaction]:
-        return list(InventoryTransaction.objects.select_related('variant', 'user', 'transaction_type').all())
+    def get_all(self) -> QuerySet[InventoryTransaction]:
+        return TransactionType.objects.select_related('variant', 'user', 'transaction_type').all()
 
     def get_filtered(self, variant_id: int = None, transaction_type_name: str = None):
         qs = InventoryTransaction.objects.select_related('variant', 'user', 'transaction_type').all()

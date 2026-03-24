@@ -1,12 +1,14 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from users.permissions import HasRole
 from core.mixins import PaginationMixin
 from inventory.transaction.serializers.serializers import InventoryTransactionSerializer, InventoryTransactionCreateSerializer
 from inventory.transaction.services.services import InventoryTransactionService
 
 class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasRole]
+    allowed_roles = ['ADMIN']
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
