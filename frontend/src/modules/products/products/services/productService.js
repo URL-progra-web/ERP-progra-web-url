@@ -1,10 +1,12 @@
 import api from '~/core/api/api';
 
 export const productService = {
-    getProducts: async ({ search, category } = {}) => {
+    getProducts: async ({ search, category, entrepreneur, business_unit } = {}) => {
         const params = {};
         if (search) params.search = search;
         if (category) params.category = category;
+        if (entrepreneur) params.entrepreneur = entrepreneur;
+        if (business_unit) params.business_unit = business_unit;
         const response = await api.get('/products/products/', { params });
         return response.data;
     },

@@ -1,32 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { colorService } from '../services/colorService';
 
-function useDebounce(value, delay = 400) {
-    const [debounced, setDebounced] = useState(value);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setDebounced(value), delay);
-        return () => clearTimeout(timer);
-    }, [value, delay]);
-
-    return debounced;
-}
-
 export function useColors() {
     const [colors, setColors] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [searchInput, setSearchInput] = useState('');
-
-    const debouncedSearch = useDebounce(searchInput);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const fetchColors = useCallback(async () => {
         try {
             setIsLoading(true);
 
             const result = await colorService.getColors({
-                search: debouncedSearch || undefined,
+                search: searchTerm || undefined,
             });
 
             const data = Array.isArray(result) ? result : result.results || [];
@@ -37,11 +25,15 @@ export function useColors() {
         } finally {
             setIsLoading(false);
         }
-    }, [debouncedSearch]);
+    }, [searchTerm]);
 
     useEffect(() => {
         fetchColors();
     }, [fetchColors]);
+
+    const handleSearch = () => {
+        setSearchTerm(searchInput);
+    };
 
     const saveColor = async (data, id = null) => {
         if (id) {
@@ -62,6 +54,7 @@ export function useColors() {
         isLoading,
         error,
         searchInput, setSearchInput,
+        handleSearch,
         saveColor,
         deleteColor,
     };

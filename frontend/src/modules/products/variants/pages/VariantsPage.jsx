@@ -17,6 +17,7 @@ const VariantsPage = () => {
         isLoading,
         error,
         searchInput, setSearchInput,
+        handleSearch,
         activeFilter, setActiveFilter,
         saveVariant,
         deleteVariant,
@@ -77,6 +78,7 @@ const VariantsPage = () => {
                     <VariantsFilters
                         searchInput={searchInput}
                         onSearchChange={setSearchInput}
+                        onSearch={handleSearch}
                         activeFilter={activeFilter}
                         onActiveChange={setActiveFilter}
                     />
