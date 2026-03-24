@@ -36,18 +36,54 @@ class OrderAPIView(APIView):
         super().__init__(**kwargs)
         self.service = orders_container.order_service
 
+    @staticmethod
+    def _error_response(message: str, code: str, http_status: int, details=None):
+        payload = {
+            'error': message,
+            'code': code,
+        }
+        if details is not None:
+            payload['details'] = details
+        return Response(payload, status=http_status)
+
+    @staticmethod
+    def _order_error_code(exc: Exception) -> str:
+        mapping = {
+            InvalidOrderData: 'order_invalid_data',
+            DuplicateOrderShortId: 'order_duplicate_short_id',
+            OrderStatusDefaultNotConfigured: 'order_default_status_missing',
+            OrderItemStockUnavailable: 'order_item_stock_unavailable',
+            OrderItemBusinessUnitMismatch: 'order_item_business_unit_mismatch',
+            OrderItemStatusDefaultNotConfigured: 'order_item_default_status_missing',
+            DuplicateOrderItemVariant: 'order_item_duplicate_variant',
+            InvalidOrderItemData: 'order_item_invalid_data',
+        }
+        for exc_type, code in mapping.items():
+            if isinstance(exc, exc_type):
+                return code
+        return 'order_unknown_error'
+
     def get(self, request):
         try:
             orders = self.service.list_orders()
             serializer = OrderSerializer(orders, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception:
-            return Response({'error': 'No se pudieron listar las órdenes'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return self._error_response(
+                message='No se pudieron listar las órdenes',
+                code='order_list_failed',
+                http_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     def post(self, request):
         serializer = OrderCreateSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response({'error': 'Datos inválidos', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return self._error_response(
+                message='Datos inválidos',
+                code='validation_error',
+                http_status=status.HTTP_400_BAD_REQUEST,
+                details=serializer.errors,
+            )
 
         try:
             validated_data = serializer.validated_data
@@ -92,9 +128,17 @@ class OrderAPIView(APIView):
             DuplicateOrderItemVariant,
             InvalidOrderItemData,
         ) as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            return self._error_response(
+                message=str(exc),
+                code=self._order_error_code(exc),
+                http_status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception:
-            return Response({'error': 'No se pudo crear la orden'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return self._error_response(
+                message='No se pudo crear la orden',
+                code='order_create_failed',
+                http_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class OrderDetailAPIView(APIView):
@@ -104,6 +148,16 @@ class OrderDetailAPIView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = orders_container.order_service
+
+    @staticmethod
+    def _error_response(message: str, code: str, http_status: int, details=None):
+        payload = {
+            'error': message,
+            'code': code,
+        }
+        if details is not None:
+            payload['details'] = details
+        return Response(payload, status=http_status)
 
     @staticmethod
     def _parse_pk(pk) -> int:
@@ -116,7 +170,7 @@ class OrderDetailAPIView(APIView):
         try:
             order = self.service.get_order(self._parse_pk(pk))
         except OrderNotFound as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+            return self._error_response(str(exc), 'order_not_found', status.HTTP_404_NOT_FOUND)
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
 
     def put(self, request, pk=None):
@@ -128,7 +182,12 @@ class OrderDetailAPIView(APIView):
     def _update(self, request, pk=None, partial: bool = False):
         serializer = OrderUpdateSerializer(data=request.data, partial=partial)
         if not serializer.is_valid():
-            return Response({'error': 'Datos inválidos', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return self._error_response(
+                message='Datos inválidos',
+                code='validation_error',
+                http_status=status.HTTP_400_BAD_REQUEST,
+                details=serializer.errors,
+            )
 
         try:
             order = self.service.update_order(
@@ -141,16 +200,16 @@ class OrderDetailAPIView(APIView):
                 notes=serializer.validated_data.get('notes'),
             )
         except OrderNotFound as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+            return self._error_response(str(exc), 'order_not_found', status.HTTP_404_NOT_FOUND)
         except InvalidOrderData as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            return self._error_response(str(exc), 'order_invalid_data', status.HTTP_400_BAD_REQUEST)
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk=None):
         try:
             self.service.delete_order(self._parse_pk(pk))
         except OrderNotFound as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+            return self._error_response(str(exc), 'order_not_found', status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

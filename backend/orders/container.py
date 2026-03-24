@@ -1,4 +1,4 @@
-from orders.products.services import ProductServiceMock
+from orders.products.services import ProductService
 from orders.products.interfaces import IProductService
 from orders.order.repositories.repositories import OrderRepository
 from orders.order.services.services import OrderService
@@ -14,7 +14,7 @@ class OrdersContainer:
     Using a container pattern allows us to:
     - Avoid creating multiple instances of the same service
     - Centralize dependency configuration
-    - Easily swap implementations (e.g., replace ProductServiceMock with real ProductService)
+    - Easily swap implementations
     - Mock dependencies during testing
     
     Example usage in APIs:
@@ -26,10 +26,7 @@ class OrdersContainer:
     """
 
     def __init__(self):
-        # Reemplazar service con:
-        # from products.services import ProductService
-        # self.product_service: IProductService = ProductService(...)
-        self.product_service: IProductService = ProductServiceMock()
+        self.product_service: IProductService = ProductService()
 
         # Order domain dependencies
         self.order_repository = OrderRepository()

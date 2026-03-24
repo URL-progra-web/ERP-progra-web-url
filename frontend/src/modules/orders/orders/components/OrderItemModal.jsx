@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { variantService } from '~/modules/products/variants/services/variantService';
+import { normalizeList } from '../helpers/normalizeList';
 
 export const OrderItemModal = ({
     isOpen,
@@ -17,26 +19,78 @@ export const OrderItemModal = ({
         status_id: '',
     });
 
+    const [variantSearch, setVariantSearch] = useState('');
+    const [variantOptions, setVariantOptions] = useState([]);
+    const [isLoadingVariants, setIsLoadingVariants] = useState(false);
+    const [variantsError, setVariantsError] = useState('');
+
     useEffect(() => {
         if (!isOpen) return;
+
         if (item) {
             setFormData({
                 variant_id: item.variant || '',
                 quantity: item.quantity || 1,
                 status_id: item.status || '',
             });
-        } else {
-            setFormData({
-                variant_id: '',
-                quantity: 1,
-                status_id: '',
-            });
+            return;
         }
+
+        setFormData({
+            variant_id: '',
+            quantity: 1,
+            status_id: '',
+        });
+        setVariantSearch('');
     }, [isOpen, item]);
+
+    useEffect(() => {
+        if (!isOpen || isEdit) return;
+
+        let mounted = true;
+        setIsLoadingVariants(true);
+        setVariantsError('');
+
+        const timer = setTimeout(async () => {
+            try {
+                const payload = await variantService.getVariants({
+                    search: variantSearch || undefined,
+                    is_active: true,
+                    in_stock: true,
+                    page_size: 25,
+                });
+                if (!mounted) return;
+                setVariantOptions(normalizeList(payload));
+            } catch (err) {
+                if (!mounted) return;
+                setVariantsError(
+                    err.response?.data?.error
+                    || err.response?.data?.message
+                    || err.response?.data?.detail
+                    || 'No se pudieron cargar variantes'
+                );
+                setVariantOptions([]);
+            } finally {
+                if (mounted) setIsLoadingVariants(false);
+            }
+        }, 350);
+
+        return () => {
+            mounted = false;
+            clearTimeout(timer);
+        };
+    }, [isOpen, isEdit, variantSearch]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleVariantChange = (e) => {
+        setFormData((prev) => ({
+            ...prev,
+            variant_id: e.target.value,
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -46,7 +100,8 @@ export const OrderItemModal = ({
         };
 
         if (!isEdit) {
-            payload.variant_id = Number(formData.variant_id);
+            if (!selectedVariant) return;
+            payload.variant_id = Number(selectedVariant.id);
         }
 
         if (formData.status_id) {
@@ -57,11 +112,15 @@ export const OrderItemModal = ({
         if (success) onClose();
     };
 
+    const selectedVariant = !isEdit
+        ? variantOptions.find((variant) => Number(variant.id) === Number(formData.variant_id))
+        : null;
+
     const submitDisabled =
         isSubmitting ||
         !formData.quantity ||
         Number(formData.quantity) <= 0 ||
-        (!isEdit && !formData.variant_id);
+        (!isEdit && !selectedVariant);
 
     return (
         <AppModal
@@ -75,19 +134,54 @@ export const OrderItemModal = ({
             submitDisabled={submitDisabled}
         >
             {!isEdit && (
-                <div className="mb-3">
-                    <label className="form-label">ID de Variant *</label>
-                    <input
-                        type="number"
-                        min="1"
-                        className="form-control"
-                        name="variant_id"
-                        value={formData.variant_id}
-                        onChange={handleChange}
-                        placeholder="Ej. 123"
-                    />
-                    <div className="form-text">Por ahora se ingresa el ID del variant directamente.</div>
-                </div>
+                <>
+                    <div className="mb-2">
+                        <label className="form-label">Buscar Variante</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={variantSearch}
+                            onChange={(e) => setVariantSearch(e.target.value)}
+                            placeholder="SKU, producto, talla o color"
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Variante *</label>
+                        <select
+                            className="form-select"
+                            name="variant_id"
+                            value={formData.variant_id}
+                            onChange={handleVariantChange}
+                            disabled={isLoadingVariants}
+                        >
+                            <option value="">
+                                {isLoadingVariants ? 'Cargando variantes...' : '(Selecciona una variante)'}
+                            </option>
+                            {variantOptions.map((variant) => (
+                                <option
+                                    key={variant.id}
+                                    value={String(variant.id)}
+                                >
+                                    {variant.sku} - {variant.product_name || 'Sin producto'}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="form-text">
+                            Filtra con el buscador y luego selecciona una variante. Resultados: {variantOptions.length}
+                        </div>
+                        {variantsError && <div className="text-danger small mt-1">{variantsError}</div>}
+                    </div>
+
+                    {selectedVariant && (
+                        <div className="alert alert-secondary py-2 px-3 mb-3">
+                            <div><strong>SKU:</strong> {selectedVariant.sku}</div>
+                            <div><strong>Producto:</strong> {selectedVariant.product_name || '-'}</div>
+                            <div><strong>Precio:</strong> ${Number(selectedVariant.price ?? 0).toFixed(2)}</div>
+                            <div><strong>Stock:</strong> {selectedVariant.quantity_available ?? 0}</div>
+                        </div>
+                    )}
+                </>
             )}
 
             <div className="mb-3">

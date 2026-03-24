@@ -30,6 +30,30 @@ class OrderItemAPIView(APIView):
 		super().__init__(**kwargs)
 		self.service = orders_container.order_item_service
 
+	@staticmethod
+	def _error_response(message: str, code: str, http_status: int, details=None):
+		payload = {
+			'error': message,
+			'code': code,
+		}
+		if details is not None:
+			payload['details'] = details
+		return Response(payload, status=http_status)
+
+	@staticmethod
+	def _item_error_code(exc: Exception) -> str:
+		mapping = {
+			InvalidOrderItemData: 'order_item_invalid_data',
+			OrderItemStockUnavailable: 'order_item_stock_unavailable',
+			OrderItemBusinessUnitMismatch: 'order_item_business_unit_mismatch',
+			OrderItemStatusDefaultNotConfigured: 'order_item_default_status_missing',
+			DuplicateOrderItemVariant: 'order_item_duplicate_variant',
+		}
+		for exc_type, code in mapping.items():
+			if isinstance(exc, exc_type):
+				return code
+		return 'order_item_unknown_error'
+
 	def get(self, request):
 		order_id = request.query_params.get('order_id')
 		parsed_order_id = None
@@ -37,7 +61,7 @@ class OrderItemAPIView(APIView):
 			try:
 				parsed_order_id = int(order_id)
 			except (TypeError, ValueError):
-				return Response({'error': 'order_id inválido'}, status=status.HTTP_400_BAD_REQUEST)
+				return self._error_response('order_id inválido', 'validation_error', status.HTTP_400_BAD_REQUEST)
 
 		items = self.service.list_items(order_id=parsed_order_id)
 		return Response(OrderItemSerializer(items, many=True).data, status=status.HTTP_200_OK)
@@ -45,7 +69,12 @@ class OrderItemAPIView(APIView):
 	def post(self, request):
 		serializer = OrderItemCreateSerializer(data=request.data)
 		if not serializer.is_valid():
-			return Response({'error': 'Datos inválidos', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+			return self._error_response(
+				'Datos inválidos',
+				'validation_error',
+				status.HTTP_400_BAD_REQUEST,
+				serializer.errors,
+			)
 
 		try:
 			item = self.service.create_item(
@@ -55,7 +84,7 @@ class OrderItemAPIView(APIView):
 				status=serializer.validated_data.get('status_id'),
 			)
 		except OrderNotFound as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+			return self._error_response(str(exc), 'order_not_found', status.HTTP_404_NOT_FOUND)
 		except (
 			InvalidOrderItemData,
 			OrderItemStockUnavailable,
@@ -63,7 +92,11 @@ class OrderItemAPIView(APIView):
 			OrderItemStatusDefaultNotConfigured,
 			DuplicateOrderItemVariant,
 		) as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+			return self._error_response(
+				str(exc),
+				self._item_error_code(exc),
+				status.HTTP_400_BAD_REQUEST,
+			)
 
 		return Response(OrderItemSerializer(item).data, status=status.HTTP_201_CREATED)
 
@@ -76,10 +109,39 @@ class OrderItemBulkCreateAPIView(APIView):
 		super().__init__(**kwargs)
 		self.service = orders_container.order_item_service
 
+	@staticmethod
+	def _error_response(message: str, code: str, http_status: int, details=None):
+		payload = {
+			'error': message,
+			'code': code,
+		}
+		if details is not None:
+			payload['details'] = details
+		return Response(payload, status=http_status)
+
+	@staticmethod
+	def _item_error_code(exc: Exception) -> str:
+		mapping = {
+			InvalidOrderItemData: 'order_item_invalid_data',
+			OrderItemStockUnavailable: 'order_item_stock_unavailable',
+			OrderItemBusinessUnitMismatch: 'order_item_business_unit_mismatch',
+			OrderItemStatusDefaultNotConfigured: 'order_item_default_status_missing',
+			DuplicateOrderItemVariant: 'order_item_duplicate_variant',
+		}
+		for exc_type, code in mapping.items():
+			if isinstance(exc, exc_type):
+				return code
+		return 'order_item_unknown_error'
+
 	def post(self, request):
 		serializer = OrderItemBulkCreateSerializer(data=request.data)
 		if not serializer.is_valid():
-			return Response({'error': 'Datos inválidos', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+			return self._error_response(
+				'Datos inválidos',
+				'validation_error',
+				status.HTTP_400_BAD_REQUEST,
+				serializer.errors,
+			)
 
 		items_payload = []
 		for item in serializer.validated_data['items']:
@@ -95,7 +157,7 @@ class OrderItemBulkCreateAPIView(APIView):
 				items_payload=items_payload,
 			)
 		except OrderNotFound as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+			return self._error_response(str(exc), 'order_not_found', status.HTTP_404_NOT_FOUND)
 		except (
 			InvalidOrderItemData,
 			OrderItemStockUnavailable,
@@ -103,7 +165,11 @@ class OrderItemBulkCreateAPIView(APIView):
 			OrderItemStatusDefaultNotConfigured,
 			DuplicateOrderItemVariant,
 		) as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+			return self._error_response(
+				str(exc),
+				self._item_error_code(exc),
+				status.HTTP_400_BAD_REQUEST,
+			)
 
 		return Response(OrderItemSerializer(items, many=True).data, status=status.HTTP_201_CREATED)
 
@@ -117,6 +183,29 @@ class OrderItemDetailAPIView(APIView):
 		self.service = orders_container.order_item_service
 
 	@staticmethod
+	def _error_response(message: str, code: str, http_status: int, details=None):
+		payload = {
+			'error': message,
+			'code': code,
+		}
+		if details is not None:
+			payload['details'] = details
+		return Response(payload, status=http_status)
+
+	@staticmethod
+	def _item_error_code(exc: Exception) -> str:
+		mapping = {
+			InvalidOrderItemData: 'order_item_invalid_data',
+			OrderItemStockUnavailable: 'order_item_stock_unavailable',
+			OrderItemBusinessUnitMismatch: 'order_item_business_unit_mismatch',
+			DuplicateOrderItemVariant: 'order_item_duplicate_variant',
+		}
+		for exc_type, code in mapping.items():
+			if isinstance(exc, exc_type):
+				return code
+		return 'order_item_unknown_error'
+
+	@staticmethod
 	def _parse_pk(pk) -> int:
 		try:
 			return int(pk)
@@ -127,13 +216,18 @@ class OrderItemDetailAPIView(APIView):
 		try:
 			item = self.service.get_item(self._parse_pk(pk))
 		except OrderItemNotFound as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+			return self._error_response(str(exc), 'order_item_not_found', status.HTTP_404_NOT_FOUND)
 		return Response(OrderItemSerializer(item).data, status=status.HTTP_200_OK)
 
 	def patch(self, request, pk=None):
 		serializer = OrderItemUpdateSerializer(data=request.data, partial=True)
 		if not serializer.is_valid():
-			return Response({'error': 'Datos inválidos', 'details': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+			return self._error_response(
+				'Datos inválidos',
+				'validation_error',
+				status.HTTP_400_BAD_REQUEST,
+				serializer.errors,
+			)
 
 		try:
 			item = self.service.update_item(
@@ -142,14 +236,18 @@ class OrderItemDetailAPIView(APIView):
 				status=serializer.validated_data.get('status_id'),
 			)
 		except OrderItemNotFound as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+			return self._error_response(str(exc), 'order_item_not_found', status.HTTP_404_NOT_FOUND)
 		except (
 			InvalidOrderItemData,
 			OrderItemStockUnavailable,
 			OrderItemBusinessUnitMismatch,
 			DuplicateOrderItemVariant,
 		) as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+			return self._error_response(
+				str(exc),
+				self._item_error_code(exc),
+				status.HTTP_400_BAD_REQUEST,
+			)
 
 		return Response(OrderItemSerializer(item).data, status=status.HTTP_200_OK)
 
@@ -157,5 +255,5 @@ class OrderItemDetailAPIView(APIView):
 		try:
 			self.service.delete_item(self._parse_pk(pk))
 		except OrderItemNotFound as exc:
-			return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+			return self._error_response(str(exc), 'order_item_not_found', status.HTTP_404_NOT_FOUND)
 		return Response(status=status.HTTP_204_NO_CONTENT)

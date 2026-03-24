@@ -7,11 +7,20 @@ export const useOrderItems = ({ orderId }) => {
     const [isLoadingItems, setIsLoadingItems] = useState(false);
     const [error, setError] = useState(null);
 
-    const parseError = (err, fallback) => (
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        fallback
-    );
+    const parseError = (err, fallback) => {
+        const data = err.response?.data;
+        if (!data) return fallback;
+        if (typeof data === 'string') return data;
+        if (data.error) return data.error;
+        if (data.message) return data.message;
+        if (data.detail) return data.detail;
+
+        const firstKey = Object.keys(data)[0];
+        const firstValue = firstKey ? data[firstKey] : null;
+        if (Array.isArray(firstValue) && firstValue.length) return String(firstValue[0]);
+        if (typeof firstValue === 'string') return firstValue;
+        return fallback;
+    };
 
     const fetchItems = useCallback(async () => {
         if (!orderId) {

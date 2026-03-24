@@ -1,27 +1,16 @@
-"""
-Temporary Product Service Implementation
-This is a temporary mock service that accesses the ProductVariant ORM directly.
-When the products team completes their service, this can be replaced by just
-changing the dependency injection in the container.
-"""
+"""Product service implementation for the orders module."""
 
 from typing import Optional, Dict, Any
 from orders.products.interfaces import IProductService
 from products.variant.models.models import ProductVariant
-from products.product.models.models import Product
-from django.db.models import Q
 
 
-class ProductServiceMock(IProductService):
+class ProductService(IProductService):
     """
-    Temporary mock implementation of ProductService.
-    Accesses ProductVariant ORM directly and caches basic queries.
-    
-    Usage in container:
-        self.product_service = ProductServiceMock()
-        
-    When products service is ready, simply replace with:
-        self.product_service = ProductService(repository=ProductRepository())
+    Product service used by orders.
+
+    It reads ProductVariant data from the products module and adapts it to the
+    dictionary contract expected by OrderItemService.
     """
 
     def get_variant_by_id(self, variant_id: int) -> Optional[Dict[str, Any]]:
@@ -132,3 +121,7 @@ class ProductServiceMock(IProductService):
             'created_at'        : variant.created_at.isoformat() if variant.created_at else None,
             'updated_at'        : variant.updated_at.isoformat() if variant.updated_at else None,
         }
+
+
+# Backward-compatibility alias while imports are migrated.
+ProductServiceMock = ProductService
