@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Third party
+    'drf_spectacular',
     'rest_framework',
     'corsheaders',
     # Local
@@ -67,6 +68,14 @@ ROOT_URLCONF = 'backend.urls'
 GLOBAL_SEEDERS = [
     'users.seeds.UserSeeder',
     'inventory.uom.seeds.UomSeeder',
+    'products.color.seeds.ColorSeeder',
+    'products.size.seeds.SizeSeeder',
+    'products.category.seeds.CategorySeeder',
+    'inventory.business_unit.seeds.BusinessUnitSeeder',
+    'crm.entrepreneur.seeds.EntrepreneurSeeder',
+    'crm.customer.seeds.CustomerSeeder',
+    'products.product.seeds.ProductSeeder',
+    'products.variant.seeds.ProductVariantSeeder',
 ]
 
 REST_FRAMEWORK = {
@@ -75,7 +84,29 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'backend.schema.CustomAutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'ERP API',
+    'DESCRIPTION': 'API endpoints for the ERP system',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'bearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
+    'SECURITY': [{'bearerAuth': []}],
 }
 
 SIMPLE_JWT = {

@@ -11,10 +11,11 @@ class UomSeeder(BaseSeeder):
     def run(self):
         # Seed UOMs
         uoms_data = [
-            {'code': 'KG', 'name': 'Kilogramo'},
-            {'code': 'G', 'name': 'Gramo'},
-            {'code': 'LT', 'name': 'Litro'},
-            {'code': 'ML', 'name': 'Mililitro'},
+            {'code': 'und', 'name': 'Unidad'},
+            {'code': 'kg', 'name': 'Kilogramo'},
+            {'code': 'g', 'name': 'Gramo'},
+            {'code': 'lt', 'name': 'Litro'},
+            {'code': 'ml', 'name': 'Mililitro'},
         ]
 
         uom_objs = {}
@@ -30,8 +31,8 @@ class UomSeeder(BaseSeeder):
 
         # Seed Conversions
         conversions_data = [
-            {'from_code': 'KG', 'to_code': 'G', 'multiplier': 1000},
-            {'from_code': 'LT', 'to_code': 'ML', 'multiplier': 1000},
+            {'from_code': 'kg', 'to_code': 'g', 'multiplier': 1000},
+            {'from_code': 'lt', 'to_code': 'ml', 'multiplier': 1000},
         ]
 
         for data in conversions_data:
