@@ -45,7 +45,8 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             setSelectedCustomer(initialCustomer);
             setFormData(prev => ({
                 ...prev,
-                customer_id: String(initialCustomer.id)
+                customer_id: String(initialCustomer.id),
+                shipping_address: initialCustomer.address || prev.shipping_address || ''
             }));
         } else {
             setSelectedCustomer(null);
@@ -98,7 +99,8 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
         setSelectedCustomer(customer);
         setFormData(prev => ({
             ...prev,
-            customer_id: String(customer.id)
+            customer_id: String(customer.id),
+            shipping_address: customer.address || ''
         }));
     };
 
@@ -180,6 +182,18 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                         </option>
                     ))}
                 </select>
+            </div>
+
+            <div className="mb-3">
+                <label className="form-label">Dirección de Envío</label>
+                <textarea
+                    className="form-control"
+                    name="shipping_address"
+                    value={formData.shipping_address}
+                    onChange={handleChange}
+                    rows="2"
+                    placeholder="Se autocompleta con la dirección del cliente, pero puedes cambiarla"
+                ></textarea>
             </div>
 
             <div className="mb-3">
