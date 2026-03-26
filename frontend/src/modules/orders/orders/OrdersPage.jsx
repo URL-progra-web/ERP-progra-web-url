@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiShoppingCart } from 'react-icons/fi';
 import { useOrders } from './hooks/useOrders';
 import { OrdersTable } from './components/OrdersTable';
-import { OrderModal } from './components/OrderModal';
 import AppAlert from '~/core/components/AppAlert';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
@@ -22,23 +21,10 @@ const OrdersPage = () => {
         isLoadingOrders,
         error,
         setError,
-        createOrder,
     } = useOrders();
     const navigate = useNavigate();
     const { user } = useAuth();
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const handleCreateOrder = async (payload) => {
-        setIsSubmitting(true);
-        const success = await createOrder(payload);
-        setIsSubmitting(false);
-        if (success) {
-            setIsModalOpen(false);
-        }
-        return success;
-    };
+    const basePath = getDashboardPath(user?.role?.name);
 
     return (
         <div className="container-fluid p-0">
@@ -48,7 +34,7 @@ const OrdersPage = () => {
                 icon={FiShoppingCart}
                 actionLabel="Nuevo Pedido"
                 actionIcon={FiShoppingCart}
-                onAction={() => setIsModalOpen(true)}
+                onAction={() => navigate(`${basePath}/orders/create`)}
             />
 
             <div className="d-flex flex-column gap-4">
@@ -72,7 +58,6 @@ const OrdersPage = () => {
                         orders={orders}
                         isLoading={isLoadingOrders}
                         onViewDetail={(orderId) => {
-                            const basePath = getDashboardPath(user?.role?.name);
                             navigate(`${basePath}/orders/detail/${orderId}`);
                         }}
                     />
@@ -85,13 +70,6 @@ const OrdersPage = () => {
                     />
                 </div>
             </div>
-
-            <OrderModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleCreateOrder}
-                isSubmitting={isSubmitting}
-            />
 
             {error && (
                 <AppAlert

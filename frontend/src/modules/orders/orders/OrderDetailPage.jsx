@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
@@ -15,6 +15,7 @@ import { OrderItemModal } from './components/OrderItemModal';
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
     const { user } = useAuth();
     const ordersListPath = `${getDashboardPath(user?.role?.name)}/orders/list`;
@@ -46,7 +47,7 @@ const OrderDetailPage = () => {
     const [itemToEdit, setItemToEdit] = useState(null);
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [isSubmittingItem, setIsSubmittingItem] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || '');
     const [formData, setFormData] = useState({
         payment_method_id: '',
         shipping_address: '',
@@ -82,6 +83,11 @@ const OrderDetailPage = () => {
 
         load();
     }, [fetchOrderDetail, orderId, setError]);
+
+    useEffect(() => {
+        if (!location.state?.successMessage) return;
+        navigate(location.pathname, { replace: true, state: {} });
+    }, [location.pathname, location.state, navigate]);
 
     const subtitle = useMemo(() => {
         if (!order) return 'Detalle del pedido';

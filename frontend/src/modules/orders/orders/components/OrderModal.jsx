@@ -11,7 +11,6 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
         shipping_address: '',
         shipping_cost: 0,
         notes: '',
-        short_id: ''
     });
 
     const [paymentMethods, setPaymentMethods] = useState([]);
@@ -76,7 +75,6 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
         if (formData.shipping_address) payload.shipping_address = formData.shipping_address;
         if (formData.shipping_cost) payload.shipping_cost = parseFloat(formData.shipping_cost);
         if (formData.notes) payload.notes = formData.notes;
-        if (formData.short_id) payload.short_id = formData.short_id;
         if (items.length) payload.items = items;
 
         const success = await onSubmit(payload);
@@ -87,7 +85,6 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                 shipping_address: '',
                 shipping_cost: 0,
                 notes: '',
-                short_id: ''
             });
             setSelectedCustomer(null);
             setItems([]);

@@ -48,12 +48,12 @@ export const useOrders = ({ autoFetch = true } = {}) => {
     const createOrder = useCallback(async (payload) => {
         try {
             setError(null);
-            await orderService.create(payload);
+            const created = await orderService.create(payload);
             await fetchOrders();
-            return true;
+            return created;
         } catch (err) {
             setError(parseError(err, 'Error al crear el pedido'));
-            return false;
+            return null;
         }
     }, [fetchOrders]);
 

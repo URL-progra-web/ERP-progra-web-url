@@ -61,20 +61,11 @@ class OrderService:
         customer,
         status: Optional[OrderStatus] = None,
         payment_method=None,
-        short_id: Optional[str] = None,
         shipping_address: Optional[str] = None,
         shipping_cost: Decimal = Decimal('0.00'),
         notes: Optional[str] = None,
     ):
-        if short_id:
-            normalized_short_id = short_id.strip().upper()
-            if not normalized_short_id:
-                raise InvalidOrderData('El short_id no puede estar vacío')
-            if self.repository.exists_by_short_id(normalized_short_id):
-                raise DuplicateOrderShortId(f"Ya existe una orden con short_id '{normalized_short_id}'")
-            short_id = normalized_short_id
-        else:
-            short_id = self._build_unique_short_id()
+        short_id = self._build_unique_short_id()
 
         status = status or self._get_default_status()
 
@@ -95,7 +86,6 @@ class OrderService:
         items_payload: list[dict],
         status: Optional[OrderStatus] = None,
         payment_method=None,
-        short_id: Optional[str] = None,
         shipping_address: Optional[str] = None,
         shipping_cost: Decimal = Decimal('0.00'),
         notes: Optional[str] = None,
@@ -109,7 +99,6 @@ class OrderService:
             customer=customer,
             status=status,
             payment_method=payment_method,
-            short_id=short_id,
             shipping_address=shipping_address,
             shipping_cost=shipping_cost,
             notes=notes,
@@ -167,7 +156,6 @@ def create_order(
     customer_id,
     status_id=None,
     payment_method_id=None,
-    short_id=None,
     shipping_address=None,
     shipping_cost=Decimal('0.00'),
     notes=None,
@@ -176,7 +164,6 @@ def create_order(
         customer=customer_id,
         status=status_id,
         payment_method=payment_method_id,
-        short_id=short_id,
         shipping_address=shipping_address,
         shipping_cost=shipping_cost,
         notes=notes,

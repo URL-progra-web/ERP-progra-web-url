@@ -47,7 +47,6 @@ class OrderSerializer(serializers.ModelSerializer):
         return total or 0
 
 class OrderCreateSerializer(serializers.Serializer):
-    short_id = serializers.CharField(max_length=20, required=False, allow_blank=True)
     customer_id = serializers.PrimaryKeyRelatedField(
         queryset=Customer.objects.all(), required=True, write_only=True
     )

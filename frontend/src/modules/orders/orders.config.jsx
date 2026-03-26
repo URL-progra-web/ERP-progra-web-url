@@ -4,6 +4,7 @@ import PaymentMethodsPage from './paymentMethods/PaymentMethodsPage';
 import OrderStatusesPage from './orderStatuses/OrderStatusesPage';
 import OrdersPage from './orders/OrdersPage';
 import OrderDetailPage from './orders/OrderDetailPage';
+import OrderCreatePage from './orders/OrderCreatePage';
 
 export const ordersFeature = {
     id: 'orders',
@@ -22,6 +23,14 @@ export const ordersFeature = {
             icon: FiShoppingCart,
             roles: ['MANAGER', 'ADMIN'],
             element: <OrderDetailPage />,
+            hidden: true,
+        },
+        {
+            text: 'Crear Pedido',
+            path: 'orders/create',
+            icon: FiShoppingCart,
+            roles: ['MANAGER', 'ADMIN'],
+            element: <OrderCreatePage />,
             hidden: true,
         },
         {
