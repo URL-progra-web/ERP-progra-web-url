@@ -23,6 +23,8 @@ const OrderCreatePage = () => {
     const {
         variants,
         products,
+        entrepreneurs,
+        businessUnits,
         colors,
         sizes,
         uoms,
@@ -34,6 +36,10 @@ const OrderCreatePage = () => {
         handleSearch,
         productFilter,
         setProductFilter,
+        entrepreneurFilter,
+        setEntrepreneurFilter,
+        businessUnitFilter,
+        setBusinessUnitFilter,
         colorFilter,
         setColorFilter,
         sizeFilter,
@@ -189,6 +195,10 @@ const OrderCreatePage = () => {
                                 onSearch={handleSearch}
                                 productFilter={productFilter}
                                 onProductChange={setProductFilter}
+                                entrepreneurFilter={entrepreneurFilter}
+                                onEntrepreneurChange={setEntrepreneurFilter}
+                                businessUnitFilter={businessUnitFilter}
+                                onBusinessUnitChange={setBusinessUnitFilter}
                                 colorFilter={colorFilter}
                                 onColorChange={setColorFilter}
                                 sizeFilter={sizeFilter}
@@ -196,6 +206,8 @@ const OrderCreatePage = () => {
                                 uomFilter={uomFilter}
                                 onUomChange={setUomFilter}
                                 products={products}
+                                entrepreneurs={entrepreneurs}
+                                businessUnits={businessUnits}
                                 colors={colors}
                                 sizes={sizes}
                                 uoms={uoms}

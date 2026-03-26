@@ -11,6 +11,8 @@ const VariantsPage = () => {
     const {
         variants,
         products,
+        entrepreneurs,
+        businessUnits,
         colors,
         sizes,
         uoms,
@@ -21,6 +23,8 @@ const VariantsPage = () => {
         handleSearch,
         activeFilter, setActiveFilter,
         productFilter, setProductFilter,
+        entrepreneurFilter, setEntrepreneurFilter,
+        businessUnitFilter, setBusinessUnitFilter,
         colorFilter, setColorFilter,
         sizeFilter, setSizeFilter,
         uomFilter, setUomFilter,
@@ -96,6 +100,10 @@ const VariantsPage = () => {
                         onActiveChange={setActiveFilter}
                         productFilter={productFilter}
                         onProductChange={setProductFilter}
+                        entrepreneurFilter={entrepreneurFilter}
+                        onEntrepreneurChange={setEntrepreneurFilter}
+                        businessUnitFilter={businessUnitFilter}
+                        onBusinessUnitChange={setBusinessUnitFilter}
                         colorFilter={colorFilter}
                         onColorChange={setColorFilter}
                         sizeFilter={sizeFilter}
@@ -103,6 +111,8 @@ const VariantsPage = () => {
                         uomFilter={uomFilter}
                         onUomChange={setUomFilter}
                         products={products}
+                        entrepreneurs={entrepreneurs}
+                        businessUnits={businessUnits}
                         colors={colors}
                         sizes={sizes}
                         uoms={uoms}
@@ -120,6 +130,8 @@ const VariantsPage = () => {
                             <tr>
                                 <th className="border-0 px-4 py-3">Producto / SKU</th>
                                 <th className="border-0 py-3">Color</th>
+                                <th className="border-0 py-3">Emprendedor/Proveedor</th>
+                                <th className="border-0 py-3">Sede</th>
                                 <th className="border-0 py-3">Talla</th>
                                 <th className="border-0 py-3">U. Medida</th>
                                 <th className="border-0 py-3">Costo</th>

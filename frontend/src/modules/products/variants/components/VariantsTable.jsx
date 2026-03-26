@@ -6,7 +6,7 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
         return (
             <tbody>
                 <tr>
-                    <td colSpan="8" className="text-center py-5">
+                    <td colSpan="10" className="text-center py-5">
                         <div className="spinner-border text-primary spinner-border-sm me-2"></div>
                         <span className="text-muted">Cargando...</span>
                     </td>
@@ -19,7 +19,7 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
         <tbody>
             {variants.length === 0 ? (
                 <tr>
-                    <td colSpan="8" className="text-center py-5 text-muted">
+                    <td colSpan="10" className="text-center py-5 text-muted">
                         No se encontraron variantes. Crea una nueva para empezar.
                     </td>
                 </tr>
@@ -31,6 +31,8 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
                     </td>
 
                     <td className="py-3">{variant.color_name || '—'}</td>
+                    <td className="py-3 text-secondary">{variant.entrepreneur_name || '—'}</td>
+                    <td className="py-3 text-secondary">{variant.business_unit_name || '—'}</td>
                     <td className="py-3">{variant.size_name || '—'}</td>
                     <td className="py-3">{variant.uom_name || '—'}</td>
                     <td className="py-3">Q {variant.cost}</td>

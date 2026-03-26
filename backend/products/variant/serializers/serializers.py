@@ -4,6 +4,10 @@ from products.variant.models.models import ProductVariant
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
+    entrepreneur = serializers.IntegerField(source='product.entrepreneur_id', read_only=True)
+    entrepreneur_name = serializers.CharField(source='product.entrepreneur.company_name', read_only=True)
+    business_unit = serializers.IntegerField(source='product.business_unit_id', read_only=True)
+    business_unit_name = serializers.CharField(source='product.business_unit.name', read_only=True)
     size_name = serializers.CharField(source='size.name', read_only=True)
     color_name = serializers.CharField(source='color.name', read_only=True)
     uom_name = serializers.CharField(source='uom.name', read_only=True)
@@ -14,6 +18,10 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             'id',
             'product',
             'product_name',
+            'entrepreneur',
+            'entrepreneur_name',
+            'business_unit',
+            'business_unit_name',
             'sku',
             'size',
             'size_name',

@@ -7,6 +7,10 @@ export const OrderCatalogFilters = ({
     onSearch,
     productFilter,
     onProductChange,
+    entrepreneurFilter,
+    onEntrepreneurChange,
+    businessUnitFilter,
+    onBusinessUnitChange,
     colorFilter,
     onColorChange,
     sizeFilter,
@@ -14,6 +18,8 @@ export const OrderCatalogFilters = ({
     uomFilter,
     onUomChange,
     products = [],
+    entrepreneurs = [],
+    businessUnits = [],
     colors = [],
     sizes = [],
     uoms = [],
@@ -60,6 +66,26 @@ export const OrderCatalogFilters = ({
                         <option value="">Todos</option>
                         {colors.map((color) => (
                             <option key={color.id} value={color.id}>{color.name}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="col-12 col-md-6">
+                    <label className="form-label small text-muted mb-1">Emprendedor/Proveedor</label>
+                    <select className="form-select" value={entrepreneurFilter} onChange={(e) => onEntrepreneurChange(e.target.value)}>
+                        <option value="">Todos</option>
+                        {entrepreneurs.map((entrepreneur) => (
+                            <option key={entrepreneur.id} value={entrepreneur.id}>{entrepreneur.company_name}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="col-12 col-md-6">
+                    <label className="form-label small text-muted mb-1">Sede</label>
+                    <select className="form-select" value={businessUnitFilter} onChange={(e) => onBusinessUnitChange(e.target.value)}>
+                        <option value="">Todas</option>
+                        {businessUnits.map((businessUnit) => (
+                            <option key={businessUnit.id} value={businessUnit.id}>{businessUnit.name}</option>
                         ))}
                     </select>
                 </div>

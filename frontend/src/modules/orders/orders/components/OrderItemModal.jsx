@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AppModal from '~/core/components/AppModal';
 import { variantService } from '~/modules/products/variants/services/variantService';
 import { normalizeList } from '../helpers/normalizeList';
+import { formatCurrency } from '../helpers/formatCurrency';
 
 export const OrderItemModal = ({
     isOpen,
@@ -179,7 +180,7 @@ export const OrderItemModal = ({
                         <div className="alert alert-secondary py-2 px-3 mb-3">
                             <div><strong>SKU:</strong> {selectedVariant.sku}</div>
                             <div><strong>Producto:</strong> {selectedVariant.product_name || '-'}</div>
-                            <div><strong>Precio:</strong> ${Number(selectedVariant.price ?? 0).toFixed(2)}</div>
+                            <div><strong>Precio:</strong> {formatCurrency(selectedVariant.price)}</div>
                             <div><strong>Stock:</strong> {selectedVariant.quantity_available ?? 0}</div>
                         </div>
                     )}

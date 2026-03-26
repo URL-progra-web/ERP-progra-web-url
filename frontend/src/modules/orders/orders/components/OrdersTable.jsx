@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatCurrency } from '../helpers/formatCurrency';
 
 export const OrdersTable = ({ orders, isLoading, onViewDetail }) => {
     if (isLoading) {
@@ -34,12 +35,7 @@ export const OrdersTable = ({ orders, isLoading, onViewDetail }) => {
                             <td>{order.payment_method_name || 'N/A'}</td>
                             <td>{order.status_name || `Estado #${order.status}`}</td>
                             <td className="text-end">{order.total_quantity ?? 0}</td>
-                            <td className="text-end">$
-                                {Number(order.total_amount ?? 0).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })}
-                            </td>
+                            <td className="text-end">{formatCurrency(order.total_amount)}</td>
                             <td>{new Date(order.created_at).toLocaleDateString()}</td>
                             <td className="text-end pe-4">
                                 <button

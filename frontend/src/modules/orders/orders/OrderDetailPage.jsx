@@ -9,6 +9,7 @@ import { useOrders } from './hooks/useOrders';
 import { useOrderItems } from './hooks/useOrderItems';
 import { orderService } from './services/orderService';
 import { orderStatusesService } from '../orderStatuses/services/orderStatusesService';
+import { formatCurrency } from './helpers/formatCurrency';
 import { normalizeList } from './helpers/normalizeList';
 import { OrderItemsTable } from './components/OrderItemsTable';
 import { OrderItemModal } from './components/OrderItemModal';
@@ -298,10 +299,7 @@ const OrderDetailPage = () => {
                     <div>
                         <h6 className="mb-0 text-uppercase text-muted small">Items del Pedido</h6>
                         <small className="text-muted">
-                            {items.length} item(s) • Total: ${Number(order.total_amount ?? 0).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                            })}
+                            {items.length} item(s) • Total: {formatCurrency(order.total_amount)}
                         </small>
                     </div>
                     <button type="button" className="btn btn-sm btn-dark" onClick={handleOpenCreateItem}>

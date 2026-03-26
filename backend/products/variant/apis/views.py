@@ -25,6 +25,7 @@ class ProductVariantViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = ProductVariant.objects.select_related(
             'product',
+            'product__entrepreneur',
             'product__business_unit',
             'size',
             'color',
@@ -55,6 +56,13 @@ class ProductVariantViewSet(ModelViewSet):
         if product not in (None, ''):
             try:
                 queryset = queryset.filter(product_id=int(product))
+            except (TypeError, ValueError):
+                return queryset.none()
+
+        entrepreneur = params.get('entrepreneur')
+        if entrepreneur not in (None, ''):
+            try:
+                queryset = queryset.filter(product__entrepreneur_id=int(entrepreneur))
             except (TypeError, ValueError):
                 return queryset.none()
 

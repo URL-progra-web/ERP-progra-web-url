@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from orders.order.exceptions import (
     DuplicateOrderShortId,
     InvalidOrderData,
+    OrderDeleteNotAllowed,
     OrderNotFound,
     OrderStatusDefaultNotConfigured,
 )
@@ -57,6 +58,7 @@ class OrderAPIView(APIView):
             OrderItemStatusDefaultNotConfigured: 'order_item_default_status_missing',
             DuplicateOrderItemVariant: 'order_item_duplicate_variant',
             InvalidOrderItemData: 'order_item_invalid_data',
+            OrderDeleteNotAllowed: 'order_delete_not_allowed',
         }
         for exc_type, code in mapping.items():
             if isinstance(exc, exc_type):
@@ -208,6 +210,8 @@ class OrderDetailAPIView(APIView):
             self.service.delete_order(self._parse_pk(pk))
         except OrderNotFound as exc:
             return self._error_response(str(exc), 'order_not_found', status.HTTP_404_NOT_FOUND)
+        except OrderDeleteNotAllowed as exc:
+            return self._error_response(str(exc), 'order_delete_not_allowed', status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

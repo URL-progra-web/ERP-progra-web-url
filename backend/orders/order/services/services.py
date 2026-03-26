@@ -7,6 +7,7 @@ from django.db import transaction
 
 from orders.order.exceptions import (
     DuplicateOrderShortId,
+    OrderDeleteNotAllowed,
     InvalidOrderData,
     OrderNotFound,
     OrderStatusDefaultNotConfigured,
@@ -142,6 +143,8 @@ class OrderService:
     @transaction.atomic
     def delete_order(self, order_id: int) -> None:
         order = self.get_order(order_id)
+        if order.status.name.upper() != 'SOLICITADO':
+            raise OrderDeleteNotAllowed('Solo se pueden eliminar pedidos en estado SOLICITADO')
         self.repository.delete(order)
 
 

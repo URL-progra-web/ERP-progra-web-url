@@ -32,6 +32,8 @@ export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = [] }
                     <tr>
                         <th className="px-4 py-3 border-0">Producto</th>
                         <th className="py-3 border-0">Especificacion</th>
+                        <th className="py-3 border-0">Emprendedor/Proveedor</th>
+                        <th className="py-3 border-0">Sede</th>
                         <th className="py-3 border-0 text-end">Precio</th>
                         <th className="py-3 border-0 text-end">Stock</th>
                         <th className="px-4 py-3 border-0 text-end">Accion</th>
@@ -49,6 +51,8 @@ export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = [] }
                                     <div className="small text-muted">SKU: {variant.sku}</div>
                                 </td>
                                 <td className="py-3 text-muted">{renderSpec(variant)}</td>
+                                <td className="py-3 text-muted">{variant.entrepreneur_name || '—'}</td>
+                                <td className="py-3 text-muted">{variant.business_unit_name || '—'}</td>
                                 <td className="py-3 text-end fw-semibold">{formatMoney(variant.price)}</td>
                                 <td className="py-3 text-end">{stock}</td>
                                 <td className="px-4 py-3 text-end">

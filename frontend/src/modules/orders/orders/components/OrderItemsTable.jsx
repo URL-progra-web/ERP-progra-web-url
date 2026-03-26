@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatCurrency } from '../helpers/formatCurrency';
 
 export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
@@ -29,18 +30,8 @@ export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete }) => {
                             <td className="ps-3">#{item.id}</td>
                             <td>{item.variant_sku || `Variant #${item.variant}`}</td>
                             <td className="text-end">{item.quantity}</td>
-                            <td className="text-end">
-                                ${Number(item.unit_price ?? 0).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })}
-                            </td>
-                            <td className="text-end fw-semibold">
-                                ${Number(item.line_total ?? 0).toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })}
-                            </td>
+                            <td className="text-end">{formatCurrency(item.unit_price)}</td>
+                            <td className="text-end fw-semibold">{formatCurrency(item.line_total)}</td>
                             <td>{item.status_name || `#${item.status}`}</td>
                             <td className="text-end pe-3">
                                 <div className="btn-group">
