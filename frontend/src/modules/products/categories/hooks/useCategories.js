@@ -1,30 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { categoryService } from '../services/categoryService';
 
-function useDebounce(value, delay = 400) {
-    const [debounced, setDebounced] = useState(value);
-    useEffect(() => {
-        const timer = setTimeout(() => setDebounced(value), delay);
-        return () => clearTimeout(timer);
-    }, [value, delay]);
-    return debounced;
-}
-
 export function useCategories() {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [searchInput, setSearchInput] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const [leafFilter, setLeafFilter] = useState('');
-
-    const debouncedSearch = useDebounce(searchInput);
 
     const fetchCategories = useCallback(async () => {
         try {
             setIsLoading(true);
             const result = await categoryService.getCategories({
-                search: debouncedSearch || undefined,
+                search: searchTerm || undefined,
                 is_leaf: leafFilter === 'leaf' ? 'true' : leafFilter === 'parent' ? 'false' : undefined,
             });
             const data = Array.isArray(result) ? result : result.results || [];
@@ -39,9 +29,13 @@ export function useCategories() {
         } finally {
             setIsLoading(false);
         }
-    }, [debouncedSearch, leafFilter]);
+    }, [searchTerm, leafFilter]);
 
     useEffect(() => { fetchCategories(); }, [fetchCategories]);
+
+    const handleSearch = () => {
+        setSearchTerm(searchInput);
+    };
 
     const saveCategory = async (data, id = null) => {
         if (id) {
@@ -62,6 +56,7 @@ export function useCategories() {
         isLoading,
         error,
         searchInput, setSearchInput,
+        searchTerm, handleSearch,
         leafFilter, setLeafFilter,
         saveCategory,
         deleteCategory,

@@ -80,4 +80,25 @@ class ProductVariantViewSet(ModelViewSet):
             if first_item:
                 queryset = queryset.filter(product__business_unit_id=first_item.variant.product.business_unit_id)
 
+        color = params.get('color')
+        if color not in (None, ''):
+            try:
+                queryset = queryset.filter(color_id=int(color))
+            except (TypeError, ValueError):
+                return queryset.none()
+
+        size = params.get('size')
+        if size not in (None, ''):
+            try:
+                queryset = queryset.filter(size_id=int(size))
+            except (TypeError, ValueError):
+                return queryset.none()
+
+        uom = params.get('uom')
+        if uom not in (None, ''):
+            try:
+                queryset = queryset.filter(uom_id=int(uom))
+            except (TypeError, ValueError):
+                return queryset.none()
+
         return queryset

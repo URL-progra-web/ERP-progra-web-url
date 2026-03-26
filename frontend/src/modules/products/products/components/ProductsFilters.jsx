@@ -1,12 +1,23 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
 
-const ProductsFilters = ({ searchInput, onSearchChange, categoryFilter, onCategoryChange, categories }) => {
+const ProductsFilters = ({ 
+    searchInput, onSearchChange, onSearch, 
+    categoryFilter, onCategoryChange,
+    entrepreneurFilter, onEntrepreneurChange,
+    businessUnitFilter, onBusinessUnitChange,
+    categories, entrepreneurs, businessUnits 
+}) => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSearch();
+    };
+
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-md-6">
-                    <div className="input-group">
+                <div className="col-md">
+                    <form onSubmit={handleSubmit} className="input-group">
                         <span className="input-group-text bg-body border-end-0 text-muted">
                             <FiSearch size={14} />
                         </span>
@@ -17,17 +28,48 @@ const ProductsFilters = ({ searchInput, onSearchChange, categoryFilter, onCatego
                             value={searchInput}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
-                    </div>
+                        <button 
+                            className="btn btn-primary" 
+                            type="submit"
+                        >
+                            Buscar
+                        </button>
+                    </form>
                 </div>
-                <div className="col-md-3 col-6">
+                <div className="col-md-auto d-flex flex-wrap gap-2">
                     <select
                         className="form-select bg-body shadow-none text-body"
+                        style={{ minWidth: '180px' }}
                         value={categoryFilter}
                         onChange={(e) => onCategoryChange(e.target.value)}
                     >
                         <option value="">Todas las categorías</option>
                         {categories.map(cat => (
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        className="form-select bg-body shadow-none text-body"
+                        style={{ minWidth: '180px' }}
+                        value={entrepreneurFilter}
+                        onChange={(e) => onEntrepreneurChange(e.target.value)}
+                    >
+                        <option value="">Todos los emprendedores</option>
+                        {entrepreneurs.map(ent => (
+                            <option key={ent.id} value={ent.id}>{ent.company_name}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        className="form-select bg-body shadow-none text-body"
+                        style={{ minWidth: '180px' }}
+                        value={businessUnitFilter}
+                        onChange={(e) => onBusinessUnitChange(e.target.value)}
+                    >
+                        <option value="">Todas las sedes</option>
+                        {businessUnits.map(bu => (
+                            <option key={bu.id} value={bu.id}>{bu.name}</option>
                         ))}
                     </select>
                 </div>

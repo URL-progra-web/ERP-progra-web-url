@@ -11,6 +11,7 @@ const SizesPage = () => {
     const {
         sizes, isLoading, error,
         searchInput, setSearchInput,
+        handleSearch,
         saveSize, deleteSize,
     } = useSizes();
 
@@ -69,6 +70,7 @@ const SizesPage = () => {
                     <SizesFilters
                         searchInput={searchInput}
                         onSearchChange={setSearchInput}
+                        onSearch={handleSearch}
                     />
                 </div>
 

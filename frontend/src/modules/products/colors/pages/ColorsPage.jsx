@@ -11,6 +11,7 @@ const ColorsPage = () => {
     const {
         colors, isLoading, error,
         searchInput, setSearchInput,
+        handleSearch,
         saveColor, deleteColor,
     } = useColors();
 
@@ -69,6 +70,7 @@ const ColorsPage = () => {
                     <ColorsFilters
                         searchInput={searchInput}
                         onSearchChange={setSearchInput}
+                        onSearch={handleSearch}
                     />
                 </div>
 
