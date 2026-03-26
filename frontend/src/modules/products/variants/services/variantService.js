@@ -1,10 +1,20 @@
 import api from '~/core/api/api';
 
 export const variantService = {
-    getVariants: async ({ search, is_active } = {}) => {
+    getVariants: async ({ search, is_active, product, color, size, uom } = {}) => {
         const params = {};
-        if (search) params.search = search;
-        if (is_active !== undefined && is_active !== '') params.is_active = is_active;
+        const appendParam = (key, value) => {
+            if (value !== undefined && value !== null && value !== '') {
+                params[key] = value;
+            }
+        };
+
+        appendParam('search', search);
+        appendParam('is_active', is_active);
+        appendParam('product', product);
+        appendParam('color', color);
+        appendParam('size', size);
+        appendParam('uom', uom);
 
         const response = await api.get('/products/variants/', { params });
         return response.data;

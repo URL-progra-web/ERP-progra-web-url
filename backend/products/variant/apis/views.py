@@ -12,4 +12,8 @@ class ProductVariantViewSet(ModelViewSet):
     search_fields = ['sku', 'product__name']
     filterset_fields = {
         'is_active': ['exact'],
+        'product': ['exact'],
+        'color': ['exact'],
+        'size': ['exact'],
+        'uom': ['exact'],
     }

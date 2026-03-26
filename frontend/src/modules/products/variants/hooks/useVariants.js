@@ -14,6 +14,10 @@ export function useVariants() {
     const [searchInput, setSearchInput] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState('');
+    const [productFilter, setProductFilter] = useState('');
+    const [colorFilter, setColorFilter] = useState('');
+    const [sizeFilter, setSizeFilter] = useState('');
+    const [uomFilter, setUomFilter] = useState('');
 
     const normalize = (result) => Array.isArray(result) ? result : result.results || [];
 
@@ -24,6 +28,10 @@ export function useVariants() {
             const result = await variantService.getVariants({
                 search: searchTerm || undefined,
                 is_active: activeFilter === '' ? undefined : activeFilter,
+                product: productFilter || undefined,
+                color: colorFilter || undefined,
+                size: sizeFilter || undefined,
+                uom: uomFilter || undefined,
             });
 
             setVariants(normalize(result));
@@ -33,7 +41,7 @@ export function useVariants() {
         } finally {
             setIsLoading(false);
         }
-    }, [searchTerm, activeFilter]);
+    }, [searchTerm, activeFilter, productFilter, colorFilter, sizeFilter, uomFilter]);
 
     const fetchRelations = useCallback(async () => {
         try {
@@ -65,6 +73,16 @@ export function useVariants() {
         setSearchTerm(searchInput);
     };
 
+    const resetFilters = () => {
+        setActiveFilter('');
+        setProductFilter('');
+        setColorFilter('');
+        setSizeFilter('');
+        setUomFilter('');
+        setSearchInput('');
+        setSearchTerm('');
+    };
+
     const saveVariant = async (data, id = null) => {
         if (id) {
             await variantService.updateVariant(id, data);
@@ -87,9 +105,15 @@ export function useVariants() {
         uoms,
         isLoading,
         error,
+        setError,
         searchInput, setSearchInput,
         handleSearch,
         activeFilter, setActiveFilter,
+        productFilter, setProductFilter,
+        colorFilter, setColorFilter,
+        sizeFilter, setSizeFilter,
+        uomFilter, setUomFilter,
+        resetFilters,
         saveVariant,
         deleteVariant,
     };
