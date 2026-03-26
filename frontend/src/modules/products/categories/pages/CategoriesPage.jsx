@@ -12,6 +12,7 @@ const CategoriesPage = () => {
     const {
         categories, isLoading, error,
         searchInput, setSearchInput,
+        handleSearch,
         leafFilter, setLeafFilter,
         saveCategory, deleteCategory,
     } = useCategories();
@@ -113,6 +114,7 @@ const CategoriesPage = () => {
                     <CategoriesFilters
                         searchInput={searchInput}
                         onSearchChange={setSearchInput}
+                        onSearch={handleSearch}
                         leafFilter={leafFilter}
                         onLeafChange={setLeafFilter}
                     />

@@ -16,8 +16,15 @@ const VariantsPage = () => {
         uoms,
         isLoading,
         error,
+        setError,
         searchInput, setSearchInput,
+        handleSearch,
         activeFilter, setActiveFilter,
+        productFilter, setProductFilter,
+        colorFilter, setColorFilter,
+        sizeFilter, setSizeFilter,
+        uomFilter, setUomFilter,
+        resetFilters,
         saveVariant,
         deleteVariant,
     } = useVariants();
@@ -66,7 +73,14 @@ const VariantsPage = () => {
                 isDark
             />
 
-            {error && <div className="alert alert-danger">{error}</div>}
+            {error && (
+                <AppAlert
+                    type="danger"
+                    header="Error"
+                    content={error}
+                    onClose={() => setError(null)}
+                />
+            )}
 
             <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
                 <div className="bg-dark text-white px-4 py-3 border-bottom">
@@ -77,8 +91,22 @@ const VariantsPage = () => {
                     <VariantsFilters
                         searchInput={searchInput}
                         onSearchChange={setSearchInput}
+                        onSearch={handleSearch}
                         activeFilter={activeFilter}
                         onActiveChange={setActiveFilter}
+                        productFilter={productFilter}
+                        onProductChange={setProductFilter}
+                        colorFilter={colorFilter}
+                        onColorChange={setColorFilter}
+                        sizeFilter={sizeFilter}
+                        onSizeChange={setSizeFilter}
+                        uomFilter={uomFilter}
+                        onUomChange={setUomFilter}
+                        products={products}
+                        colors={colors}
+                        sizes={sizes}
+                        uoms={uoms}
+                        onReset={resetFilters}
                     />
                 </div>
 

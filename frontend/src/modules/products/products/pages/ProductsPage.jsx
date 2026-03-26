@@ -12,7 +12,10 @@ const ProductsPage = () => {
         products, categories, entrepreneurs, businessUnits,
         isLoading, error,
         searchInput, setSearchInput,
+        handleSearch,
         categoryFilter, setCategoryFilter,
+        entrepreneurFilter, setEntrepreneurFilter,
+        businessUnitFilter, setBusinessUnitFilter,
         saveProduct, deleteProduct,
     } = useProducts();
 
@@ -63,9 +66,16 @@ const ProductsPage = () => {
                     <ProductsFilters
                         searchInput={searchInput}
                         onSearchChange={setSearchInput}
+                        onSearch={handleSearch}
                         categoryFilter={categoryFilter}
                         onCategoryChange={setCategoryFilter}
+                        entrepreneurFilter={entrepreneurFilter}
+                        onEntrepreneurChange={setEntrepreneurFilter}
+                        businessUnitFilter={businessUnitFilter}
+                        onBusinessUnitChange={setBusinessUnitFilter}
                         categories={categories}
+                        entrepreneurs={entrepreneurs}
+                        businessUnits={businessUnits}
                     />
                 </div>
 
