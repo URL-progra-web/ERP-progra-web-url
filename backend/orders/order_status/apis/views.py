@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.mixins import PaginationMixin
+from orders.order_item.exceptions import OrderItemStockUnavailable
 from orders.order_status.exceptions import (
     InvalidOrderStatusTransition,
     OrderAlreadyTerminal,
@@ -85,7 +86,7 @@ class OrderStatusViewSet(viewsets.ViewSet, PaginationMixin):
             )
         except (OrderNotFound, OrderStatusNotFound) as exc:
             return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
-        except (InvalidOrderStatusTransition, OrderAlreadyTerminal) as exc:
+        except (InvalidOrderStatusTransition, OrderAlreadyTerminal, OrderItemStockUnavailable) as exc:
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({
             'order_id': order.id,

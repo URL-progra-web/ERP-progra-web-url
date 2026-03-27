@@ -1,11 +1,15 @@
+from decimal import Decimal
 from typing import Optional
+
+from inventory.uom_conversion.models.models import UoMConversion
+from inventory.uom.models.models import UoM
 from inventory.transaction.models.models import InventoryTransaction
 from products.variant.models.models import ProductVariant
 from users.user.models.models import User
 from inventory.transaction_type.models.models import TransactionType
 from inventory.transaction.repositories.repositories import InventoryTransactionRepository
 from django.db import transaction as db_transaction
-from django.db.models import QuerySet, F
+from django.db.models import QuerySet
 
 class InventoryTransactionService:
     def __init__(self, repository: InventoryTransactionRepository = None):
@@ -20,8 +24,20 @@ class InventoryTransactionService:
     def list_transactions_filtered(self, variant_id: int = None, transaction_type_name: str = None):
         return self.repository.get_filtered(variant_id=variant_id, transaction_type_name=transaction_type_name)
 
-    def create_transaction(self, variant_id: int, transaction_type_name: str, quantity: int, 
-                          user: User = None, reference: str = None, notes: str = None) -> InventoryTransaction:
+    @staticmethod
+    def _resolve_conversion(selected_uom: UoM, base_uom: UoM) -> Decimal:
+        if selected_uom.id == base_uom.id:
+            return Decimal('1')
+
+        conversion = UoMConversion.objects.filter(from_uom=selected_uom, to_uom=base_uom).first()
+        if not conversion:
+            raise ValueError(
+                f"No existe conversión de '{selected_uom.code}' hacia '{base_uom.code}'."
+            )
+        return Decimal(str(conversion.multiplier))
+
+    def create_transaction(self, variant_id: int, transaction_type_name: str, quantity,
+                          selected_uom_id: int, user: User = None, reference: str = None, notes: str = None) -> InventoryTransaction:
         try:
             transaction_type = TransactionType.objects.get(name=transaction_type_name)
         except TransactionType.DoesNotExist:
@@ -29,21 +45,32 @@ class InventoryTransactionService:
 
         with db_transaction.atomic():
             try:
-                # Lock row to prevent race conditions during read-modify-write
-                variant = ProductVariant.objects.select_for_update().get(id=variant_id)
+                variant = ProductVariant.objects.select_related('product__base_uom').get(id=variant_id)
             except ProductVariant.DoesNotExist:
                 raise ValueError(f"No se encontró la variante con id {variant_id}.")
-            
-            change_amount = quantity * transaction_type.factor
 
-            variant.quantity_available = F('quantity_available') + change_amount
-            variant.save()
+            try:
+                selected_uom = UoM.objects.get(id=selected_uom_id)
+            except UoM.DoesNotExist:
+                raise ValueError(f"No se encontró la UOM con id {selected_uom_id}.")
+
+            normalized_quantity = Decimal(str(quantity))
+            if normalized_quantity <= 0:
+                raise ValueError('La cantidad debe ser mayor a cero.')
+
+            base_uom = variant.product.base_uom
+            conversion_multiplier = self._resolve_conversion(selected_uom, base_uom)
+            base_quantity = normalized_quantity * conversion_multiplier
 
             new_inventory_transaction = self.repository.create(
                 variant=variant,
                 user=user,
                 transaction_type=transaction_type,
-                quantity=quantity,
+                selected_uom=selected_uom,
+                base_uom=base_uom,
+                quantity=normalized_quantity,
+                conversion_multiplier=conversion_multiplier,
+                base_quantity=base_quantity,
                 reference=reference,
                 notes=notes
             )
@@ -56,15 +83,4 @@ class InventoryTransactionService:
             raise ValueError(f"No se encontró la transacción con id {transaction_id}.")
         
         with db_transaction.atomic():
-            # Lock variant for safe update
-            try: 
-                variant = ProductVariant.objects.select_for_update().get(id=transaction_obj.variant_id)
-            except ProductVariant.DoesNotExist:
-                raise ValueError(f"No se encontró la variante con id {transaction_obj.variant_id}.")
-            
-            reversal_amount = (transaction_obj.quantity * transaction_obj.transaction_type.factor) * -1
-
-            variant.quantity_available = F('quantity_available') + reversal_amount
-            variant.save()
- 
             self.repository.delete(transaction_obj)

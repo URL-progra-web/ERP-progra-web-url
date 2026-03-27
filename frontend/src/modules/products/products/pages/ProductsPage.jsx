@@ -9,13 +9,14 @@ import PageHeader from '~/core/components/PageHeader';
 
 const ProductsPage = () => {
     const {
-        products, categories, entrepreneurs, businessUnits,
+        products, categories, entrepreneurs, businessUnits, uoms,
         isLoading, error,
         searchInput, setSearchInput,
         handleSearch,
         categoryFilter, setCategoryFilter,
         entrepreneurFilter, setEntrepreneurFilter,
         businessUnitFilter, setBusinessUnitFilter,
+        baseUomFilter, setBaseUomFilter,
         saveProduct, deleteProduct,
     } = useProducts();
 
@@ -73,9 +74,12 @@ const ProductsPage = () => {
                         onEntrepreneurChange={setEntrepreneurFilter}
                         businessUnitFilter={businessUnitFilter}
                         onBusinessUnitChange={setBusinessUnitFilter}
+                        baseUomFilter={baseUomFilter}
+                        onBaseUomChange={setBaseUomFilter}
                         categories={categories}
                         entrepreneurs={entrepreneurs}
                         businessUnits={businessUnits}
+                        uoms={uoms}
                     />
                 </div>
 
@@ -90,6 +94,7 @@ const ProductsPage = () => {
                                 <th className="border-0 py-3">Categoría</th>
                                 <th className="border-0 py-3">Emprendedor</th>
                                 <th className="border-0 py-3">Sede</th>
+                                <th className="border-0 py-3">UOM Base</th>
                                 <th className="border-0 px-4 py-3 text-end">Acciones</th>
                             </tr>
                         </thead>
@@ -109,6 +114,7 @@ const ProductsPage = () => {
                     categories={categories}
                     entrepreneurs={entrepreneurs}
                     businessUnits={businessUnits}
+                    uoms={uoms}
                     onClose={handleCloseModal}
                     onSave={handleSave}
                 />

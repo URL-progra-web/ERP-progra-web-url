@@ -3,6 +3,7 @@ from products.product.models.models import Product
 from products.category.models.models import Category
 from crm.entrepreneur.models.models import Entrepreneur
 from inventory.business_unit.models.models import BusinessUnit
+from inventory.uom.models.models import UoM
 
 
 class ProductSeeder(BaseSeeder):
@@ -25,6 +26,11 @@ class ProductSeeder(BaseSeeder):
             business_unit = BusinessUnit.objects.first()
             if not business_unit:
                 print("No business units found. Please run BusinessUnitSeeder first.")
+                return
+
+            base_uom = UoM.objects.filter(code__iexact='und').first()
+            if not base_uom:
+                print("No base UOM found. Please run UomSeeder first.")
                 return
         except Exception as e:
             print(f"Error getting dependencies: {e}")
@@ -118,7 +124,8 @@ class ProductSeeder(BaseSeeder):
                     description=data['description'],
                     category=data['category'],
                     entrepreneur=entrepreneur,
-                    business_unit=business_unit
+                    business_unit=business_unit,
+                    base_uom=base_uom,
                 )
                 print(f"Created product: {data['name']}")
             except Exception as e:
