@@ -146,7 +146,7 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             isOpen={isOpen}
             onClose={onClose}
             title="Nuevo Pedido"
-            tone="dark"
+            tone="dark" accent="var(--bs-orange)"
             size="md"
             onSubmit={handleSubmit}
             submitLabel="Guardar Pedido"

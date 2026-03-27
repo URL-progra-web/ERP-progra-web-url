@@ -60,7 +60,7 @@ const SizeModal = ({ size, onClose, onSave }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar Talla' : 'Nueva Talla'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}

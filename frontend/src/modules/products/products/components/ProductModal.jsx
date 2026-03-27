@@ -85,7 +85,7 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
     return (
         <AppModal
             title={isEditing ? 'Editar Producto' : 'Nuevo Producto'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear producto'}

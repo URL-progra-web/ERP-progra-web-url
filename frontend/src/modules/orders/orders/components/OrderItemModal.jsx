@@ -134,7 +134,7 @@ export const OrderItemModal = ({
             isOpen={isOpen}
             onClose={onClose}
             title={isEdit ? 'Editar Item de Pedido' : 'Agregar Item al Pedido'}
-            tone="dark"
+            tone="dark" accent="var(--bs-orange)"
             size="md"
             onSubmit={handleSubmit}
             submitLabel={isEdit ? 'Guardar Cambios' : 'Agregar Item'}

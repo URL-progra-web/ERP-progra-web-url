@@ -60,7 +60,7 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar emprendedor' : 'Nuevo emprendedor'}
-            tone="dark"
+            tone="dark" accent="var(--bs-success)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear emprendedor'}
@@ -123,7 +123,7 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
                     <option value="">Sin asignar</option>
                     {users.map((user) => (
                         <option key={user.id} value={user.id}>
-                            {user.username} ({user.email})
+                            {user.name} ({user.email})
                         </option>
                     ))}
                 </select>

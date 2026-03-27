@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2, FiRefreshCw, FiArrowRight } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 /**
  * Tab completa de Conversiones: filtros + tabla.
@@ -98,20 +99,10 @@ export function ConversionsTab({
                                         </code>
                                     </td>
                                     <td className="px-4 text-end">
-                                        <button
-                                            className="btn btn-sm btn-outline-secondary me-2"
-                                            title="Editar"
-                                            onClick={() => onEdit(conv)}
-                                        >
-                                            <FiEdit2 />
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-outline-danger"
-                                            title="Eliminar"
-                                            onClick={() => onDelete(conv)}
-                                        >
-                                            <FiTrash2 />
-                                        </button>
+                                        <TableActions actions={[
+                                            { icon: FiEdit2,  onClick: () => onEdit(conv),   title: 'Editar',   variant: 'primary' },
+                                            { icon: FiTrash2, onClick: () => onDelete(conv), title: 'Eliminar', variant: 'danger'  },
+                                        ]} />
                                     </td>
                                 </tr>
                             ))

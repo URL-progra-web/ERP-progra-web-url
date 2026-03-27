@@ -5,6 +5,7 @@ import { EntrepreneursFilters } from './components/EntrepreneursFilters';
 import { EntrepreneursTable } from './components/EntrepreneursTable';
 import { EntrepreneurModal } from './components/EntrepreneurModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
 
@@ -79,52 +80,42 @@ const EntrepreneursPage = () => {
                 actionLabel="Nuevo emprendedor"
                 actionIcon={FiPlus}
                 onAction={() => handleOpenModal()}
+                isDark
             />
 
-            <div className="card border-0 shadow-lg mb-4 overflow-hidden">
-                <div className="bg-black text-white px-4 py-3 border-bottom">
-                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h6 className="mb-0 text-uppercase small">Filtros avanzados</h6>
-                        <span className="badge bg-dark-subtle text-dark">{entrepreneurs.length} visibles</span>
-                    </div>
-                </div>
-                <div className="card-body bg-body-secondary">
-                    <EntrepreneursFilters
-                        search={search}
-                        onSearchChange={setSearch}
-                        createdFrom={createdFrom}
-                        onCreatedFromChange={setCreatedFrom}
-                        createdTo={createdTo}
-                        onCreatedToChange={setCreatedTo}
-                        onSubmit={applyFilters}
-                    />
-                </div>
-            </div>
+            {error && !alertConfig && <div className="alert alert-warning">{error}</div>}
 
-            <div className="card border-0 shadow-lg overflow-hidden">
-                <div className="bg-black text-white px-4 py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div>
-                        <h6 className="mb-0 text-uppercase small">Listado de emprendedores</h6>
-                        <small className="text-white-50">{count} registro(s) totales</small>
+            <AppCard accent="var(--bs-success)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <EntrepreneursFilters
+                            search={search}
+                            onSearchChange={setSearch}
+                            createdFrom={createdFrom}
+                            onCreatedFromChange={setCreatedFrom}
+                            createdTo={createdTo}
+                            onCreatedToChange={setCreatedTo}
+                            onSubmit={applyFilters}
+                        />
                     </div>
-                    <span className="badge bg-dark-subtle text-dark">Página {page} de {numPages}</span>
-                </div>
-                <div className="bg-body px-3 px-md-4 py-3">
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado de emprendedores">
                     <EntrepreneursTable
                         entrepreneurs={entrepreneurs}
                         isLoading={isLoading}
                         onEdit={handleOpenModal}
                         onDelete={handleDelete}
                     />
-                </div>
 
-                <AppPagination
-                    page={page}
-                    numPages={numPages}
-                    count={count}
-                    onPageChange={setPage}
-                />
-            </div>
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <EntrepreneurModal
@@ -146,14 +137,6 @@ const EntrepreneursPage = () => {
                 />
             )}
 
-            {error && !alertConfig && (
-                <AppAlert
-                    type="warning"
-                    header="Atención"
-                    content={error}
-                    onClose={() => setError(null)}
-                />
-            )}
         </div>
     );
 };

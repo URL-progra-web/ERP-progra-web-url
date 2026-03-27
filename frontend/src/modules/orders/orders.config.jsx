@@ -1,10 +1,11 @@
 import React from 'react';
 import { FiCreditCard, FiLayers, FiShoppingCart } from 'react-icons/fi';
-import PaymentMethodsPage from './paymentMethods/PaymentMethodsPage';
-import OrderStatusesPage from './orderStatuses/OrderStatusesPage';
-import OrdersPage from './orders/OrdersPage';
-import OrderDetailPage from './orders/OrderDetailPage';
-import OrderCreatePage from './orders/OrderCreatePage';
+
+const PaymentMethodsPage = React.lazy(() => import('./paymentMethods/PaymentMethodsPage'));
+const OrderStatusesPage = React.lazy(() => import('./orderStatuses/OrderStatusesPage'));
+const OrdersPage = React.lazy(() => import('./orders/OrdersPage'));
+const OrderDetailPage = React.lazy(() => import('./orders/OrderDetailPage'));
+const OrderCreatePage = React.lazy(() => import('./orders/OrderCreatePage'));
 
 export const ordersFeature = {
     id: 'orders',

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2, FiUser } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 export const EntrepreneursTable = ({ entrepreneurs, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
@@ -42,7 +43,7 @@ export const EntrepreneursTable = ({ entrepreneurs, isLoading, onEdit, onDelete 
                                     <div className="d-flex align-items-center gap-2">
                                         <FiUser className="text-primary" />
                                         <div>
-                                            <div className="small fw-medium">{entrepreneur.user.username}</div>
+                                            <div className="small fw-medium">{entrepreneur.user.name}</div>
                                             <div className="text-muted" style={{ fontSize: '0.75rem' }}>
                                                 {entrepreneur.user.email}
                                             </div>
@@ -58,14 +59,10 @@ export const EntrepreneursTable = ({ entrepreneurs, isLoading, onEdit, onDelete 
                                 </span>
                             </td>
                             <td className="text-end px-4">
-                                <div className="btn-group btn-group-sm">
-                                    <button className="btn btn-outline-primary" onClick={() => onEdit(entrepreneur)}>
-                                        <FiEdit2 />
-                                    </button>
-                                    <button className="btn btn-outline-danger" onClick={() => onDelete(entrepreneur)}>
-                                        <FiTrash2 />
-                                    </button>
-                                </div>
+                                <TableActions actions={[
+                                    { icon: FiEdit2,  onClick: () => onEdit(entrepreneur),   title: 'Editar',   variant: 'primary' },
+                                    { icon: FiTrash2, onClick: () => onDelete(entrepreneur), title: 'Eliminar', variant: 'danger'  },
+                                ]} />
                             </td>
                         </tr>
                     ))}

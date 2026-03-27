@@ -5,6 +5,7 @@ import SizesFilters from '../components/SizesFilters';
 import SizesTable from '../components/SizesTable';
 import SizeModal from '../components/SizeModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 
 const SizesPage = () => {
@@ -61,42 +62,38 @@ const SizesPage = () => {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Filtros</h6>
-                </div>
-
-                <div className="p-3 p-md-4 border-bottom">
-                    <SizesFilters
-                        searchInput={searchInput}
-                        onSearchChange={setSearchInput}
-                        onSearch={handleSearch}
-                    />
-                </div>
-
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Listado</h6>
-                </div>
-
-                <div className="table-responsive bg-body">
-                    <table className="table table-hover mb-0 align-middle">
-                        <thead className="text-uppercase text-muted small">
-                            <tr>
-                                <th className="border-0 px-4 py-3">Talla</th>
-                                <th className="border-0 py-3">Creada</th>
-                                <th className="border-0 px-4 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <SizesTable
-                            sizes={sizes}
-                            isLoading={isLoading}
-                            onEdit={handleOpenModal}
-                            onDelete={handleConfirmDelete}
+            <AppCard accent="var(--bs-primary)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <SizesFilters
+                            searchInput={searchInput}
+                            onSearchChange={setSearchInput}
+                            onSearch={handleSearch}
                         />
-                    </table>
-                </div>
-            </div>
+                    </div>
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado">
+                    <div className="table-responsive bg-body">
+                        <table className="table table-hover mb-0 align-middle">
+                            <thead className="text-uppercase text-muted small">
+                                <tr>
+                                    <th className="border-0 px-4 py-3">Talla</th>
+                                    <th className="border-0 py-3">Creada</th>
+                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <SizesTable
+                                sizes={sizes}
+                                isLoading={isLoading}
+                                onEdit={handleOpenModal}
+                                onDelete={handleConfirmDelete}
+                            />
+                        </table>
+                    </div>
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <SizeModal
