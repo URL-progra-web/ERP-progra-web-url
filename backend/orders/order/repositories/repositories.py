@@ -20,6 +20,14 @@ class OrderRepository:
     def exists_by_short_id(self, short_id: str) -> bool:
         return Order.objects.filter(short_id=short_id).exists()
 
+    def get_last_short_id_by_prefix(self, prefix: str) -> Optional[str]:
+        return (
+            Order.objects.filter(short_id__startswith=prefix)
+            .order_by('-short_id')
+            .values_list('short_id', flat=True)
+            .first()
+        )
+
     def create(self, **kwargs) -> Order:
         return Order.objects.create(**kwargs)
 

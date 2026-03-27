@@ -2,6 +2,7 @@ from typing import Dict, Iterable, Optional, Sequence
 
 from django.db import transaction
 
+from inventory.transaction_type.models.models import TransactionType
 from orders.order.exceptions import OrderNotFound
 from orders.order_item.exceptions import OrderItemStockUnavailable
 from inventory.transaction.services.services import InventoryTransactionService
@@ -20,6 +21,9 @@ from users.user.models.models import User
 
 
 class OrderStatusService:
+    CONFIRMATION_TRANSACTION_TYPE = 'Salida'
+    CANCELLATION_RESTORE_TRANSACTION_TYPE = 'Entrada'
+
     allowed_transitions: Dict[str, Sequence[str]] = {
         'SOLICITADO': ('CONFIRMADO',),
         'CONFIRMADO': ('ENVIADO', 'CANCELADO'),
@@ -56,15 +60,41 @@ class OrderStatusService:
 
     def _apply_confirmation_inventory(self, order, actor: Optional[User], notes: Optional[str]) -> None:
         self._validate_confirmation_stock(order)
+        TransactionType.objects.get_or_create(
+            name=self.CONFIRMATION_TRANSACTION_TYPE,
+            defaults={
+                'factor': -1,
+                'description': 'Salida por confirmacion de pedido',
+            },
+        )
 
         for item in order.items.select_related('variant').all():
             self.inventory_transaction_service.create_transaction(
                 variant_id=item.variant_id,
-                transaction_type_name='Salida',
+                transaction_type_name=self.CONFIRMATION_TRANSACTION_TYPE,
                 quantity=item.quantity,
                 user=actor,
                 reference=order.short_id,
                 notes=notes or f'Confirmacion de pedido {order.short_id}',
+            )
+
+    def _restore_inventory_for_cancellation(self, order, actor: Optional[User], notes: Optional[str]) -> None:
+        TransactionType.objects.get_or_create(
+            name=self.CANCELLATION_RESTORE_TRANSACTION_TYPE,
+            defaults={
+                'factor': 1,
+                'description': 'Entrada por cancelacion de pedido',
+            },
+        )
+
+        for item in order.items.select_related('variant').all():
+            self.inventory_transaction_service.create_transaction(
+                variant_id=item.variant_id,
+                transaction_type_name=self.CANCELLATION_RESTORE_TRANSACTION_TYPE,
+                quantity=item.quantity,
+                user=actor,
+                reference=order.short_id,
+                notes=notes or f'Cancelacion de pedido {order.short_id}',
             )
 
     def list_statuses(self, search: Optional[str] = None):
@@ -154,6 +184,8 @@ class OrderStatusService:
         with transaction.atomic():
             if current_status_name == 'SOLICITADO' and target_status.name == 'CONFIRMADO':
                 self._apply_confirmation_inventory(order, actor=actor, notes=notes)
+            if current_status_name == 'CONFIRMADO' and target_status.name == 'CANCELADO':
+                self._restore_inventory_for_cancellation(order, actor=actor, notes=notes)
             self.order_repository.update_status(order, target_status)
             self.history_repository.create(order=order, status=target_status, user=actor, notes=notes)
 
