@@ -1,7 +1,7 @@
 import React from 'react';
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
 
-export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
+export const CustomersTable = ({ customers, isLoading, onEdit, onDelete, onCreateOrder }) => {
     if (isLoading) {
         return (
             <div className="text-center py-5">
@@ -49,6 +49,15 @@ export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
                             </td>
                             <td className="text-end px-4">
                                 <div className="btn-group btn-group-sm">
+                                    {onCreateOrder && (
+                                        <button
+                                            className="btn btn-outline-success"
+                                            onClick={() => onCreateOrder(customer)}
+                                            title="Nuevo pedido"
+                                        >
+                                            <FiShoppingCart />
+                                        </button>
+                                    )}
                                     <button className="btn btn-outline-primary" onClick={() => onEdit(customer)}>
                                         <FiEdit2 />
                                     </button>

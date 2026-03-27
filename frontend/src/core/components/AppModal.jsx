@@ -26,6 +26,7 @@ const TONES = {
 const DEFAULT_TONE = 'primary';
 
 const AppModal = ({
+    isOpen,
     title,
     tone = DEFAULT_TONE,
     onClose,
@@ -37,6 +38,8 @@ const AppModal = ({
     footer,
     size = 'md',
 }) => {
+    const shouldRender = typeof isOpen === 'undefined' ? true : isOpen;
+    if (!shouldRender) return null;
     const toneConfig = TONES[tone] || TONES[DEFAULT_TONE];
     const Container = onSubmit ? 'form' : 'div';
 

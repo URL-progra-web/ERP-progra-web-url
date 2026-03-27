@@ -4,6 +4,8 @@ import { variantService } from '../services/variantService';
 export function useVariants() {
     const [variants, setVariants] = useState([]);
     const [products, setProducts] = useState([]);
+    const [entrepreneurs, setEntrepreneurs] = useState([]);
+    const [businessUnits, setBusinessUnits] = useState([]);
     const [colors, setColors] = useState([]);
     const [sizes, setSizes] = useState([]);
     const [uoms, setUoms] = useState([]);
@@ -15,6 +17,8 @@ export function useVariants() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState('');
     const [productFilter, setProductFilter] = useState('');
+    const [entrepreneurFilter, setEntrepreneurFilter] = useState('');
+    const [businessUnitFilter, setBusinessUnitFilter] = useState('');
     const [colorFilter, setColorFilter] = useState('');
     const [sizeFilter, setSizeFilter] = useState('');
     const [uomFilter, setUomFilter] = useState('');
@@ -29,6 +33,8 @@ export function useVariants() {
                 search: searchTerm || undefined,
                 is_active: activeFilter === '' ? undefined : activeFilter,
                 product: productFilter || undefined,
+                entrepreneur: entrepreneurFilter || undefined,
+                business_unit: businessUnitFilter || undefined,
                 color: colorFilter || undefined,
                 size: sizeFilter || undefined,
                 uom: uomFilter || undefined,
@@ -41,18 +47,22 @@ export function useVariants() {
         } finally {
             setIsLoading(false);
         }
-    }, [searchTerm, activeFilter, productFilter, colorFilter, sizeFilter, uomFilter]);
+    }, [searchTerm, activeFilter, productFilter, entrepreneurFilter, businessUnitFilter, colorFilter, sizeFilter, uomFilter]);
 
     const fetchRelations = useCallback(async () => {
         try {
-            const [productsRes, colorsRes, sizesRes, uomsRes] = await Promise.all([
+            const [productsRes, entrepreneursRes, businessUnitsRes, colorsRes, sizesRes, uomsRes] = await Promise.all([
                 variantService.getProducts(),
+                variantService.getEntrepreneurs(),
+                variantService.getBusinessUnits(),
                 variantService.getColors(),
                 variantService.getSizes(),
                 variantService.getUoms(),
             ]);
 
             setProducts(normalize(productsRes));
+            setEntrepreneurs(normalize(entrepreneursRes));
+            setBusinessUnits(normalize(businessUnitsRes));
             setColors(normalize(colorsRes));
             setSizes(normalize(sizesRes));
             setUoms(normalize(uomsRes));
@@ -76,6 +86,8 @@ export function useVariants() {
     const resetFilters = () => {
         setActiveFilter('');
         setProductFilter('');
+        setEntrepreneurFilter('');
+        setBusinessUnitFilter('');
         setColorFilter('');
         setSizeFilter('');
         setUomFilter('');
@@ -100,6 +112,8 @@ export function useVariants() {
     return {
         variants,
         products,
+        entrepreneurs,
+        businessUnits,
         colors,
         sizes,
         uoms,
@@ -110,6 +124,8 @@ export function useVariants() {
         handleSearch,
         activeFilter, setActiveFilter,
         productFilter, setProductFilter,
+        entrepreneurFilter, setEntrepreneurFilter,
+        businessUnitFilter, setBusinessUnitFilter,
         colorFilter, setColorFilter,
         sizeFilter, setSizeFilter,
         uomFilter, setUomFilter,

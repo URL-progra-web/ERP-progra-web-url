@@ -9,6 +9,10 @@ const VariantsFilters = ({
     onActiveChange,
     productFilter,
     onProductChange,
+    entrepreneurFilter,
+    onEntrepreneurChange,
+    businessUnitFilter,
+    onBusinessUnitChange,
     colorFilter,
     onColorChange,
     sizeFilter,
@@ -16,6 +20,8 @@ const VariantsFilters = ({
     uomFilter,
     onUomChange,
     products = [],
+    entrepreneurs = [],
+    businessUnits = [],
     colors = [],
     sizes = [],
     uoms = [],
@@ -78,6 +84,34 @@ const VariantsFilters = ({
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
+                        <label className="form-label small text-muted mb-1">Emprendedor/Proveedor</label>
+                        <select
+                            className="form-select bg-body shadow-none text-body"
+                            value={entrepreneurFilter}
+                            onChange={(e) => onEntrepreneurChange(e.target.value)}
+                        >
+                            <option value="">Todos</option>
+                            {entrepreneurs.map((entrepreneur) => (
+                                <option key={entrepreneur.id} value={entrepreneur.id}>{entrepreneur.company_name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="col-12 col-md-6 col-xl-4">
+                        <label className="form-label small text-muted mb-1">Sede</label>
+                        <select
+                            className="form-select bg-body shadow-none text-body"
+                            value={businessUnitFilter}
+                            onChange={(e) => onBusinessUnitChange(e.target.value)}
+                        >
+                            <option value="">Todas</option>
+                            {businessUnits.map((businessUnit) => (
+                                <option key={businessUnit.id} value={businessUnit.id}>{businessUnit.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1">Talla</label>
                         <select
                             className="form-select bg-body shadow-none text-body"
@@ -92,7 +126,7 @@ const VariantsFilters = ({
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
-                        <label className="form-label small text-muted mb-1">Unidad de medida</label>
+                        <label className="form-label small text-muted mb-1">UOM base</label>
                         <select
                             className="form-select bg-body shadow-none text-body"
                             value={uomFilter}
