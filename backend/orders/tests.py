@@ -1,3 +1,6 @@
+from datetime import date
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from crm.customer.models.models import Customer
@@ -162,6 +165,24 @@ class OrderStatusServiceTests(TestCase):
         self.assertEqual(transaction.transaction_type_id, 'Salida')
         self.assertEqual(transaction.quantity, 3)
 
+    def test_confirm_transition_bootstraps_output_transaction_type_if_missing(self):
+        TransactionType.objects.filter(name='Salida').delete()
+        order = self._create_order(short_id='WF-STOCK-BOOT')
+        OrderItem.objects.create(
+            order=order,
+            variant=self.variant,
+            quantity=2,
+            unit_cost=10,
+            unit_price=20,
+            status=self.requested,
+        )
+
+        updated = self.service.transition_order(order.id, 'CONFIRMADO', actor=None, notes='Confirm stock')
+
+        self.assertEqual(updated.status.name, 'CONFIRMADO')
+        self.assertTrue(TransactionType.objects.filter(name='Salida', factor=-1).exists())
+        self.assertTrue(InventoryTransaction.objects.filter(reference=order.short_id).exists())
+
     def test_confirm_transition_with_insufficient_stock_keeps_order_pending(self):
         order = self._create_order(short_id='WF-STOCK-2')
         OrderItem.objects.create(
@@ -181,3 +202,70 @@ class OrderStatusServiceTests(TestCase):
         self.assertEqual(order.status.name, 'SOLICITADO')
         self.assertEqual(self.variant.quantity_available, 20)
         self.assertFalse(InventoryTransaction.objects.filter(reference=order.short_id).exists())
+
+    def test_cancel_transition_restores_stock_for_confirmed_order(self):
+        order = self._create_order(short_id='WF-CANCEL-1')
+        OrderItem.objects.create(
+            order=order,
+            variant=self.variant,
+            quantity=4,
+            unit_cost=10,
+            unit_price=20,
+            status=self.requested,
+        )
+
+        self.service.transition_order(order.id, 'CONFIRMADO', actor=None, notes='Confirm first')
+        cancelled = self.service.transition_order(order.id, 'CANCELADO', actor=None, notes='Cancel later')
+
+        order.refresh_from_db()
+        self.variant.refresh_from_db()
+        self.assertEqual(cancelled.status.name, 'CANCELADO')
+        self.assertEqual(order.status.name, 'CANCELADO')
+        self.assertEqual(self.variant.quantity_available, 20)
+        self.assertTrue(TransactionType.objects.filter(name='Entrada', factor=1).exists())
+        self.assertEqual(InventoryTransaction.objects.filter(reference=order.short_id).count(), 2)
+        self.assertTrue(
+            InventoryTransaction.objects.filter(reference=order.short_id, transaction_type_id='Entrada').exists()
+        )
+
+
+class OrderServiceShortIdTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.customer = Customer.objects.create(name='ShortId Guest', phone='555-0300')
+        cls.requested = OrderStatus.objects.get(name='SOLICITADO')
+
+    def setUp(self):
+        self.service = OrderService()
+
+    @patch('orders.order.services.services.localdate', return_value=date(2026, 3, 26))
+    def test_create_order_generates_daily_sequence_short_id(self, _mock_localdate):
+        first_order = self.service.create_order(customer=self.customer, status=self.requested)
+        second_order = self.service.create_order(customer=self.customer, status=self.requested)
+
+        self.assertEqual(first_order.short_id, 'ORD-260326-00001')
+        self.assertEqual(second_order.short_id, 'ORD-260326-00002')
+
+    @patch('orders.order.services.services.localdate', return_value=date(2026, 3, 27))
+    def test_create_order_resets_sequence_each_day(self, _mock_localdate):
+        Order.objects.create(
+            short_id='ORD-260326-00009',
+            customer=self.customer,
+            status=self.requested,
+        )
+
+        order = self.service.create_order(customer=self.customer, status=self.requested)
+
+        self.assertEqual(order.short_id, 'ORD-260327-00001')
+
+    @patch('orders.order.services.services.localdate', return_value=date(2026, 3, 26))
+    def test_create_order_skips_to_next_available_daily_sequence(self, _mock_localdate):
+        Order.objects.create(
+            short_id='ORD-260326-00007',
+            customer=self.customer,
+            status=self.requested,
+        )
+
+        order = self.service.create_order(customer=self.customer, status=self.requested)
+
+        self.assertEqual(order.short_id, 'ORD-260326-00008')
