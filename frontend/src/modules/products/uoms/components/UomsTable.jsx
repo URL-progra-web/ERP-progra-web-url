@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 /**
  * Tabla de Unidades de Medida con filas de carga, vacío y datos.
@@ -38,20 +39,10 @@ export function UomsTable({ uoms, isLoading, onEdit, onDelete }) {
                                 </td>
                                 <td className="fw-semibold">{uom.name}</td>
                                 <td className="px-4 text-end">
-                                    <button
-                                        className="btn btn-sm btn-outline-secondary me-2"
-                                        title="Editar"
-                                        onClick={() => onEdit(uom)}
-                                    >
-                                        <FiEdit2 />
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger"
-                                        title="Eliminar"
-                                        onClick={() => onDelete(uom)}
-                                    >
-                                        <FiTrash2 />
-                                    </button>
+                                    <TableActions actions={[
+                                        { icon: FiEdit2,  onClick: () => onEdit(uom),   title: 'Editar',   variant: 'primary' },
+                                        { icon: FiTrash2, onClick: () => onDelete(uom), title: 'Eliminar', variant: 'danger'  },
+                                    ]} />
                                 </td>
                             </tr>
                         ))

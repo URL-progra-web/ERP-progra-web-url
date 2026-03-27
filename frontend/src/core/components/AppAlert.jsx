@@ -1,11 +1,12 @@
 import React from 'react';
+import { FiInfo, FiAlertTriangle, FiTrash2, FiCheckCircle } from 'react-icons/fi';
 import AppModal from './AppModal';
 
-const TYPE_MAP = {
-    info: { tone: 'dark', icon: 'ℹ️' },
-    warning: { tone: 'dark', icon: '⚠️' },
-    danger: { tone: 'dark', icon: '🗑️' },
-    success: { tone: 'dark', icon: '✅' },
+const TYPE_CONFIG = {
+    info:    { tone: 'primary', icon: FiInfo,          iconColor: 'var(--bs-primary)' },
+    warning: { tone: 'dark',    icon: FiAlertTriangle,  iconColor: '#f59e0b' },
+    danger:  { tone: 'danger',  icon: FiTrash2,         iconColor: '#ef4444' },
+    success: { tone: 'primary', icon: FiCheckCircle,    iconColor: '#22c55e' },
 };
 
 const AppAlert = ({
@@ -16,23 +17,34 @@ const AppAlert = ({
     onConfirm,
     onClose,
 }) => {
-    const config = TYPE_MAP[type] ?? TYPE_MAP.info;
+    const config = TYPE_CONFIG[type] ?? TYPE_CONFIG.info;
+    const Icon = config.icon;
 
-    const handleSubmit = (event) => {
-        event?.preventDefault();
+    const handleSubmit = (e) => {
+        e?.preventDefault();
         onConfirm?.();
     };
 
+    const titleNode = (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon size={18} style={{ color: config.iconColor, flexShrink: 0 }} />
+            {header}
+        </span>
+    );
+
     return (
         <AppModal
-            title={(<span className="d-flex align-items-center gap-2"><span>{config.icon}</span><span>{header}</span></span>)}
+            title={titleNode}
             tone={config.tone}
             onClose={onClose}
             onSubmit={onConfirm ? handleSubmit : undefined}
             submitLabel={confirmLabel}
             cancelLabel="Cancelar"
+            size="sm"
         >
-            <p className="mb-0" style={{ lineHeight: 1.6 }}>{content}</p>
+            <p style={{ margin: 0, lineHeight: 1.65, color: 'var(--bs-secondary-color)' }}>
+                {content}
+            </p>
         </AppModal>
     );
 };

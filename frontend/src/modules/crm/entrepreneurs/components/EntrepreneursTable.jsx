@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2, FiUser } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 export const EntrepreneursTable = ({ entrepreneurs, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
@@ -58,14 +59,10 @@ export const EntrepreneursTable = ({ entrepreneurs, isLoading, onEdit, onDelete 
                                 </span>
                             </td>
                             <td className="text-end px-4">
-                                <div className="btn-group btn-group-sm">
-                                    <button className="btn btn-outline-primary" onClick={() => onEdit(entrepreneur)}>
-                                        <FiEdit2 />
-                                    </button>
-                                    <button className="btn btn-outline-danger" onClick={() => onDelete(entrepreneur)}>
-                                        <FiTrash2 />
-                                    </button>
-                                </div>
+                                <TableActions actions={[
+                                    { icon: FiEdit2,  onClick: () => onEdit(entrepreneur),   title: 'Editar',   variant: 'primary' },
+                                    { icon: FiTrash2, onClick: () => onDelete(entrepreneur), title: 'Eliminar', variant: 'danger'  },
+                                ]} />
                             </td>
                         </tr>
                     ))}

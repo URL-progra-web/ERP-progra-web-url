@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiPlus, FiBox } from 'react-icons/fi';
+import FilterTabs from '~/core/components/FilterTabs';
 import { useUoms } from './hooks/useUoms';
 import { useUomPageState } from './hooks/useUomPageState';
 import { UomModal } from './components/UomModal';
@@ -59,29 +60,15 @@ const UomsPage = () => {
 
             <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
                 {/* Tabs */}
-                <div className="bg-dark text-white px-4 py-3 d-flex flex-wrap gap-3 align-items-center">
-                    <div className="d-flex gap-2 flex-wrap">
-                        <button
-                            className={`btn btn-sm px-4 py-2 rounded-3 border-0 ${activeTab === 'uoms' ? 'bg-white text-dark fw-semibold shadow-sm' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
-                            style={activeTab === 'uoms' ? { color: '#1f1f1f' } : {}}
-                            onClick={() => setActiveTab('uoms')}
-                        >
-                            Unidades de Medida
-                            <span className="badge bg-light text-dark ms-2 fw-semibold">
-                                {uoms.length}
-                            </span>
-                        </button>
-                        <button
-                            className={`btn btn-sm px-4 py-2 rounded-3 ${activeTab === 'conversions' ? 'bg-white text-dark fw-semibold shadow-sm border-0' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
-                            style={activeTab === 'conversions' ? { color: '#1f1f1f' } : {}}
-                            onClick={() => setActiveTab('conversions')}
-                        >
-                            Conversiones
-                            <span className="badge bg-light text-dark ms-2 fw-semibold">
-                                {conversions.length}
-                            </span>
-                        </button>
-                    </div>
+                <div className="px-4 py-3 border-bottom" style={{ background: 'var(--bs-tertiary-bg)' }}>
+                    <FilterTabs
+                        options={[
+                            { value: 'uoms',        label: 'Unidades de Medida', badge: uoms.length },
+                            { value: 'conversions', label: 'Conversiones',       badge: conversions.length },
+                        ]}
+                        value={activeTab}
+                        onChange={setActiveTab}
+                    />
                 </div>
 
                 <div className="bg-body p-3 p-md-4">

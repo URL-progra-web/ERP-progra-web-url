@@ -107,9 +107,7 @@ const CategoriesPage = () => {
             {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Filtros</h6>
-                </div>
+                <div className="section-header">Filtros</div>
                 <div className="p-3 p-md-4 border-bottom">
                     <CategoriesFilters
                         searchInput={searchInput}
@@ -120,9 +118,7 @@ const CategoriesPage = () => {
                     />
                 </div>
 
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Listado</h6>
-                </div>
+                <div className="section-header">Listado</div>
                 {rootCategories.length > 0 && (
                     <CategoriesTabs
                         rootCategories={rootCategories}

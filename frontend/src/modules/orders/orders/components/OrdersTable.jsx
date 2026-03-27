@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiCheck, FiEye, FiPackage, FiRotateCw, FiTrash2, FiTruck, FiX } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 import { formatCurrency } from '../helpers/formatCurrency';
 
 const getTransitionIcon = (targetStatus) => {
@@ -64,22 +65,15 @@ export const OrdersTable = ({
                                 <td>{order.status_name || `Estado #${order.status}`}</td>
                                 <td>
                                     {transitions.length ? (
-                                        <div className="d-flex flex-wrap gap-2">
-                                            {transitions.map((targetStatus) => (
-                                                <button
-                                                    key={`${order.id}-${targetStatus}`}
-                                                    type="button"
-                                                    className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center"
-                                                    style={{ width: '2rem', height: '2rem' }}
-                                                    disabled={isTransitioning || isDeleting}
-                                                    onClick={() => onTransition?.(order, targetStatus)}
-                                                    title={targetStatus}
-                                                    aria-label={`Cambiar pedido ${order.short_id} a ${targetStatus}`}
-                                                >
-                                                    {React.createElement(getTransitionIcon(targetStatus), { size: 15 })}
-                                                </button>
-                                            ))}
-                                        </div>
+                                        <TableActions
+                                            justify="flex-start"
+                                            actions={transitions.map((targetStatus) => ({
+                                                icon: getTransitionIcon(targetStatus),
+                                                onClick: () => onTransition?.(order, targetStatus),
+                                                title: targetStatus,
+                                                disabled: isTransitioning || isDeleting,
+                                            }))}
+                                        />
                                     ) : (
                                         <span className="text-muted small">Sin cambios</span>
                                     )}
@@ -88,30 +82,21 @@ export const OrdersTable = ({
                                 <td className="text-end">{formatCurrency(order.total_amount)}</td>
                                 <td>{new Date(order.created_at).toLocaleDateString()}</td>
                                 <td className="text-center">
-                                    <button
-                                        type="button"
-                                        className="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center"
-                                        style={{ width: '2rem', height: '2rem' }}
-                                        disabled={isDeleting || isTransitioning || !canDelete}
-                                        onClick={() => onDelete?.(order)}
-                                        title={canDelete ? 'Eliminar pedido' : 'Solo se puede eliminar en estado SOLICITADO'}
-                                        aria-label={`Eliminar pedido ${order.short_id}`}
-                                    >
-                                        <FiTrash2 size={15} />
-                                    </button>
+                                    <TableActions actions={[{
+                                        icon: FiTrash2,
+                                        onClick: () => onDelete?.(order),
+                                        title: canDelete ? 'Eliminar pedido' : 'Solo se puede eliminar en estado SOLICITADO',
+                                        variant: 'danger',
+                                        disabled: isDeleting || isTransitioning || !canDelete,
+                                    }]} />
                                 </td>
                                 <td className="text-end pe-4">
-                                    <button
-                                        type="button"
-                                        className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center text-body"
-                                        style={{ width: '2rem', height: '2rem' }}
-                                        disabled={isDeleting || isTransitioning}
-                                        onClick={() => onViewDetail?.(order.id)}
-                                        title="Ver detalle"
-                                        aria-label={`Ver detalle del pedido ${order.short_id}`}
-                                    >
-                                        <FiEye size={15} />
-                                    </button>
+                                    <TableActions actions={[{
+                                        icon: FiEye,
+                                        onClick: () => onViewDetail?.(order.id),
+                                        title: 'Ver detalle',
+                                        disabled: isDeleting || isTransitioning,
+                                    }]} />
                                 </td>
                             </tr>
                         );

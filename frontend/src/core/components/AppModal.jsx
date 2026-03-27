@@ -1,34 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
-const TONES = {
-    primary: {
-        headerClass: 'bg-primary text-white',
-        closeClass: 'btn-close-white',
-        submitClass: 'btn btn-primary fw-semibold',
-    },
-    secondary: {
-        headerClass: 'bg-secondary text-white',
-        closeClass: 'btn-close-white',
-        submitClass: 'btn btn-secondary fw-semibold',
-    },
-    dark: {
-        headerClass: 'bg-dark text-white',
-        closeClass: 'btn-close-white',
-        submitClass: 'btn btn-dark fw-semibold text-white',
-    },
-    neutral: {
-        headerClass: 'bg-body border-bottom fw-bold',
-        closeClass: '',
-        submitClass: 'btn btn-primary fw-semibold',
-    },
+const TONE_SUBMIT = {
+    primary:   'btn btn-primary fw-semibold',
+    secondary: 'btn btn-secondary fw-semibold',
+    dark:      'btn btn-primary fw-semibold',
+    neutral:   'btn btn-primary fw-semibold',
+    danger:    'btn btn-danger fw-semibold',
 };
-
-const DEFAULT_TONE = 'primary';
 
 const AppModal = ({
     isOpen,
     title,
-    tone = DEFAULT_TONE,
+    tone = 'primary',
     onClose,
     onSubmit,
     submitLabel = 'Guardar',
@@ -39,32 +23,106 @@ const AppModal = ({
     size = 'md',
 }) => {
     const shouldRender = typeof isOpen === 'undefined' ? true : isOpen;
-    if (!shouldRender) return null;
-    const toneConfig = TONES[tone] || TONES[DEFAULT_TONE];
-    const Container = onSubmit ? 'form' : 'div';
 
-    return (
+    // Close on Escape
+    useEffect(() => {
+        if (!shouldRender) return;
+        const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+    }, [shouldRender, onClose]);
+
+    // Lock body scroll while open
+    useEffect(() => {
+        if (!shouldRender) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = prev; };
+    }, [shouldRender]);
+
+    if (!shouldRender) return null;
+
+    const submitClass = TONE_SUBMIT[tone] ?? TONE_SUBMIT.primary;
+    const Container = onSubmit ? 'form' : 'div';
+    const maxWidth = size === 'lg' ? 700 : size === 'sm' ? 400 : 540;
+
+    return ReactDOM.createPortal(
+        /* Backdrop — rendered directly to body to escape any transformed containers */
         <div
-            className="modal show d-block"
-            style={{ background: 'rgba(0,0,0,0.45)', zIndex: 1100 }}
-            onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+            onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(3px)',
+                WebkitBackdropFilter: 'blur(3px)',
+                zIndex: 1100,
+                overflowY: 'auto',
+                padding: 'max(5vh, 28px) 16px 40px',
+                animation: 'fadeIn 0.15s ease both',
+            }}
         >
-            <div className={`modal-dialog modal-dialog-centered modal-${size}`}>
-                <Container className="modal-content border-0 shadow-lg" onSubmit={onSubmit}>
-                    <div className={`modal-header ${toneConfig.headerClass}`}>
-                        <h5 className="modal-title mb-0 fw-bold">{title}</h5>
-                        <button type="button" className={`btn-close ${toneConfig.closeClass}`} onClick={onClose} />
+            {/* Dialog wrapper — centered, scrolls with the backdrop */}
+            <div
+                style={{
+                    width: '100%',
+                    maxWidth,
+                    margin: '0 auto',
+                    animation: 'scaleIn 0.18s cubic-bezier(0.4,0,0.2,1) both',
+                }}
+            >
+                <Container
+                    className="modal-content"
+                    onSubmit={onSubmit}
+                    style={{ display: 'flex', flexDirection: 'column' }}
+                >
+                    {/* Header */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '16px 20px',
+                        borderBottom: '1px solid var(--bs-border-color)',
+                        flexShrink: 0,
+                    }}>
+                        <h5 className="modal-title" style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>
+                            {title}
+                        </h5>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                background: 'none', border: 'none', cursor: 'pointer',
+                                color: 'var(--bs-secondary-color)', padding: '4px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                borderRadius: 'var(--radius-xs)', fontSize: '20px', lineHeight: 1,
+                                transition: 'color var(--transition)',
+                            }}
+                            onMouseOver={e => e.currentTarget.style.color = 'var(--bs-body-color)'}
+                            onMouseOut={e => e.currentTarget.style.color = 'var(--bs-secondary-color)'}
+                        >
+                            ×
+                        </button>
                     </div>
-                    <div className="modal-body">
+
+                    {/* Body */}
+                    <div className="modal-body" style={{ padding: '20px' }}>
                         {children}
                     </div>
+
+                    {/* Footer */}
                     {footer ?? (
-                        <div className="modal-footer border-0">
-                            <button type="button" className="btn btn-outline-secondary" onClick={onClose}>
+                        <div style={{
+                            display: 'flex', justifyContent: 'flex-end', gap: '8px',
+                            padding: '14px 20px',
+                            borderTop: '1px solid var(--bs-border-color)',
+                            flexShrink: 0,
+                        }}>
+                            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
                                 {cancelLabel}
                             </button>
                             {onSubmit && (
-                                <button type="submit" className={toneConfig.submitClass} disabled={submitDisabled}>
+                                <button type="submit" className={`${submitClass} btn-sm`} disabled={submitDisabled}>
                                     {submitLabel}
                                 </button>
                             )}
@@ -72,7 +130,8 @@ const AppModal = ({
                     )}
                 </Container>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronRight, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 const CategoriesTable = ({ categories, isLoading, onEdit, onDelete }) => {
     const [expanded, setExpanded] = useState(new Set());
@@ -83,20 +84,10 @@ const CategoriesTable = ({ categories, isLoading, onEdit, onDelete }) => {
                         {new Date(category.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-end">
-                        <button
-                            className="btn btn-sm btn-outline-secondary border-0 me-2"
-                            onClick={() => onEdit(category)}
-                            title="Editar"
-                        >
-                            <FiEdit2 size={14} className="text-primary" />
-                        </button>
-                        <button
-                            className="btn btn-sm btn-outline-secondary border-0"
-                            onClick={() => onDelete(category)}
-                            title="Eliminar"
-                        >
-                            <FiTrash2 size={14} className="text-danger" />
-                        </button>
+                        <TableActions actions={[
+                            { icon: FiEdit2,  onClick: () => onEdit(category),   title: 'Editar',   variant: 'primary' },
+                            { icon: FiTrash2, onClick: () => onDelete(category), title: 'Eliminar', variant: 'danger'  },
+                        ]} />
                     </td>
                 </tr>
                 {hasChildren && isExpanded && renderRows(children, level + 1)}

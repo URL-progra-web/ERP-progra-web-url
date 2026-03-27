@@ -62,9 +62,7 @@ const SizesPage = () => {
             {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Filtros</h6>
-                </div>
+                <div className="section-header">Filtros</div>
 
                 <div className="p-3 p-md-4 border-bottom">
                     <SizesFilters
@@ -74,9 +72,7 @@ const SizesPage = () => {
                     />
                 </div>
 
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Listado</h6>
-                </div>
+                <div className="section-header">Listado</div>
 
                 <div className="table-responsive bg-body">
                     <table className="table table-hover mb-0 align-middle">
