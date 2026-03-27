@@ -8,6 +8,11 @@ import Login from '~/modules/Auth/pages/Login';
 import DynamicRoutes from '~/core/registry/DynamicRoutes';
 import ForbiddenPage from '~/modules/misc/pages/ForbiddenPage';
 import NotFoundPage from '~/modules/misc/pages/NotFoundPage';
+// Public store pages
+import { PublicLayout } from '~/modules/public/layouts/PublicLayout';
+import { CatalogPage } from '~/modules/public/pages/CatalogPage';
+import { ProductDetailPage } from '~/modules/public/pages/ProductDetailPage';
+import { CheckoutPage } from '~/modules/public/pages/CheckoutPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Added for dropdowns/modals
 
@@ -20,7 +25,14 @@ function App() {
             <AuthProvider>
                 <BrowserRouter>
                     <Routes>
-                        {/* Public */}
+                        {/* Public Store */}
+                        <Route path="/tienda" element={<PublicLayout />}>
+                            <Route index element={<CatalogPage />} />
+                            <Route path="producto/:id" element={<ProductDetailPage />} />
+                            <Route path="checkout" element={<CheckoutPage />} />
+                        </Route>
+
+                        {/* Auth */}
                         <Route path="/login" element={<Login />} />
 
                         {/* Roles protected routes... */}
