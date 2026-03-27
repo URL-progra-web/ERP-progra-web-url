@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from inventory.transaction.services.stock_service import InventoryStockService
 from products.variant.models.models import ProductVariant
 
 
@@ -10,7 +11,9 @@ class ProductVariantSerializer(serializers.ModelSerializer):
     business_unit_name = serializers.CharField(source='product.business_unit.name', read_only=True)
     size_name = serializers.CharField(source='size.name', read_only=True)
     color_name = serializers.CharField(source='color.name', read_only=True)
-    uom_name = serializers.CharField(source='uom.name', read_only=True)
+    base_uom = serializers.IntegerField(source='product.base_uom_id', read_only=True)
+    base_uom_name = serializers.CharField(source='product.base_uom.name', read_only=True)
+    quantity_available = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductVariant
@@ -27,8 +30,8 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             'size_name',
             'color',
             'color_name',
-            'uom',
-            'uom_name',
+            'base_uom',
+            'base_uom_name',
             'cost',
             'price',
             'quantity_available',
@@ -48,11 +51,6 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El precio no puede ser negativo.")
         return value
 
-    def validate_quantity_available(self, value):
-        if value < 0:
-            raise serializers.ValidationError("La cantidad disponible no puede ser negativa.")
-        return value
-
     def validate(self, attrs):
         cost = attrs.get('cost')
         price = attrs.get('price')
@@ -63,3 +61,9 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             })
 
         return attrs
+
+    def get_quantity_available(self, obj):
+        annotated = getattr(obj, 'stock_available', None)
+        if annotated is not None:
+            return annotated
+        return InventoryStockService.get_variant_stock(obj.id)

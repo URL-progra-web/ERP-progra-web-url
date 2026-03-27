@@ -34,7 +34,7 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
                     <td className="py-3 text-secondary">{variant.entrepreneur_name || '—'}</td>
                     <td className="py-3 text-secondary">{variant.business_unit_name || '—'}</td>
                     <td className="py-3">{variant.size_name || '—'}</td>
-                    <td className="py-3">{variant.uom_name || '—'}</td>
+                    <td className="py-3">{variant.base_uom_name || '—'}</td>
                     <td className="py-3">Q {variant.cost}</td>
                     <td className="py-3">Q {variant.price}</td>
                     <td className="py-3">

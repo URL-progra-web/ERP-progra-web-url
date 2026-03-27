@@ -157,7 +157,6 @@ const VariantsPage = () => {
                     products={products}
                     colors={colors}
                     sizes={sizes}
-                    uoms={uoms}
                     onClose={handleCloseModal}
                     onSave={handleSave}
                 />

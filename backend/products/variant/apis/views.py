@@ -1,4 +1,7 @@
-from django.db.models import Q
+from decimal import Decimal
+
+from django.db.models import DecimalField, ExpressionWrapper, F, Q, Sum, Value
+from django.db.models.functions import Coalesce
 from rest_framework.viewsets import ModelViewSet
 from orders.order.models.models import Order
 from products.variant.models.models import ProductVariant
@@ -25,11 +28,22 @@ class ProductVariantViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = ProductVariant.objects.select_related(
             'product',
+            'product__base_uom',
             'product__entrepreneur',
             'product__business_unit',
             'size',
             'color',
-            'uom',
+        ).annotate(
+            stock_available=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F('inventorytransaction__base_quantity') * F('inventorytransaction__transaction_type__factor'),
+                        output_field=DecimalField(max_digits=18, decimal_places=4),
+                    )
+                ),
+                Value(Decimal('0.0000')),
+                output_field=DecimalField(max_digits=18, decimal_places=4),
+            )
         ).order_by('-id')
         params = self.request.query_params
 
@@ -48,9 +62,9 @@ class ProductVariantViewSet(ModelViewSet):
 
         in_stock = self._parse_bool(params.get('in_stock'))
         if in_stock is True:
-            queryset = queryset.filter(quantity_available__gt=0)
+            queryset = queryset.filter(stock_available__gt=0)
         elif in_stock is False:
-            queryset = queryset.filter(quantity_available__lte=0)
+            queryset = queryset.filter(stock_available__lte=0)
 
         product = params.get('product')
         if product not in (None, ''):
@@ -105,7 +119,7 @@ class ProductVariantViewSet(ModelViewSet):
         uom = params.get('uom')
         if uom not in (None, ''):
             try:
-                queryset = queryset.filter(uom_id=int(uom))
+                queryset = queryset.filter(product__base_uom_id=int(uom))
             except (TypeError, ValueError):
                 return queryset.none()
 

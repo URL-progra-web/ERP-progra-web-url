@@ -39,6 +39,7 @@ class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
                     variant_id=serializer.validated_data['variant_id'],
                     transaction_type_name=serializer.validated_data['transaction_type_name'],
                     quantity=serializer.validated_data['quantity'],
+                    selected_uom_id=serializer.validated_data['selected_uom_id'],
                     user=request.user if request.user.is_authenticated else None,
                     reference=serializer.validated_data.get('reference'),
                     notes=serializer.validated_data.get('notes')

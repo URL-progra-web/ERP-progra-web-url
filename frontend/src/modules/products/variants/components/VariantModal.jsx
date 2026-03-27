@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
 
-const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave }) => {
+const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => {
     const isEditing = !!variant;
 
     const [formData, setFormData] = useState({
@@ -9,10 +9,8 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
         sku: '',
         size: '',
         color: '',
-        uom: '',
         cost: '',
         price: '',
-        quantity_available: 0,
         is_active: true,
     });
 
@@ -26,10 +24,8 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
                 sku: variant.sku || '',
                 size: variant.size || '',
                 color: variant.color || '',
-                uom: variant.uom || '',
                 cost: variant.cost || '',
                 price: variant.price || '',
-                quantity_available: variant.quantity_available ?? 0,
                 is_active: variant.is_active ?? true,
             });
         }
@@ -47,8 +43,8 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
         e.preventDefault();
         setError('');
 
-        if (!formData.product || !formData.sku.trim() || !formData.uom) {
-            setError('Producto, SKU y unidad de medida son obligatorios.');
+        if (!formData.product || !formData.sku.trim()) {
+            setError('Producto y SKU son obligatorios.');
             return;
         }
 
@@ -60,10 +56,8 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
                 sku: formData.sku,
                 size: formData.size || null,
                 color: formData.color || null,
-                uom: formData.uom,
                 cost: formData.cost,
                 price: formData.price,
-                quantity_available: Number(formData.quantity_available),
                 is_active: formData.is_active,
             };
 
@@ -106,6 +100,9 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
                             <option key={item.id} value={item.id}>{item.name}</option>
                         ))}
                     </select>
+                    <div className="form-text">
+                        La unidad base y el stock se gestionan desde el producto y el kardex, no desde la variante.
+                    </div>
                 </div>
 
                 <div className="mb-3">
@@ -152,23 +149,8 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
                     </div>
                 </div>
 
-                <div className="mt-3 mb-3">
-                    <label className="form-label fw-semibold">Unidad de medida *</label>
-                    <select
-                        name="uom"
-                        className="form-select"
-                        value={formData.uom}
-                        onChange={handleChange}
-                    >
-                        <option value="">Selecciona una unidad</option>
-                        {uoms.map(item => (
-                            <option key={item.id} value={item.id}>{item.name}</option>
-                        ))}
-                    </select>
-                </div>
-
                 <div className="row g-3">
-                    <div className="col-md-4">
+                    <div className="col-md-6">
                         <label className="form-label fw-semibold">Costo *</label>
                         <input
                             type="number"
@@ -181,7 +163,7 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
                         />
                     </div>
 
-                    <div className="col-md-4">
+                    <div className="col-md-6">
                         <label className="form-label fw-semibold">Precio *</label>
                         <input
                             type="number"
@@ -190,18 +172,6 @@ const VariantModal = ({ variant, products, colors, sizes, uoms, onClose, onSave 
                             name="price"
                             className="form-control"
                             value={formData.price}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="col-md-4">
-                        <label className="form-label fw-semibold">Cantidad disponible *</label>
-                        <input
-                            type="number"
-                            min="0"
-                            name="quantity_available"
-                            className="form-control"
-                            value={formData.quantity_available}
                             onChange={handleChange}
                         />
                     </div>

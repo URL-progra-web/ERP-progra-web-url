@@ -6,7 +6,8 @@ const ProductsFilters = ({
     categoryFilter, onCategoryChange,
     entrepreneurFilter, onEntrepreneurChange,
     businessUnitFilter, onBusinessUnitChange,
-    categories, entrepreneurs, businessUnits 
+    baseUomFilter, onBaseUomChange,
+    categories, entrepreneurs, businessUnits, uoms
 }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -70,6 +71,18 @@ const ProductsFilters = ({
                         <option value="">Todas las sedes</option>
                         {businessUnits.map(bu => (
                             <option key={bu.id} value={bu.id}>{bu.name}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        className="form-select bg-body shadow-none text-body"
+                        style={{ minWidth: '180px' }}
+                        value={baseUomFilter}
+                        onChange={(e) => onBaseUomChange(e.target.value)}
+                    >
+                        <option value="">Todas las UOM base</option>
+                        {uoms.map((uom) => (
+                            <option key={uom.id} value={uom.id}>{uom.name}</option>
                         ))}
                     </select>
                 </div>

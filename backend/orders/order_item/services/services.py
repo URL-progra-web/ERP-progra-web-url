@@ -3,6 +3,8 @@ from typing import Optional
 
 from django.db import transaction
 
+from inventory.uom.models.models import UoM
+from inventory.uom_conversion.models.models import UoMConversion
 from orders.order.exceptions import OrderNotFound
 from orders.order.models.models import Order
 from orders.order.repositories.repositories import OrderRepository
@@ -59,7 +61,8 @@ class OrderItemService:
 		self,
 		order: Order,
 		variant_id: int,
-		quantity: int,
+		quantity: Decimal,
+		selected_uom: UoM,
 		allow_same_variant_existing: bool = False,
 	) -> dict:
 		if quantity <= 0:
@@ -72,9 +75,27 @@ class OrderItemService:
 		if not variant_data.get('is_active', False):
 			raise InvalidOrderItemData(f"El variant {variant_data.get('sku')} está inactivo")
 
-		if int(variant_data.get('quantity_available', 0)) < quantity:
+		base_uom_id = variant_data.get('base_uom_id')
+		if base_uom_id is None:
+			raise InvalidOrderItemData(f"El variant {variant_data.get('sku')} no tiene UOM base configurada")
+
+		if selected_uom.id == base_uom_id:
+			conversion_multiplier = Decimal('1')
+		else:
+			conversion = UoMConversion.objects.filter(from_uom_id=selected_uom.id, to_uom_id=base_uom_id).first()
+			if not conversion:
+				raise InvalidOrderItemData(
+					f"No existe conversión desde {selected_uom.name} hacia {variant_data.get('base_uom')}"
+				)
+			conversion_multiplier = Decimal(str(conversion.multiplier))
+
+		base_quantity = quantity * conversion_multiplier
+
+		available_stock = Decimal(str(variant_data.get('quantity_available', 0)))
+
+		if available_stock < base_quantity:
 			raise OrderItemStockUnavailable(
-				f"Stock insuficiente para {variant_data.get('sku')}. Disponible: {variant_data.get('quantity_available')}, solicitado: {quantity}"
+				f"Stock insuficiente para {variant_data.get('sku')}. Disponible: {available_stock}, solicitado: {base_quantity}"
 			)
 
 		existing_item = self.repository.get_by_order_and_variant(order=order, variant_id=variant_id)
@@ -90,6 +111,10 @@ class OrderItemService:
 				f"No se permiten variantes de distintas unidades de negocio en la misma orden. Esperada {existing_bu}, recibida {variant_bu}."
 			)
 
+		variant_data['selected_uom_id'] = selected_uom.id
+		variant_data['selected_uom_name'] = selected_uom.name
+		variant_data['conversion_multiplier'] = conversion_multiplier
+		variant_data['base_quantity'] = base_quantity
 		return variant_data
 
 	def list_items(self, order_id: Optional[int] = None):
@@ -106,11 +131,17 @@ class OrderItemService:
 		self,
 		order_id: int,
 		variant_id: int,
-		quantity: int,
+		quantity: Decimal,
+		selected_uom: UoM,
 		status: Optional[OrderStatus] = None,
 	):
 		order = self._get_order(order_id)
-		variant_data = self._validate_variant(order=order, variant_id=variant_id, quantity=quantity)
+		variant_data = self._validate_variant(
+			order=order,
+			variant_id=variant_id,
+			quantity=quantity,
+			selected_uom=selected_uom,
+		)
 
 		status = status or self._get_default_status()
 
@@ -118,6 +149,10 @@ class OrderItemService:
 			order=order,
 			variant_id=variant_id,
 			quantity=quantity,
+			selected_uom_id=variant_data['selected_uom_id'],
+			base_uom_id=variant_data['base_uom_id'],
+			conversion_multiplier=variant_data['conversion_multiplier'],
+			base_quantity=variant_data['base_quantity'],
 			unit_cost=Decimal(str(variant_data.get('cost', 0))),
 			unit_price=Decimal(str(variant_data.get('price', 0))),
 			status=status,
@@ -127,20 +162,29 @@ class OrderItemService:
 	def update_item(
 		self,
 		item_id: int,
-		quantity: Optional[int] = None,
+		quantity: Optional[Decimal] = None,
+		selected_uom: Optional[UoM] = None,
 		status: Optional[OrderStatus] = None,
 	):
 		item = self.get_item(item_id)
 		updates = {}
 
-		if quantity is not None:
+		resolved_quantity = quantity if quantity is not None else item.quantity
+		resolved_uom = selected_uom or item.selected_uom
+
+		if quantity is not None or selected_uom is not None:
 			variant_data = self._validate_variant(
 				order=item.order,
 				variant_id=item.variant_id,
-				quantity=quantity,
+				quantity=resolved_quantity,
+				selected_uom=resolved_uom,
 				allow_same_variant_existing=True,
 			)
-			updates['quantity'] = quantity
+			updates['quantity'] = resolved_quantity
+			updates['selected_uom'] = resolved_uom
+			updates['base_uom_id'] = variant_data['base_uom_id']
+			updates['conversion_multiplier'] = variant_data['conversion_multiplier']
+			updates['base_quantity'] = variant_data['base_quantity']
 			updates['unit_cost'] = Decimal(str(variant_data.get('cost', 0)))
 			updates['unit_price'] = Decimal(str(variant_data.get('price', 0)))
 
@@ -166,15 +210,17 @@ class OrderItemService:
 		for payload in items_payload:
 			variant_id = payload.get('variant_id')
 			quantity = payload.get('quantity')
+			selected_uom = payload.get('selected_uom')
 			status = payload.get('status')
-			if variant_id is None or quantity is None:
-				raise InvalidOrderItemData('Cada item debe incluir variant_id y quantity')
+			if variant_id is None or quantity is None or selected_uom is None:
+				raise InvalidOrderItemData('Cada item debe incluir variant_id, selected_uom y quantity')
 
 			created_items.append(
 				self.create_item(
 					order_id=order_id,
 					variant_id=variant_id,
 					quantity=quantity,
+					selected_uom=selected_uom,
 					status=status,
 				)
 			)

@@ -28,6 +28,7 @@ const OrderCreatePage = () => {
         colors,
         sizes,
         uoms,
+        conversionsByBaseUom,
         isLoading,
         error: catalogError,
         setError: setCatalogError,
@@ -126,6 +127,7 @@ const OrderCreatePage = () => {
             items: items.map((item) => ({
                 variant_id: Number(item.variant_id),
                 quantity: Number(item.quantity),
+                selected_uom_id: Number(item.selected_uom_id),
             })),
         };
 
@@ -219,6 +221,8 @@ const OrderCreatePage = () => {
                             isLoading={isLoading}
                             onAdd={addVariant}
                             cartItems={items}
+                            uoms={uoms}
+                            conversionsByBaseUom={conversionsByBaseUom}
                         />
                     </div>
                 </div>

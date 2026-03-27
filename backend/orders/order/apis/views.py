@@ -95,6 +95,7 @@ class OrderAPIView(APIView):
                     {
                         'variant_id': item['variant_id'].id,
                         'quantity': item['quantity'],
+                        'selected_uom': item['selected_uom_id'],
                         'status': item.get('status_id'),
                     }
                     for item in items

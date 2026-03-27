@@ -1,12 +1,13 @@
 import api from '~/core/api/api';
 
 export const productService = {
-    getProducts: async ({ search, category, entrepreneur, business_unit } = {}) => {
+    getProducts: async ({ search, category, entrepreneur, business_unit, base_uom } = {}) => {
         const params = {};
         if (search) params.search = search;
         if (category) params.category = category;
         if (entrepreneur) params.entrepreneur = entrepreneur;
         if (business_unit) params.business_unit = business_unit;
+        if (base_uom) params.base_uom = base_uom;
         const response = await api.get('/products/products/', { params });
         return response.data;
     },
@@ -38,6 +39,11 @@ export const productService = {
 
     getBusinessUnits: async () => {
         const response = await api.get('/inventory/business-units/');
+        return response.data;
+    },
+
+    getUoms: async () => {
+        const response = await api.get('/inventory/uoms/');
         return response.data;
     },
 };

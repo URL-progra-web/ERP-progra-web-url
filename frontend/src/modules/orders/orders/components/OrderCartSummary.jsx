@@ -7,17 +7,19 @@ const formatMoney = (value) => `Q ${Number(value ?? 0).toLocaleString(undefined,
 })}`;
 
 const getLineTitle = (item) => {
-    const parts = [item.color_name, item.size_name, item.uom_name].filter(Boolean);
+    const parts = [item.color_name, item.size_name, item.selected_uom_name || item.base_uom_name].filter(Boolean);
     return parts.length ? parts.join(' / ') : 'Sin especificaciones';
 };
 
 export const OrderCartSummary = ({
     items,
+    availableUomsByItem = {},
     shippingCost,
     onShippingCostChange,
     onIncrement,
     onDecrement,
     onQuantityChange,
+    onSelectedUomChange,
     onRemove,
     onClear,
 }) => {
@@ -48,30 +50,45 @@ export const OrderCartSummary = ({
                     {items.map((item) => {
                         const lineTotal = Number(item.unit_price ?? 0) * Number(item.quantity ?? 0);
                         return (
-                            <div key={item.variant_id} className="border rounded-4 p-3 bg-body-tertiary">
+                            <div key={`${item.variant_id}-${item.selected_uom_id}`} className="border rounded-4 p-3 bg-body-tertiary">
                                 <div className="d-flex justify-content-between gap-3 align-items-start">
                                     <div>
                                         <div className="fw-semibold">{item.product_name}</div>
                                         <div className="small text-muted">SKU: {item.sku}</div>
                                         <div className="small text-muted">{getLineTitle(item)}</div>
                                     </div>
-                                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onRemove(item.variant_id)}>
+                                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onRemove(item.variant_id, item.selected_uom_id)}>
                                         <FiTrash2 />
                                     </button>
                                 </div>
 
                                 <div className="d-flex justify-content-between align-items-center gap-3 mt-3 flex-wrap">
+                                    <div style={{ minWidth: 180 }}>
+                                        <label className="form-label small text-muted mb-1">UOM de operacion</label>
+                                        <select
+                                            className="form-select form-select-sm"
+                                            value={item.selected_uom_id || ''}
+                                            onChange={(e) => onSelectedUomChange?.(item.variant_id, item.selected_uom_id, e.target.value)}
+                                        >
+                                            {(availableUomsByItem[`${item.variant_id}`] || []).map((uom) => (
+                                                <option key={uom.id} value={uom.id}>{uom.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     <div className="small text-muted">
                                         Precio: <span className="fw-semibold text-body">{formatMoney(item.unit_price)}</span>
                                     </div>
                                     <div className="small text-muted">
-                                        Stock disponible: <span className="fw-semibold text-body">{item.stock}</span>
+                                        Stock disponible: <span className="fw-semibold text-body">{item.stock} {item.base_uom_name}</span>
+                                    </div>
+                                    <div className="small text-muted">
+                                        Conversion: <span className="fw-semibold text-body">x{item.conversion_multiplier}</span>
                                     </div>
                                 </div>
 
                                 <div className="d-flex justify-content-between align-items-center gap-3 mt-3 flex-wrap">
                                     <div className="input-group" style={{ maxWidth: 170 }}>
-                                        <button type="button" className="btn btn-outline-secondary" onClick={() => onDecrement(item.variant_id)}>
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => onDecrement(item.variant_id, item.selected_uom_id)}>
                                             <FiMinus />
                                         </button>
                                         <input
@@ -79,13 +96,13 @@ export const OrderCartSummary = ({
                                             min="1"
                                             className="form-control text-center"
                                             value={item.quantity}
-                                            onChange={(e) => onQuantityChange(item.variant_id, e.target.value)}
+                                            onChange={(e) => onQuantityChange(item.variant_id, item.selected_uom_id, e.target.value)}
                                         />
-                                        <button type="button" className="btn btn-outline-secondary" onClick={() => onIncrement(item.variant_id)}>
+                                        <button type="button" className="btn btn-outline-secondary" onClick={() => onIncrement(item.variant_id, item.selected_uom_id)}>
                                             <FiPlus />
                                         </button>
                                     </div>
-                                    <div className="fw-semibold">Subtotal: {formatMoney(lineTotal)}</div>
+                                    <div className="fw-semibold">Subtotal: {formatMoney(lineTotal)} · {item.base_quantity} {item.base_uom_name}</div>
                                 </div>
                             </div>
                         );

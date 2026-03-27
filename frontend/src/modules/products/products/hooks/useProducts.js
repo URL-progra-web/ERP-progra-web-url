@@ -7,6 +7,7 @@ export function useProducts() {
     const [categories, setCategories] = useState([]);
     const [entrepreneurs, setEntrepreneurs] = useState([]);
     const [businessUnits, setBusinessUnits] = useState([]);
+    const [uoms, setUoms] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -15,6 +16,7 @@ export function useProducts() {
     const [categoryFilter, setCategoryFilter] = useState('');
     const [entrepreneurFilter, setEntrepreneurFilter] = useState('');
     const [businessUnitFilter, setBusinessUnitFilter] = useState('');
+    const [baseUomFilter, setBaseUomFilter] = useState('');
 
     const normalize = (result) => Array.isArray(result) ? result : result.results || [];
 
@@ -26,6 +28,7 @@ export function useProducts() {
                 category: categoryFilter || undefined,
                 entrepreneur: entrepreneurFilter || undefined,
                 business_unit: businessUnitFilter || undefined,
+                base_uom: baseUomFilter || undefined,
             });
             setProducts(normalize(result));
             setError(null);
@@ -34,13 +37,14 @@ export function useProducts() {
         } finally {
             setIsLoading(false);
         }
-    }, [searchTerm, categoryFilter, entrepreneurFilter, businessUnitFilter]);
+    }, [searchTerm, categoryFilter, entrepreneurFilter, businessUnitFilter, baseUomFilter]);
 
     const fetchRelations = useCallback(async () => {
-        const [categoriesRes, entrepreneursRes, businessUnitsRes] = await Promise.allSettled([
+        const [categoriesRes, entrepreneursRes, businessUnitsRes, uomsRes] = await Promise.allSettled([
             categoryService.getCategories(),
             productService.getEntrepreneurs(),
             productService.getBusinessUnits(),
+            productService.getUoms(),
         ]);
 
         if (categoriesRes.status === 'fulfilled') {
@@ -55,10 +59,15 @@ export function useProducts() {
             setBusinessUnits(normalize(businessUnitsRes.value));
         }
 
+        if (uomsRes.status === 'fulfilled') {
+            setUoms(normalize(uomsRes.value));
+        }
+
         if (
             categoriesRes.status === 'rejected' ||
             entrepreneursRes.status === 'rejected' ||
-            businessUnitsRes.status === 'rejected'
+            businessUnitsRes.status === 'rejected' ||
+            uomsRes.status === 'rejected'
         ) {
             setError((prev) => prev || 'Error al cargar catálogos de soporte.');
         }
@@ -93,6 +102,7 @@ export function useProducts() {
         categories,
         entrepreneurs,
         businessUnits,
+        uoms,
         isLoading,
         error,
         searchInput, setSearchInput,
@@ -100,6 +110,7 @@ export function useProducts() {
         categoryFilter, setCategoryFilter,
         entrepreneurFilter, setEntrepreneurFilter,
         businessUnitFilter, setBusinessUnitFilter,
+        baseUomFilter, setBaseUomFilter,
         saveProduct,
         deleteProduct,
     };

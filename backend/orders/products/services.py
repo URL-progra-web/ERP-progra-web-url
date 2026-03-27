@@ -1,6 +1,9 @@
 """Product service implementation for the orders module."""
 
+from decimal import Decimal
 from typing import Optional, Dict, Any
+
+from inventory.transaction.services.stock_service import InventoryStockService
 from orders.products.interfaces import IProductService
 from products.variant.models.models import ProductVariant
 
@@ -13,12 +16,16 @@ class ProductService(IProductService):
     dictionary contract expected by OrderItemService.
     """
 
+    def __init__(self):
+        self.stock_service = InventoryStockService()
+
     def get_variant_by_id(self, variant_id: int) -> Optional[Dict[str, Any]]:
         """Get variant by ID with full details."""
         try:
             variant = ProductVariant.objects.select_related(
                 'product',
-                'product__business_unit'
+                'product__business_unit',
+                'product__base_uom',
             ).get(id=variant_id)
             
             return self._variant_to_dict(variant)
@@ -30,7 +37,8 @@ class ProductService(IProductService):
         try:
             variant = ProductVariant.objects.select_related(
                 'product',
-                'product__business_unit'
+                'product__business_unit',
+                'product__base_uom',
             ).get(sku=sku)
             
             return self._variant_to_dict(variant)
@@ -40,13 +48,14 @@ class ProductService(IProductService):
     def validate_variant_availability(
         self,
         variant_id: int,
-        quantity: int,
+        quantity: Decimal,
         business_unit_id: int
     ) -> tuple[bool, Optional[str]]:
         try:
             variant = ProductVariant.objects.select_related(
                 'product',
-                'product__business_unit'
+                'product__business_unit',
+                'product__base_uom',
             ).get(id=variant_id)
             
             # Check if active
@@ -58,8 +67,9 @@ class ProductService(IProductService):
                 return False, f"Variant {variant.sku} does not belong to business unit {business_unit_id}"
             
             # Check quantity
-            if variant.quantity_available < quantity:
-                return False, f"Insufficient stock. Available: {variant.quantity_available}, Requested: {quantity}"
+            stock = self.stock_service.get_variant_stock(variant.id)
+            if stock < quantity:
+                return False, f"Insufficient stock. Available: {stock}, Requested: {quantity}"
             
             return True, None
             
@@ -78,16 +88,15 @@ class ProductService(IProductService):
         variants = ProductVariant.objects.filter(
             product__business_unit_id=business_unit_id,
             is_active=True,
-            quantity_available__gt=0
         ).select_related(
             'product',
             'product__business_unit',
+            'product__base_uom',
             'size',
             'color',
-            'uom'
         )
-        
-        return [self._variant_to_dict(v) for v in variants]
+
+        return [self._variant_to_dict(v) for v in variants if self.stock_service.get_variant_stock(v.id) > 0]
 
     def calculate_line_total(
         self,
@@ -113,10 +122,11 @@ class ProductService(IProductService):
             'business_unit_id'  : variant.product.business_unit_id,
             'size'              : variant.size.name if variant.size else None,
             'color'             : variant.color.name if variant.color else None,
-            'uom'               : variant.uom.name if variant.uom else None,
+            'base_uom_id'       : variant.product.base_uom_id,
+            'base_uom'          : variant.product.base_uom.name if variant.product.base_uom else None,
             'cost'              : float(variant.cost),
             'price'             : float(variant.price),
-            'quantity_available': variant.quantity_available,
+            'quantity_available': float(InventoryStockService.get_variant_stock(variant.id)),
             'is_active'         : variant.is_active,
             'created_at'        : variant.created_at.isoformat() if variant.created_at else None,
             'updated_at'        : variant.updated_at.isoformat() if variant.updated_at else None,

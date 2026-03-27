@@ -1,7 +1,9 @@
 from django.db.models import DecimalField, F, Sum
 from rest_framework import serializers
+from decimal import Decimal
 
 from crm.customer.models.models import Customer
+from inventory.uom.models.models import UoM
 from orders.order.models.models import Order
 from orders.order_status.models.models import OrderStatus
 from orders.payment_method.models.models import PaymentMethod
@@ -35,7 +37,7 @@ class OrderSerializer(serializers.ModelSerializer):
         )
 
     def get_total_quantity(self, obj):
-        return obj.items.aggregate(total=Sum('quantity')).get('total') or 0
+        return obj.items.aggregate(total=Sum('base_quantity')).get('total') or 0
 
     def get_total_amount(self, obj):
         total = obj.items.aggregate(
@@ -62,7 +64,8 @@ class OrderCreateSerializer(serializers.Serializer):
     
     class ItemSerializer(serializers.Serializer):
         variant_id = serializers.PrimaryKeyRelatedField(queryset=ProductVariant.objects.all(), write_only=True)
-        quantity = serializers.IntegerField(min_value=1)
+        selected_uom_id = serializers.PrimaryKeyRelatedField(queryset=UoM.objects.all(), write_only=True)
+        quantity = serializers.DecimalField(max_digits=14, decimal_places=4, min_value=Decimal('0.0001'))
         status_id = serializers.PrimaryKeyRelatedField(
             queryset=OrderStatus.objects.all(), required=False, allow_null=True, write_only=True
         )
