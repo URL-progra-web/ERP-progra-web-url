@@ -5,6 +5,7 @@ import ProductsFilters from '../components/ProductsFilters';
 import ProductsTable from '../components/ProductsTable';
 import ProductModal from '../components/ProductModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 
 const ProductsPage = () => {
@@ -59,50 +60,52 @@ const ProductsPage = () => {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="section-header">Filtros</div>
-                <div className="p-3 p-md-4 border-bottom">
-                    <ProductsFilters
-                        searchInput={searchInput}
-                        onSearchChange={setSearchInput}
-                        onSearch={handleSearch}
-                        categoryFilter={categoryFilter}
-                        onCategoryChange={setCategoryFilter}
-                        entrepreneurFilter={entrepreneurFilter}
-                        onEntrepreneurChange={setEntrepreneurFilter}
-                        businessUnitFilter={businessUnitFilter}
-                        onBusinessUnitChange={setBusinessUnitFilter}
-                        baseUomFilter={baseUomFilter}
-                        onBaseUomChange={setBaseUomFilter}
-                        categories={categories}
-                        entrepreneurs={entrepreneurs}
-                        businessUnits={businessUnits}
-                        uoms={uoms}
-                    />
-                </div>
-
-                <div className="section-header">Listado</div>
-                <div className="table-responsive bg-body">
-                    <table className="table table-hover mb-0 align-middle">
-                        <thead className="text-uppercase text-muted small">
-                            <tr>
-                                <th className="border-0 px-4 py-3">Producto</th>
-                                <th className="border-0 py-3">Categoría</th>
-                                <th className="border-0 py-3">Emprendedor</th>
-                                <th className="border-0 py-3">Sede</th>
-                                <th className="border-0 py-3">UOM Base</th>
-                                <th className="border-0 px-4 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <ProductsTable
-                            products={products}
-                            isLoading={isLoading}
-                            onEdit={handleOpenModal}
-                            onDelete={handleConfirmDelete}
+            <AppCard accent="var(--bs-primary)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <ProductsFilters
+                            searchInput={searchInput}
+                            onSearchChange={setSearchInput}
+                            onSearch={handleSearch}
+                            categoryFilter={categoryFilter}
+                            onCategoryChange={setCategoryFilter}
+                            entrepreneurFilter={entrepreneurFilter}
+                            onEntrepreneurChange={setEntrepreneurFilter}
+                            businessUnitFilter={businessUnitFilter}
+                            onBusinessUnitChange={setBusinessUnitFilter}
+                            baseUomFilter={baseUomFilter}
+                            onBaseUomChange={setBaseUomFilter}
+                            categories={categories}
+                            entrepreneurs={entrepreneurs}
+                            businessUnits={businessUnits}
+                            uoms={uoms}
                         />
-                    </table>
-                </div>
-            </div>
+                    </div>
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado">
+                    <div className="table-responsive bg-body">
+                        <table className="table table-hover mb-0 align-middle">
+                            <thead className="text-uppercase text-muted small">
+                                <tr>
+                                    <th className="border-0 px-4 py-3">Producto</th>
+                                    <th className="border-0 py-3">Categoría</th>
+                                    <th className="border-0 py-3">Emprendedor</th>
+                                    <th className="border-0 py-3">Sede</th>
+                                    <th className="border-0 py-3">UOM Base</th>
+                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <ProductsTable
+                                products={products}
+                                isLoading={isLoading}
+                                onEdit={handleOpenModal}
+                                onDelete={handleConfirmDelete}
+                            />
+                        </table>
+                    </div>
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <ProductModal

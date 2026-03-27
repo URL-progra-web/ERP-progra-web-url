@@ -5,6 +5,7 @@ import { useOrders } from './hooks/useOrders';
 import { OrdersTable } from './components/OrdersTable';
 import { orderStatusesService } from '../orderStatuses/services/orderStatusesService';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
 import { useAuth } from '~/core/auth/AuthContext';
@@ -98,6 +99,7 @@ const OrdersPage = () => {
                 actionLabel="Nuevo Pedido"
                 actionIcon={FiShoppingCart}
                 onAction={() => navigate(`${basePath}/orders/create`)}
+                isDark
             />
 
             {successMessage && (
@@ -115,23 +117,20 @@ const OrdersPage = () => {
                 </div>
             )}
 
-            <div className="d-flex flex-column gap-4">
-                <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-body py-3">
-                        <div className="d-flex flex-column gap-2">
-                            <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
-                                <h6 className="mb-0 text-uppercase text-muted small">Listado</h6>
-                                <span className="badge bg-dark-subtle text-dark-emphasis">{count}</span>
-                            </div>
-                            <input
-                                type="search"
-                                className="form-control"
-                                placeholder="Buscar..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                        </div>
+            <AppCard accent="var(--bs-orange)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <input
+                            type="search"
+                            className="form-control"
+                            placeholder="Buscar por ID, cliente, estado..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </div>
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado de pedidos">
                     <OrdersTable
                         orders={orders}
                         isLoading={isLoadingOrders}
@@ -151,8 +150,8 @@ const OrdersPage = () => {
                         count={count}
                         onPageChange={setPage}
                     />
-                </div>
-            </div>
+                </AppCard.Section>
+            </AppCard>
 
             {error && (
                 <AppAlert

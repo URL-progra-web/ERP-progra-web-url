@@ -6,6 +6,7 @@ import CategoriesTable from '../components/CategoriesTable';
 import CategoryModal from '../components/CategoryModal';
 import CategoriesTabs from '../components/CategoriesTabs';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 
 const CategoriesPage = () => {
@@ -106,47 +107,49 @@ const CategoriesPage = () => {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="section-header">Filtros</div>
-                <div className="p-3 p-md-4 border-bottom">
-                    <CategoriesFilters
-                        searchInput={searchInput}
-                        onSearchChange={setSearchInput}
-                        onSearch={handleSearch}
-                        leafFilter={leafFilter}
-                        onLeafChange={setLeafFilter}
-                    />
-                </div>
-
-                <div className="section-header">Listado</div>
-                {rootCategories.length > 0 && (
-                    <CategoriesTabs
-                        rootCategories={rootCategories}
-                        activeRoot={activeRoot}
-                        onChange={setActiveRoot}
-                        branchCounts={branchCounts}
-                        totalCount={categoriesWithRoot.length}
-                    />
-                )}
-                <div className="table-responsive bg-body">
-                    <table className="table table-hover mb-0 align-middle">
-                        <thead className="text-uppercase text-muted small">
-                            <tr>
-                                <th className="border-0 px-4 py-3">Categoría</th>
-                                <th className="border-0 py-3">Tipo</th>
-                                <th className="border-0 py-3">Creada</th>
-                                <th className="border-0 px-4 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <CategoriesTable
-                            categories={filteredCategories}
-                            isLoading={isLoading}
-                            onEdit={handleOpenModal}
-                            onDelete={handleConfirmDelete}
+            <AppCard accent="var(--bs-primary)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <CategoriesFilters
+                            searchInput={searchInput}
+                            onSearchChange={setSearchInput}
+                            onSearch={handleSearch}
+                            leafFilter={leafFilter}
+                            onLeafChange={setLeafFilter}
                         />
-                    </table>
-                </div>
-            </div>
+                    </div>
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado">
+                    {rootCategories.length > 0 && (
+                        <CategoriesTabs
+                            rootCategories={rootCategories}
+                            activeRoot={activeRoot}
+                            onChange={setActiveRoot}
+                            branchCounts={branchCounts}
+                            totalCount={categoriesWithRoot.length}
+                        />
+                    )}
+                    <div className="table-responsive bg-body">
+                        <table className="table table-hover mb-0 align-middle">
+                            <thead className="text-uppercase text-muted small">
+                                <tr>
+                                    <th className="border-0 px-4 py-3">Categoría</th>
+                                    <th className="border-0 py-3">Tipo</th>
+                                    <th className="border-0 py-3">Creada</th>
+                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <CategoriesTable
+                                categories={filteredCategories}
+                                isLoading={isLoading}
+                                onEdit={handleOpenModal}
+                                onDelete={handleConfirmDelete}
+                            />
+                        </table>
+                    </div>
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <CategoryModal

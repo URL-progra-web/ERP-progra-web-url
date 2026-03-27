@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { useOutletContext, Link } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { Link, useOutletContext } from 'react-router-dom';
+import {
+  FiAlertCircle,
+  FiArrowLeft,
+  FiCheck,
+  FiClock,
+  FiMessageCircle,
+  FiShield,
+  FiTruck,
+} from 'react-icons/fi';
 import { TurnstileWidget } from '../components/TurnstileWidget';
 import { publicService } from '../services/publicService';
 import { formatPrice } from '../utils/currency';
+import { StoreImage } from '../components/StoreImage';
+import { getProductMockImage } from '../utils/mockImages';
 
 export const CheckoutPage = () => {
   const cart = useOutletContext();
-  
+
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_phone: '',
@@ -20,23 +30,23 @@ export const CheckoutPage = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
+  const handleChange = (event) => {
+    setFormData((previous) => ({
+      ...previous,
+      [event.target.name]: event.target.value,
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
     if (!turnstileToken) {
-      setError('Por favor completa la verificación de seguridad');
+      setError('Por favor completa la verificacion de seguridad');
       return;
     }
 
     if (cart.items.length === 0) {
-      setError('Tu carrito está vacío');
+      setError('Tu carrito esta vacio');
       return;
     }
 
@@ -47,80 +57,94 @@ export const CheckoutPage = () => {
       const orderData = {
         ...formData,
         turnstile_token: turnstileToken,
-        items: cart.items.map(item => ({
+        items: cart.items.map((item) => ({
           variant_id: item.variant_id,
           quantity: item.quantity,
         })),
       };
 
       const response = await publicService.createOrder(orderData);
-      
       setSuccess(response);
       cart.clearCart();
-      
     } catch (err) {
       const errorData = err.response?.data;
       let errorMessage = 'Error al procesar el pedido';
-      
+
       if (errorData) {
         if (errorData.error) {
           errorMessage = errorData.error;
         } else if (errorData.detail) {
           errorMessage = errorData.detail;
         } else if (typeof errorData === 'object') {
-          // Handle validation errors
           const messages = [];
-          for (const [field, errors] of Object.entries(errorData)) {
+
+          Object.entries(errorData).forEach(([field, errors]) => {
             if (Array.isArray(errors)) {
               messages.push(`${field}: ${errors.join(', ')}`);
             } else if (typeof errors === 'string') {
               messages.push(`${field}: ${errors}`);
             }
-          }
+          });
+
           if (messages.length > 0) {
             errorMessage = messages.join('. ');
           }
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Mostrar confirmación de éxito
   if (success) {
     return (
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center">
-            <div className="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4" 
-                 style={{ width: '80px', height: '80px' }}>
-              <FiCheck size={40} />
+      <div className="store-success-card">
+        <div className="store-success-mark">
+          <FiCheck size={42} />
+        </div>
+        <span className="store-kicker">Solicitud enviada</span>
+        <h2 className="store-section__title mt-2 mb-3">Tu pedido ya esta en revision.</h2>
+        <p className="store-lead mx-auto mb-4">
+          Recibimos la orden <strong>{success.order?.short_id}</strong>. En breve te escribiremos por WhatsApp para confirmar disponibilidad, entrega y total final.
+        </p>
+
+        <div className="store-success-grid">
+          <div className="store-info-card">
+            <span className="store-info-card__icon"><FiMessageCircle size={18} /></span>
+            <div>
+              <strong className="d-block text-body mb-1">Siguiente paso</strong>
+              <span className="store-muted">Un asesor valida variantes y coordina contigo el cierre del pedido.</span>
             </div>
-            <h2 className="mb-3">Pedido Enviado</h2>
-            <p className="text-muted mb-4">
-              Tu pedido <strong>{success.order?.short_id}</strong> ha sido recibido.
-              <br />
-              Nos pondremos en contacto contigo pronto por WhatsApp para confirmar los detalles.
-            </p>
-            <Link to="/tienda" className="btn btn-primary">
-              Seguir comprando
-            </Link>
           </div>
+          <div className="store-info-card">
+            <span className="store-info-card__icon"><FiClock size={18} /></span>
+            <div>
+              <strong className="d-block text-body mb-1">Seguimiento agil</strong>
+              <span className="store-muted">Tu referencia queda registrada para continuar la conversacion sin fricciones.</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="store-btn-group justify-content-center mt-4">
+          <Link to="/tienda" className="btn btn-store-primary text-decoration-none">
+            Seguir comprando
+          </Link>
         </div>
       </div>
     );
   }
 
-  // Carrito vacío
-  if (cart.items.length === 0 && !success) {
+  if (cart.items.length === 0) {
     return (
-      <div className="container py-5 text-center">
-        <h2>Tu carrito está vacío</h2>
-        <p className="text-muted">Agrega algunos productos antes de continuar</p>
-        <Link to="/tienda" className="btn btn-primary">
+      <div className="store-empty-state">
+        <span className="store-kicker">Checkout vacio</span>
+        <h2 className="store-section__title mt-2 mb-3">Todavia no hay productos para solicitar.</h2>
+        <p className="store-lead mx-auto mb-4">
+          Explora el catalogo, agrega variantes al carrito y vuelve aqui para enviar tu pedido asistido.
+        </p>
+        <Link to="/tienda" className="btn btn-store-primary text-decoration-none">
           Ver productos
         </Link>
       </div>
@@ -128,153 +152,200 @@ export const CheckoutPage = () => {
   }
 
   return (
-    <div className="container py-4">
-      <Link to="/tienda" className="btn btn-link mb-4 ps-0 text-decoration-none">
-        <FiArrowLeft className="me-2" /> Seguir comprando
+    <div className="container">
+    <div className="d-grid gap-4">
+      <Link to="/tienda" className="btn-store-ghost d-inline-flex align-items-center gap-2 text-decoration-none">
+        <FiArrowLeft size={16} /> Seguir comprando
       </Link>
 
-      <h1 className="mb-4">Finalizar Pedido</h1>
+      <section className="store-shell store-hero">
+        <div className="store-hero__layout">
+          <div className="store-hero__content d-grid gap-3">
+            <span className="store-kicker">Confirmacion del pedido</span>
+            <h1 className="store-display">
+              Finaliza tu <span>solicitud</span>
+            </h1>
+            <p className="store-lead mb-0">
+              Este checkout esta pensado como un flujo asistido: nos compartes tus datos, validamos seguridad y coordinamos el cierre final por WhatsApp.
+            </p>
+          </div>
 
-      <div className="row">
-        {/* Formulario */}
-        <div className="col-lg-7 mb-4">
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <h5 className="card-title mb-4">Datos de Contacto</h5>
-              
-              {error && (
-                <div className="alert alert-danger d-flex align-items-center">
-                  <FiAlertCircle className="me-2 flex-shrink-0" />
-                  <span>{error}</span>
+          <div className="store-hero__aside">
+            <div className="store-highlight d-grid gap-3">
+              <span className="store-kicker">Que sucede despues</span>
+              <div className="store-trust-grid">
+                <div className="store-info-card">
+                  <span className="store-info-card__icon"><FiMessageCircle size={18} /></span>
+                  <div>
+                    <strong className="d-block text-body mb-1">Contacto directo</strong>
+                    <span className="store-muted">Te escribimos para validar existencias y entrega.</span>
+                  </div>
                 </div>
-              )}
+                <div className="store-info-card">
+                  <span className="store-info-card__icon"><FiShield size={18} /></span>
+                  <div>
+                    <strong className="d-block text-body mb-1">Verificacion segura</strong>
+                    <span className="store-muted">La solicitud se protege antes de entrar al flujo operativo.</span>
+                  </div>
+                </div>
+                <div className="store-info-card">
+                  <span className="store-info-card__icon"><FiTruck size={18} /></span>
+                  <div>
+                    <strong className="d-block text-body mb-1">Entrega coordinada</strong>
+                    <span className="store-muted">Se confirma costo final segun zona y disponibilidad real.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label className="form-label">Nombre completo *</label>
+      <div className="store-checkout-layout">
+        <section className="store-checkout-card">
+          <div className="d-grid gap-4">
+            <div>
+              <span className="store-kicker">Datos de contacto</span>
+              <h2 className="store-section__title mt-2 mb-2">Cuéntanos como prefieres que te contactemos.</h2>
+              <p className="store-section__subtitle mb-0">No se realiza cobro en linea. La confirmacion final y el total definitivo se revisan contigo.</p>
+            </div>
+
+            {error && (
+              <div className="alert alert-danger d-flex align-items-start gap-2 mb-0">
+                <FiAlertCircle className="mt-1 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="store-form-grid">
+              <div className="store-form-grid store-form-grid--two">
+                <div>
+                  <label className="store-form-label">Nombre completo *</label>
                   <input
                     type="text"
                     name="customer_name"
-                    className="form-control"
+                    className="form-control store-form-control"
                     value={formData.customer_name}
                     onChange={handleChange}
                     required
                   />
                 </div>
 
-                <div className="mb-3">
-                  <label className="form-label">Teléfono (WhatsApp) *</label>
+                <div>
+                  <label className="store-form-label">Telefono / WhatsApp *</label>
                   <input
                     type="tel"
                     name="customer_phone"
-                    className="form-control"
+                    className="form-control store-form-control"
                     placeholder="+502 5555-1234"
                     value={formData.customer_phone}
                     onChange={handleChange}
                     required
                   />
-                  <small className="text-muted">
-                    Te contactaremos por WhatsApp para confirmar tu pedido
-                  </small>
+                  <div className="store-form-help mt-2">Usaremos este canal para confirmar tu pedido.</div>
                 </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Email (opcional)</label>
-                  <input
-                    type="email"
-                    name="customer_email"
-                    className="form-control"
-                    value={formData.customer_email}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Dirección de envío (opcional)</label>
-                  <textarea
-                    name="shipping_address"
-                    className="form-control"
-                    rows="2"
-                    value={formData.shipping_address}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Notas adicionales (opcional)</label>
-                  <textarea
-                    name="notes"
-                    className="form-control"
-                    rows="2"
-                    placeholder="Instrucciones especiales, horarios de contacto, etc."
-                    value={formData.notes}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                {/* Turnstile */}
-                <div className="mb-4">
-                  <TurnstileWidget
-                    onVerify={setTurnstileToken}
-                    onError={(err) => setError(err)}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-lg w-100"
-                  disabled={loading || !turnstileToken}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" />
-                      Procesando...
-                    </>
-                  ) : (
-                    'Enviar Pedido'
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        {/* Resumen del pedido */}
-        <div className="col-lg-5">
-          <div className="card shadow-sm sticky-top" style={{ top: '100px' }}>
-            <div className="card-body">
-              <h5 className="card-title mb-4">Resumen del Pedido</h5>
-              
-              {cart.items.map(item => (
-                <div key={item.variant_id} className="d-flex justify-content-between mb-2">
-                  <div>
-                    <span>{item.product_name}</span>
-                    <small className="text-muted d-block">
-                      {item.size_name && item.size_name}
-                      {item.size_name && item.color_name && ' - '}
-                      {item.color_name && item.color_name}
-                      {' x'}{item.quantity}
-                    </small>
-                  </div>
-                  <span>{formatPrice(item.price * item.quantity)}</span>
-                </div>
-              ))}
-
-              <hr />
-
-              <div className="d-flex justify-content-between fw-bold">
-                <span>Total:</span>
-                <span className="text-primary">{formatPrice(cart.getTotalAmount())}</span>
               </div>
 
-              <small className="text-muted d-block mt-3">
-                * Los precios pueden variar según disponibilidad. 
-                Te confirmaremos el total final por WhatsApp.
-              </small>
+              <div>
+                <label className="store-form-label">Email</label>
+                <input
+                  type="email"
+                  name="customer_email"
+                  className="form-control store-form-control"
+                  value={formData.customer_email}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="store-form-label">Direccion de envio</label>
+                <textarea
+                  name="shipping_address"
+                  className="form-control store-form-textarea"
+                  value={formData.shipping_address}
+                  onChange={handleChange}
+                  rows="3"
+                />
+              </div>
+
+              <div>
+                <label className="store-form-label">Notas adicionales</label>
+                <textarea
+                  name="notes"
+                  className="form-control store-form-textarea"
+                  placeholder="Horario ideal, referencias, instrucciones especiales..."
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows="3"
+                />
+              </div>
+
+              <div className="store-panel">
+                <span className="store-kicker">Seguridad</span>
+                <h3 className="store-card__title mt-2 mb-2">Verifica tu solicitud</h3>
+                <p className="store-muted mb-3">Esto protege el formulario antes de enviarlo al flujo operativo del ERP.</p>
+                <TurnstileWidget
+                  onVerify={(token) => {
+                    setTurnstileToken(token);
+                    setError(null);
+                  }}
+                  onError={(message) => setError(message)}
+                />
+              </div>
+
+              <button type="submit" className="btn btn-store-primary w-100" disabled={loading || !turnstileToken}>
+                {loading ? 'Procesando solicitud...' : 'Enviar pedido'}
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <aside className="store-summary-card">
+          <div>
+            <span className="store-kicker">Resumen</span>
+            <h2 className="store-summary-card__title mt-2">Pedido listo para enviar</h2>
+          </div>
+
+          <div className="store-order-summary">
+            {cart.items.map((item) => (
+              <article key={item.variant_id} className="store-summary-item">
+                <div className="store-summary-item__media">
+                  <StoreImage src={getProductMockImage(item.product_id, `checkout-${item.variant_id}`)} alt={item.product_name} />
+                </div>
+
+                <div className="d-grid gap-2">
+                  <div>
+                    <h4 className="store-card__title fs-6 mb-1">{item.product_name}</h4>
+                    <div className="store-card__meta">
+                      {item.size_name && <span>Talla {item.size_name}</span>}
+                      {item.color_name && <span>Color {item.color_name}</span>}
+                    </div>
+                  </div>
+
+                  <div className="store-summary-line">
+                    <span className="store-muted">Cantidad x{item.quantity}</span>
+                    <strong>{formatPrice(item.price * item.quantity)}</strong>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="store-summary-line pt-2">
+            <span className="store-kicker">Total estimado</span>
+            <div className="store-price"><strong>{formatPrice(cart.getTotalAmount())}</strong></div>
+          </div>
+
+          <div className="store-info-card">
+            <span className="store-info-card__icon"><FiClock size={18} /></span>
+            <div>
+              <strong className="d-block text-body mb-1">Sin cobro inmediato</strong>
+              <span className="store-muted">El monto final puede ajustarse segun stock, entrega y coordinacion por WhatsApp.</span>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
+    </div>
     </div>
   );
 };

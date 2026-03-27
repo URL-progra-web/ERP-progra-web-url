@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '~/core/theme/ThemeContext';
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'; // Test key para desarrollo
 
 export const TurnstileWidget = ({ onVerify, onError }) => {
   const containerRef = useRef(null);
   const widgetIdRef = useRef(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const loadTurnstile = () => {
@@ -20,7 +22,7 @@ export const TurnstileWidget = ({ onVerify, onError }) => {
           'expired-callback': () => {
             onError?.('La verificación ha expirado, intenta de nuevo');
           },
-          theme: 'light',
+          theme: theme === 'dark' ? 'dark' : 'light',
         });
       }
     };
@@ -47,7 +49,7 @@ export const TurnstileWidget = ({ onVerify, onError }) => {
         widgetIdRef.current = null;
       }
     };
-  }, [onVerify, onError]);
+  }, [onVerify, onError, theme]);
 
-  return <div ref={containerRef} className="mb-3" />;
+  return <div ref={containerRef} className="mb-0" />;
 };

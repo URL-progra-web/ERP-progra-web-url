@@ -1,7 +1,8 @@
 import React from 'react';
 import { FiUsers, FiBriefcase } from 'react-icons/fi';
-import CustomersPage from './customers/CustomersPage';
-import EntrepreneursPage from './entrepreneurs/EntrepreneursPage';
+
+const CustomersPage = React.lazy(() => import('./customers/CustomersPage'));
+const EntrepreneursPage = React.lazy(() => import('./entrepreneurs/EntrepreneursPage'));
 
 export const crmFeature = {
     id: 'crm',

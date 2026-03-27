@@ -4,6 +4,7 @@ import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { PaymentMethodsTable } from './components/PaymentMethodsTable';
 import { PaymentMethodModal } from './components/PaymentMethodModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import AppPagination from '~/core/components/AppPagination';
 import FilterTabs from '~/core/components/FilterTabs';
 import PageHeader from '~/core/components/PageHeader';
@@ -104,52 +105,54 @@ const PaymentMethodsPage = () => {
                 onAction={() => handleOpenModal()}
             />
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="section-header">Filtros</div>
-                <div className="p-3 p-md-4 border-bottom">
-                    <div className="row g-3 align-items-end">
-                        <div className="col-md-5">
-                            <label className="form-label text-muted small mb-1">Buscar</label>
-                            <input
-                                type="search"
-                                className="form-control"
-                                placeholder="Nombre del método"
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setPage(1);
-                                }}
-                            />
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label text-muted small mb-1">Estado</label>
-                            <div>
-                                <FilterTabs
-                                    options={STATUS_FILTERS}
-                                    value={statusFilter}
-                                    onChange={(val) => { setStatusFilter(val); setPage(1); }}
+            <AppCard accent="var(--bs-orange)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <div className="row g-3 align-items-end">
+                            <div className="col-md-5">
+                                <label className="form-label text-muted small mb-1">Buscar</label>
+                                <input
+                                    type="search"
+                                    className="form-control"
+                                    placeholder="Nombre del método"
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setPage(1);
+                                    }}
                                 />
+                            </div>
+                            <div className="col-md-4">
+                                <label className="form-label text-muted small mb-1">Estado</label>
+                                <div>
+                                    <FilterTabs
+                                        options={STATUS_FILTERS}
+                                        value={statusFilter}
+                                        onChange={(val) => { setStatusFilter(val); setPage(1); }}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </AppCard.Section>
 
-                <div className="section-header">Listado</div>
-                <PaymentMethodsTable
-                    records={records}
-                    isLoading={isLoading}
-                    onToggle={handleToggle}
-                    onEdit={handleOpenModal}
-                    onDelete={handleDelete}
-                />
+                <AppCard.Section label="Listado">
+                    <PaymentMethodsTable
+                        records={records}
+                        isLoading={isLoading}
+                        onToggle={handleToggle}
+                        onEdit={handleOpenModal}
+                        onDelete={handleDelete}
+                    />
 
-                <AppPagination
-                    page={page}
-                    numPages={numPages}
-                    count={count}
-                    onPageChange={setPage}
-                />
-            </div>
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <PaymentMethodModal

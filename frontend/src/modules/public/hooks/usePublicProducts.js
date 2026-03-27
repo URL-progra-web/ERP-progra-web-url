@@ -7,7 +7,7 @@ export const usePublicProducts = (initialParams = {}) => {
   const [categoryPath, setCategoryPath] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [params, setParams] = useState(initialParams);
+  const [params, setParams] = useState({ page_size: 24, ...initialParams });
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);

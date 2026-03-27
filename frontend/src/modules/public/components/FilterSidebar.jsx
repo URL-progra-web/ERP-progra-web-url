@@ -38,27 +38,18 @@ export const FilterSidebar = ({
   };
 
   return (
-    <div className="store-filter-sidebar">
-      <div className="d-flex justify-content-between align-items-center gap-3">
-        <div>
-          <span className="store-kicker"><FiFilter size={12} /> Refinar</span>
-          <h3 className="store-card__title mt-2">Filtros disponibles</h3>
-        </div>
-        {hasActiveFilters && (
-          <button type="button" className="btn-store-ghost" onClick={onClearFilters}>
-            <FiX size={14} className="me-1" />
-            Limpiar
-          </button>
-        )}
-      </div>
+    <div className="store-filter-sidebar" style={{ fontSize: '0.875rem' }}>
+      {hasActiveFilters && (
+        <button type="button" className="btn-store-ghost btn-sm w-100 mb-2" onClick={onClearFilters} style={{ fontSize: '0.8rem', padding: '4px 8px' }}>
+          <FiX size={12} className="me-1" />
+          Limpiar
+        </button>
+      )}
 
       {sizes.length > 0 && (
-        <div className="store-sidebar__section">
-          <div>
-            <span className="store-form-label">Talla</span>
-            <p className="store-muted mb-0">Selecciona variaciones disponibles.</p>
-          </div>
-          <div className="d-flex flex-wrap gap-2">
+        <div className="store-sidebar__section" style={{ marginBottom: '0.75rem' }}>
+          <span className="store-form-label" style={{ fontSize: '0.75rem', marginBottom: '0.5rem', display: 'block' }}>Talla</span>
+          <div className="d-flex flex-wrap gap-1">
             {sizes.map(size => (
               <button
                 key={size.id}
@@ -68,6 +59,7 @@ export const FilterSidebar = ({
                     ? 'is-selected'
                     : ''
                 }`}
+                style={{ fontSize: '0.75rem', padding: '6px 10px' }}
                 onClick={() => onToggleSize(size.id)}
               >
                 {size.name}
@@ -78,12 +70,9 @@ export const FilterSidebar = ({
       )}
 
       {colors.length > 0 && (
-        <div className="store-sidebar__section">
-          <div>
-            <span className="store-form-label">Color</span>
-            <p className="store-muted mb-0">Usa tonos para filtrar mas rapido.</p>
-          </div>
-          <div className="d-flex flex-wrap gap-2">
+        <div className="store-sidebar__section" style={{ marginBottom: '0.75rem' }}>
+          <span className="store-form-label" style={{ fontSize: '0.75rem', marginBottom: '0.5rem', display: 'block' }}>Color</span>
+          <div className="d-flex flex-wrap gap-1">
             {colors.map(color => (
               <button
                 key={color.id}
@@ -93,11 +82,12 @@ export const FilterSidebar = ({
                     ? 'is-selected'
                     : ''
                 }`}
+                style={{ fontSize: '0.75rem', padding: '6px 10px' }}
                 onClick={() => onToggleColor(color.id)}
                 title={color.name}
               >
                 {color.hex_code && (
-                  <span className="store-filter-pill__swatch" style={{ backgroundColor: color.hex_code }} />
+                  <span className="store-filter-pill__swatch" style={{ backgroundColor: color.hex_code, width: '12px', height: '12px' }} />
                 )}
                 <span>{color.name}</span>
               </button>
@@ -108,17 +98,15 @@ export const FilterSidebar = ({
 
       {price_range.max > 0 && (
         <div className="store-sidebar__section">
-          <div>
-            <span className="store-form-label">Precio</span>
-            <p className="store-muted mb-0">Ajusta un rango para esta seleccion.</p>
-          </div>
+          <span className="store-form-label" style={{ fontSize: '0.75rem', marginBottom: '0.5rem', display: 'block' }}>Precio</span>
 
-          <div className="d-flex gap-2 flex-column flex-sm-row">
+          <div className="d-flex gap-2 mt-1">
             <div className="flex-fill">
-              <label className="store-form-label">Minimo</label>
+              <label className="store-form-label" style={{ fontSize: '0.7rem' }}>Mín</label>
               <input
                 type="number"
-                className="form-control store-price-input"
+                className="form-control form-control-sm store-price-input"
+                style={{ fontSize: '0.8rem' }}
                 value={localMinPrice}
                 onChange={(e) => setLocalMinPrice(Number(e.target.value))}
                 min={price_range.min}
@@ -126,10 +114,11 @@ export const FilterSidebar = ({
               />
             </div>
             <div className="flex-fill">
-              <label className="store-form-label">Maximo</label>
+              <label className="store-form-label" style={{ fontSize: '0.7rem' }}>Máx</label>
               <input
                 type="number"
-                className="form-control store-price-input"
+                className="form-control form-control-sm store-price-input"
+                style={{ fontSize: '0.8rem' }}
                 value={localMaxPrice}
                 onChange={(e) => setLocalMaxPrice(Number(e.target.value))}
                 min={localMinPrice}
@@ -138,17 +127,17 @@ export const FilterSidebar = ({
             </div>
           </div>
 
-          <div className="store-pill">
+          <div className="store-pill mt-2" style={{ fontSize: '0.75rem', padding: '4px 8px' }}>
             {formatPrice(localMinPrice)} - {formatPrice(localMaxPrice)}
           </div>
 
-          <div className="store-btn-group">
-            <button type="button" className="btn btn-store-primary flex-fill" onClick={handlePriceApply}>
+          <div className="store-btn-group mt-2">
+            <button type="button" className="btn btn-store-primary btn-sm flex-fill" style={{ fontSize: '0.75rem' }} onClick={handlePriceApply}>
               Aplicar
             </button>
             {(selectedFilters.minPrice !== null || selectedFilters.maxPrice !== null) && (
-              <button type="button" className="btn btn-store-secondary" onClick={handlePriceReset}>
-                <FiX size={14} />
+              <button type="button" className="btn btn-store-secondary btn-sm" onClick={handlePriceReset}>
+                <FiX size={12} />
               </button>
             )}
           </div>
@@ -156,8 +145,8 @@ export const FilterSidebar = ({
       )}
 
       {sizes.length === 0 && colors.length === 0 && (
-        <p className="store-muted mb-0">
-          No hay filtros disponibles para esta selección.
+        <p className="store-muted mb-0" style={{ fontSize: '0.8rem' }}>
+          No hay filtros disponibles.
         </p>
       )}
     </div>

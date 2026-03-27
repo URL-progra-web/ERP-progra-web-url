@@ -65,7 +65,7 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar Categoría' : 'Nueva Categoría'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}

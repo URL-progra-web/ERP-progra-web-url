@@ -96,6 +96,7 @@ export const ProductDetailPage = () => {
   }
 
   return (
+    <div className="container">
     <div className="store-detail">
       <Link to="/tienda" className="btn-store-ghost d-inline-flex align-items-center gap-2 text-decoration-none">
         <FiArrowLeft size={16} /> Volver al catalogo
@@ -305,6 +306,7 @@ export const ProductDetailPage = () => {
           </section>
         </div>
       </div>
+    </div>
     </div>
   );
 };

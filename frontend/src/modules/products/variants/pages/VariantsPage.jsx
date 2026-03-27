@@ -5,6 +5,7 @@ import VariantsFilters from '../components/VariantsFilters';
 import VariantsTable from '../components/VariantsTable';
 import VariantModal from '../components/VariantModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 
 const VariantsPage = () => {
@@ -86,66 +87,66 @@ const VariantsPage = () => {
                 />
             )}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="section-header">Filtros</div>
-
-                <div className="p-3 p-md-4 border-bottom">
-                    <VariantsFilters
-                        searchInput={searchInput}
-                        onSearchChange={setSearchInput}
-                        onSearch={handleSearch}
-                        activeFilter={activeFilter}
-                        onActiveChange={setActiveFilter}
-                        productFilter={productFilter}
-                        onProductChange={setProductFilter}
-                        entrepreneurFilter={entrepreneurFilter}
-                        onEntrepreneurChange={setEntrepreneurFilter}
-                        businessUnitFilter={businessUnitFilter}
-                        onBusinessUnitChange={setBusinessUnitFilter}
-                        colorFilter={colorFilter}
-                        onColorChange={setColorFilter}
-                        sizeFilter={sizeFilter}
-                        onSizeChange={setSizeFilter}
-                        uomFilter={uomFilter}
-                        onUomChange={setUomFilter}
-                        products={products}
-                        entrepreneurs={entrepreneurs}
-                        businessUnits={businessUnits}
-                        colors={colors}
-                        sizes={sizes}
-                        uoms={uoms}
-                        onReset={resetFilters}
-                    />
-                </div>
-
-                <div className="section-header">Listado</div>
-
-                <div className="table-responsive bg-body">
-                    <table className="table table-hover mb-0 align-middle">
-                        <thead className="text-uppercase text-muted small">
-                            <tr>
-                                <th className="border-0 px-4 py-3">Producto / SKU</th>
-                                <th className="border-0 py-3">Color</th>
-                                <th className="border-0 py-3">Emprendedor/Proveedor</th>
-                                <th className="border-0 py-3">Sede</th>
-                                <th className="border-0 py-3">Talla</th>
-                                <th className="border-0 py-3">U. Medida</th>
-                                <th className="border-0 py-3">Costo</th>
-                                <th className="border-0 py-3">Precio</th>
-                                <th className="border-0 py-3">Stock / Estado</th>
-                                <th className="border-0 px-4 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <VariantsTable
-                            variants={variants}
-                            isLoading={isLoading}
-                            onEdit={handleOpenModal}
-                            onDelete={handleConfirmDelete}
+            <AppCard accent="var(--bs-primary)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <VariantsFilters
+                            searchInput={searchInput}
+                            onSearchChange={setSearchInput}
+                            onSearch={handleSearch}
+                            activeFilter={activeFilter}
+                            onActiveChange={setActiveFilter}
+                            productFilter={productFilter}
+                            onProductChange={setProductFilter}
+                            entrepreneurFilter={entrepreneurFilter}
+                            onEntrepreneurChange={setEntrepreneurFilter}
+                            businessUnitFilter={businessUnitFilter}
+                            onBusinessUnitChange={setBusinessUnitFilter}
+                            colorFilter={colorFilter}
+                            onColorChange={setColorFilter}
+                            sizeFilter={sizeFilter}
+                            onSizeChange={setSizeFilter}
+                            uomFilter={uomFilter}
+                            onUomChange={setUomFilter}
+                            products={products}
+                            entrepreneurs={entrepreneurs}
+                            businessUnits={businessUnits}
+                            colors={colors}
+                            sizes={sizes}
+                            uoms={uoms}
+                            onReset={resetFilters}
                         />
-                    </table>
-                </div>
-            </div>
+                    </div>
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado">
+                    <div className="table-responsive bg-body">
+                        <table className="table table-hover mb-0 align-middle">
+                            <thead className="text-uppercase text-muted small">
+                                <tr>
+                                    <th className="border-0 px-4 py-3">Producto / SKU</th>
+                                    <th className="border-0 py-3">Color</th>
+                                    <th className="border-0 py-3">Emprendedor/Proveedor</th>
+                                    <th className="border-0 py-3">Sede</th>
+                                    <th className="border-0 py-3">Talla</th>
+                                    <th className="border-0 py-3">U. Medida</th>
+                                    <th className="border-0 py-3">Costo</th>
+                                    <th className="border-0 py-3">Precio</th>
+                                    <th className="border-0 py-3">Stock / Estado</th>
+                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <VariantsTable
+                                variants={variants}
+                                isLoading={isLoading}
+                                onEdit={handleOpenModal}
+                                onDelete={handleConfirmDelete}
+                            />
+                        </table>
+                    </div>
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <VariantModal

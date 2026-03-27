@@ -60,7 +60,7 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar emprendedor' : 'Nuevo emprendedor'}
-            tone="dark"
+            tone="dark" accent="var(--bs-success)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear emprendedor'}

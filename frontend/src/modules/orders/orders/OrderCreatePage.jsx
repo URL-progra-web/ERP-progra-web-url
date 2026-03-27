@@ -3,6 +3,7 @@ import { FiArrowLeft, FiShoppingCart } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import { useAuth } from '~/core/auth/AuthContext';
 import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import { CustomerSearch } from './components/CustomerSearch';
@@ -185,132 +186,135 @@ const OrderCreatePage = () => {
 
             <div className="row g-4 align-items-start">
                 <div className="col-12 col-xl-8">
-                    <div className="card border-0 shadow-sm overflow-hidden">
-                        <div className="card-header bg-dark text-white px-4 py-3">
-                            <h6 className="mb-1 text-uppercase">Catalogo de Variantes</h6>
-                            <small className="text-white-50">Solo se muestran variantes activas con stock disponible.</small>
-                        </div>
-                        <div className="card-body border-bottom p-4">
-                            <OrderCatalogFilters
-                                searchInput={searchInput}
-                                onSearchChange={setSearchInput}
-                                onSearch={handleSearch}
-                                productFilter={productFilter}
-                                onProductChange={setProductFilter}
-                                entrepreneurFilter={entrepreneurFilter}
-                                onEntrepreneurChange={setEntrepreneurFilter}
-                                businessUnitFilter={businessUnitFilter}
-                                onBusinessUnitChange={setBusinessUnitFilter}
-                                colorFilter={colorFilter}
-                                onColorChange={setColorFilter}
-                                sizeFilter={sizeFilter}
-                                onSizeChange={setSizeFilter}
-                                uomFilter={uomFilter}
-                                onUomChange={setUomFilter}
-                                products={products}
-                                entrepreneurs={entrepreneurs}
-                                businessUnits={businessUnits}
-                                colors={colors}
-                                sizes={sizes}
+                    <AppCard accent="var(--bs-orange)">
+                        <AppCard.Section label="Catálogo de Variantes">
+                            <div className="p-3 p-md-4 border-bottom">
+                                <OrderCatalogFilters
+                                    searchInput={searchInput}
+                                    onSearchChange={setSearchInput}
+                                    onSearch={handleSearch}
+                                    productFilter={productFilter}
+                                    onProductChange={setProductFilter}
+                                    entrepreneurFilter={entrepreneurFilter}
+                                    onEntrepreneurChange={setEntrepreneurFilter}
+                                    businessUnitFilter={businessUnitFilter}
+                                    onBusinessUnitChange={setBusinessUnitFilter}
+                                    colorFilter={colorFilter}
+                                    onColorChange={setColorFilter}
+                                    sizeFilter={sizeFilter}
+                                    onSizeChange={setSizeFilter}
+                                    uomFilter={uomFilter}
+                                    onUomChange={setUomFilter}
+                                    products={products}
+                                    entrepreneurs={entrepreneurs}
+                                    businessUnits={businessUnits}
+                                    colors={colors}
+                                    sizes={sizes}
+                                    uoms={uoms}
+                                    onReset={resetFilters}
+                                />
+                            </div>
+                        </AppCard.Section>
+
+                        <AppCard.Section label="Variantes disponibles">
+                            <OrderCatalogTable
+                                variants={variants}
+                                isLoading={isLoading}
+                                onAdd={addVariant}
+                                cartItems={items}
                                 uoms={uoms}
-                                onReset={resetFilters}
+                                conversionsByBaseUom={conversionsByBaseUom}
                             />
-                        </div>
-                        <OrderCatalogTable
-                            variants={variants}
-                            isLoading={isLoading}
-                            onAdd={addVariant}
-                            cartItems={items}
-                            uoms={uoms}
-                            conversionsByBaseUom={conversionsByBaseUom}
-                        />
-                    </div>
+                        </AppCard.Section>
+                    </AppCard>
                 </div>
 
                 <div className="col-12 col-xl-4">
                     <div className="d-flex flex-column gap-4" style={{ position: 'sticky', top: '1rem' }}>
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-header bg-body px-4 py-3">
-                                <h6 className="mb-0 text-uppercase text-muted small">Datos del Pedido</h6>
-                            </div>
-                            <div className="card-body p-4 d-flex flex-column gap-3">
-                                <div>
-                                    <label className="form-label">Cliente *</label>
-                                    <CustomerSearch
-                                        selectedCustomer={selectedCustomer}
-                                        onSelect={handleSelectCustomer}
-                                        onClear={handleClearCustomer}
-                                        disabled={isSubmitting}
-                                        initialQuery={selectedCustomer?.name || ''}
-                                    />
-                                </div>
+                        <AppCard accent="var(--bs-orange)">
+                            <AppCard.Section label="Datos del Pedido">
+                                <div className="p-3 p-md-4 d-flex flex-column gap-3">
+                                    <div>
+                                        <label className="form-label">Cliente *</label>
+                                        <CustomerSearch
+                                            selectedCustomer={selectedCustomer}
+                                            onSelect={handleSelectCustomer}
+                                            onClear={handleClearCustomer}
+                                            disabled={isSubmitting}
+                                            initialQuery={selectedCustomer?.name || ''}
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label className="form-label">Metodo de Pago</label>
-                                    <select
-                                        className="form-select"
-                                        name="payment_method_id"
-                                        value={formData.payment_method_id}
-                                        onChange={handleChange}
-                                        disabled={isLoadingCatalogs}
-                                    >
-                                        <option value="">(Ninguno / Por definir)</option>
-                                        {paymentMethods.map((pm) => (
-                                            <option key={pm.id} value={pm.id}>{pm.name || pm.code || `Metodo #${pm.id}`}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="form-label">Direccion de Envio</label>
-                                    <textarea
-                                        className="form-control"
-                                        rows="2"
-                                        name="shipping_address"
-                                        value={formData.shipping_address}
-                                        onChange={handleChange}
-                                        placeholder="Se autocompleta desde el cliente, pero puedes editarla"
-                                    />
-                                </div>
+                                    <div>
+                                        <label className="form-label">Metodo de Pago</label>
+                                        <select
+                                            className="form-select"
+                                            name="payment_method_id"
+                                            value={formData.payment_method_id}
+                                            onChange={handleChange}
+                                            disabled={isLoadingCatalogs}
+                                        >
+                                            <option value="">(Ninguno / Por definir)</option>
+                                            {paymentMethods.map((pm) => (
+                                                <option key={pm.id} value={pm.id}>{pm.name || pm.code || `Metodo #${pm.id}`}</option>
+                                            ))}
+                                        </select>
+                                    </div>
 
-                                <div>
-                                    <label className="form-label">Notas</label>
-                                    <textarea
-                                        className="form-control"
-                                        rows="3"
-                                        name="notes"
-                                        value={formData.notes}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                                    <div>
+                                        <label className="form-label">Direccion de Envio</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="2"
+                                            name="shipping_address"
+                                            value={formData.shipping_address}
+                                            onChange={handleChange}
+                                            placeholder="Se autocompleta desde el cliente, pero puedes editarla"
+                                        />
+                                    </div>
 
-                        <div className="card border-0 shadow-sm">
-                            <div className="card-body p-4">
-                                <OrderCartSummary
-                                    items={items}
-                                    shippingCost={formData.shipping_cost}
-                                    onShippingCostChange={(value) => setFormData((prev) => ({ ...prev, shipping_cost: value }))}
-                                    onIncrement={incrementItem}
-                                    onDecrement={decrementItem}
-                                    onQuantityChange={updateQuantity}
-                                    onRemove={removeItem}
-                                    onClear={clearCart}
-                                />
-
-                                <div className="mt-4 d-grid gap-2">
-                                    <button type="button" className="btn btn-dark btn-lg" onClick={handleSubmit} disabled={submitDisabled}>
-                                        {isSubmitting ? 'Confirmando carrito...' : 'Confirmar carrito'}
-                                    </button>
-                                    <div className="text-center small text-muted">
-                                        {summary.totalQuantity} unidad(es) en carrito • Total estimado Q {totalAmount.toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        })}
+                                    <div>
+                                        <label className="form-label">Notas</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="3"
+                                            name="notes"
+                                            value={formData.notes}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </AppCard.Section>
+                        </AppCard>
+
+                        <AppCard accent="var(--bs-orange)">
+                            <AppCard.Section label="Carrito">
+                                <div className="p-3 p-md-4">
+                                    <OrderCartSummary
+                                        items={items}
+                                        shippingCost={formData.shipping_cost}
+                                        onShippingCostChange={(value) => setFormData((prev) => ({ ...prev, shipping_cost: value }))}
+                                        onIncrement={incrementItem}
+                                        onDecrement={decrementItem}
+                                        onQuantityChange={updateQuantity}
+                                        onRemove={removeItem}
+                                        onClear={clearCart}
+                                    />
+
+                                    <div className="mt-4 d-grid gap-2">
+                                        <button type="button" className="btn btn-dark btn-lg" onClick={handleSubmit} disabled={submitDisabled}>
+                                            {isSubmitting ? 'Confirmando carrito...' : 'Confirmar carrito'}
+                                        </button>
+                                        <div className="text-center small text-muted">
+                                            {summary.totalQuantity} unidad(es) en carrito • Total estimado Q {totalAmount.toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </AppCard.Section>
+                        </AppCard>
                     </div>
                 </div>
             </div>

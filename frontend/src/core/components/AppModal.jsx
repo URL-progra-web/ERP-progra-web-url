@@ -1,18 +1,22 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { FiX } from 'react-icons/fi';
 
 const TONE_SUBMIT = {
     primary:   'btn btn-primary fw-semibold',
     secondary: 'btn btn-secondary fw-semibold',
-    dark:      'btn btn-primary fw-semibold',
+    dark:      'btn btn-dark fw-semibold',
     neutral:   'btn btn-primary fw-semibold',
     danger:    'btn btn-danger fw-semibold',
 };
+
+const SIZE_MAX = { sm: 400, md: 540, lg: 700, xl: 900 };
 
 const AppModal = ({
     isOpen,
     title,
     tone = 'primary',
+    accent,
     onClose,
     onSubmit,
     submitLabel = 'Guardar',
@@ -24,7 +28,6 @@ const AppModal = ({
 }) => {
     const shouldRender = typeof isOpen === 'undefined' ? true : isOpen;
 
-    // Close on Escape
     useEffect(() => {
         if (!shouldRender) return;
         const handler = (e) => { if (e.key === 'Escape') onClose?.(); };
@@ -32,7 +35,6 @@ const AppModal = ({
         return () => document.removeEventListener('keydown', handler);
     }, [shouldRender, onClose]);
 
-    // Lock body scroll while open
     useEffect(() => {
         if (!shouldRender) return;
         const prev = document.body.style.overflow;
@@ -44,80 +46,71 @@ const AppModal = ({
 
     const submitClass = TONE_SUBMIT[tone] ?? TONE_SUBMIT.primary;
     const Container = onSubmit ? 'form' : 'div';
-    const maxWidth = size === 'lg' ? 700 : size === 'sm' ? 400 : 540;
+    const maxWidth = SIZE_MAX[size] ?? SIZE_MAX.md;
 
     return ReactDOM.createPortal(
-        /* Backdrop — rendered directly to body to escape any transformed containers */
         <div
             onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
             style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0,0,0,0.55)',
-                backdropFilter: 'blur(3px)',
-                WebkitBackdropFilter: 'blur(3px)',
+                background: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
                 zIndex: 1100,
                 overflowY: 'auto',
                 padding: 'max(5vh, 28px) 16px 40px',
                 animation: 'fadeIn 0.15s ease both',
             }}
         >
-            {/* Dialog wrapper — centered, scrolls with the backdrop */}
-            <div
-                style={{
-                    width: '100%',
-                    maxWidth,
-                    margin: '0 auto',
-                    animation: 'scaleIn 0.18s cubic-bezier(0.4,0,0.2,1) both',
-                }}
-            >
+            <div style={{
+                width: '100%',
+                maxWidth,
+                margin: '0 auto',
+                animation: 'scaleIn 0.18s cubic-bezier(0.4,0,0.2,1) both',
+            }}>
                 <Container
-                    className="modal-content"
-                    onSubmit={onSubmit}
+                    className="rounded-4 overflow-hidden border shadow-lg bg-body"
                     style={{ display: 'flex', flexDirection: 'column' }}
+                    onSubmit={onSubmit}
                 >
                     {/* Header */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '16px 20px',
-                        borderBottom: '1px solid var(--bs-border-color)',
-                        flexShrink: 0,
-                    }}>
-                        <h5 className="modal-title" style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>
-                            {title}
-                        </h5>
+                    <div
+                        className="section-header d-flex align-items-center justify-content-between"
+                        style={accent ? {
+                            '--card-accent': accent,
+                            background: `color-mix(in srgb, ${accent} 12%, var(--bs-tertiary-bg))`,
+                        } : undefined}
+                    >
+                        <span>{title}</span>
                         <button
                             type="button"
                             onClick={onClose}
+                            className="d-flex align-items-center justify-content-center p-1 border-0 bg-transparent rounded-2"
                             style={{
-                                background: 'none', border: 'none', cursor: 'pointer',
-                                color: 'var(--bs-secondary-color)', padding: '4px',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                borderRadius: 'var(--radius-xs)', fontSize: '20px', lineHeight: 1,
-                                transition: 'color var(--transition)',
+                                color: 'var(--card-accent, var(--bs-secondary-color))',
+                                cursor: 'pointer',
+                                transition: 'opacity 0.15s',
+                                lineHeight: 1,
                             }}
-                            onMouseOver={e => e.currentTarget.style.color = 'var(--bs-body-color)'}
-                            onMouseOut={e => e.currentTarget.style.color = 'var(--bs-secondary-color)'}
+                            onMouseOver={e => e.currentTarget.style.opacity = '0.7'}
+                            onMouseOut={e => e.currentTarget.style.opacity = '1'}
                         >
-                            ×
+                            <FiX size={15} strokeWidth={2.5} />
                         </button>
                     </div>
 
                     {/* Body */}
-                    <div className="modal-body" style={{ padding: '20px' }}>
+                    <div className="p-4">
                         {children}
                     </div>
 
                     {/* Footer */}
                     {footer ?? (
-                        <div style={{
-                            display: 'flex', justifyContent: 'flex-end', gap: '8px',
-                            padding: '14px 20px',
-                            borderTop: '1px solid var(--bs-border-color)',
-                            flexShrink: 0,
-                        }}>
+                        <div
+                            className="d-flex justify-content-end gap-2 px-4 py-3"
+                            style={{ borderTop: '1px solid var(--bs-border-color)' }}
+                        >
                             <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
                                 {cancelLabel}
                             </button>

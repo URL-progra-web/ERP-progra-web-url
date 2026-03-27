@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export const useImagePreloader = (urls, enabled = true) => {
+  const cacheKey = useMemo(() => [...new Set((urls || []).filter(Boolean))].join('|'), [urls]);
+  const normalizedUrls = useMemo(() => (cacheKey ? cacheKey.split('|') : []), [cacheKey]);
+
   const [state, setState] = useState({
     loaded: !enabled,
     loadedCount: 0,
@@ -8,17 +11,27 @@ export const useImagePreloader = (urls, enabled = true) => {
   });
 
   useEffect(() => {
-    const normalizedUrls = [...new Set((urls || []).filter(Boolean))];
-
     if (!enabled || normalizedUrls.length === 0) {
-      setState({ loaded: true, loadedCount: 0, total: normalizedUrls.length });
+      setState((previous) => {
+        if (previous.loaded && previous.total === normalizedUrls.length && previous.loadedCount === 0) {
+          return previous;
+        }
+
+        return { loaded: true, loadedCount: 0, total: normalizedUrls.length };
+      });
       return undefined;
     }
 
     let cancelled = false;
     let loadedCount = 0;
 
-    setState({ loaded: false, loadedCount: 0, total: normalizedUrls.length });
+    setState((previous) => {
+      if (!previous.loaded && previous.loadedCount === 0 && previous.total === normalizedUrls.length) {
+        return previous;
+      }
+
+      return { loaded: false, loadedCount: 0, total: normalizedUrls.length };
+    });
 
     const handleAssetReady = () => {
       loadedCount += 1;
@@ -47,7 +60,7 @@ export const useImagePreloader = (urls, enabled = true) => {
         image.onerror = null;
       });
     };
-  }, [enabled, urls]);
+  }, [cacheKey, enabled]);
 
   return {
     ...state,

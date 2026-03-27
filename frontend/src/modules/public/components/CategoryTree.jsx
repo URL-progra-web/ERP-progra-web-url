@@ -36,36 +36,59 @@ const CategoryNode = ({ category, selectedId, onSelect, level = 0 }) => {
     <div className="store-category-tree__node">
       <button
         type="button"
-        className={`store-category-item ${isSelected ? 'is-selected' : ''}`}
-        style={{ paddingLeft: `${level * 18 + 14}px` }}
+        className={`${isSelected ? 'fw-semibold' : ''}`}
+        style={{ 
+          paddingLeft: `${level * 14 + 4}px`, 
+          padding: '4px 8px', 
+          fontSize: '0.875rem',
+          background: 'transparent',
+          border: 'none',
+          width: '100%',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: isSelected ? 'var(--bs-primary)' : 'var(--bs-body-color)',
+          cursor: 'pointer',
+          transition: 'color 0.2s'
+        }}
         onClick={handleSelect}
+        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--bs-primary)'}
+        onMouseLeave={(e) => {
+          if (!isSelected) e.currentTarget.style.color = 'var(--bs-body-color)';
+        }}
       >
         {hasChildren ? (
           <span
             onClick={handleToggle}
             aria-hidden="true"
+            style={{ width: '14px', display: 'flex', alignItems: 'center' }}
           >
-            {expanded ? <FiChevronDown size={14} /> : <FiChevronRight size={14} />}
+            {expanded ? <FiChevronDown size={12} /> : <FiChevronRight size={12} />}
           </span>
         ) : (
           <span style={{ width: 14 }} />
         )}
 
-        <span className="store-category-item__icon">
-          <FiFolder size={14} />
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <FiFolder size={12} />
         </span>
 
-        <span className="flex-grow-1 text-start">{category.name}</span>
+        <span className="flex-grow-1">{category.name}</span>
 
         {category.product_count > 0 && (
-          <span className="store-pill ms-auto">
+          <span style={{ 
+            fontSize: '0.7rem', 
+            opacity: 0.6,
+            marginLeft: 'auto'
+          }}>
             {category.product_count}
           </span>
         )}
       </button>
 
       {hasChildren && expanded && (
-        <div className="d-grid gap-2 mt-2">
+        <div style={{ marginTop: '2px' }}>
           {category.children.map(child => (
             <CategoryNode
               key={child.id}
@@ -88,26 +111,36 @@ export const CategoryTree = ({ categories, selectedId, onSelect }) => {
 
   return (
     <div className="store-category-tree">
-      <div className="d-flex justify-content-between align-items-center gap-3">
-        <div>
-          <span className="store-kicker">Navegacion</span>
-          <h3 className="store-card__title mt-2">Categorias</h3>
-        </div>
-        <span className="store-pill"><FiGrid size={12} /> {categories.length}</span>
-      </div>
-
       <button
         type="button"
-        className={`store-category-item ${!selectedId ? 'is-selected' : ''}`}
+        className={`${!selectedId ? 'fw-semibold' : ''}`}
+        style={{ 
+          padding: '4px 8px', 
+          fontSize: '0.875rem',
+          background: 'transparent',
+          border: 'none',
+          width: '100%',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: !selectedId ? 'var(--bs-primary)' : 'var(--bs-body-color)',
+          cursor: 'pointer',
+          transition: 'color 0.2s'
+        }}
         onClick={handleClearSelection}
+        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--bs-primary)'}
+        onMouseLeave={(e) => {
+          if (selectedId) e.currentTarget.style.color = 'var(--bs-body-color)';
+        }}
       >
-        <span className="store-category-item__icon">
-          <FiGrid size={14} />
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <FiGrid size={12} />
         </span>
-        <span className="flex-grow-1 text-start">Todas las categorias</span>
+        <span className="flex-grow-1">Todas</span>
       </button>
 
-      <div className="d-grid gap-2">
+      <div style={{ marginTop: '2px' }}>
         {categories.map(category => (
           <CategoryNode
             key={category.id}
