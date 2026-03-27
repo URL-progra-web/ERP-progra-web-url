@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 export const CustomersTable = ({ customers, isLoading, onEdit, onDelete, onCreateOrder }) => {
     if (isLoading) {
@@ -48,23 +49,11 @@ export const CustomersTable = ({ customers, isLoading, onEdit, onDelete, onCreat
                                 </span>
                             </td>
                             <td className="text-end px-4">
-                                <div className="btn-group btn-group-sm">
-                                    {onCreateOrder && (
-                                        <button
-                                            className="btn btn-outline-success"
-                                            onClick={() => onCreateOrder(customer)}
-                                            title="Nuevo pedido"
-                                        >
-                                            <FiShoppingCart />
-                                        </button>
-                                    )}
-                                    <button className="btn btn-outline-primary" onClick={() => onEdit(customer)}>
-                                        <FiEdit2 />
-                                    </button>
-                                    <button className="btn btn-outline-danger" onClick={() => onDelete(customer)}>
-                                        <FiTrash2 />
-                                    </button>
-                                </div>
+                                <TableActions actions={[
+                                    ...(onCreateOrder ? [{ icon: FiShoppingCart, onClick: () => onCreateOrder(customer), title: 'Nuevo pedido', variant: 'success' }] : []),
+                                    { icon: FiEdit2,  onClick: () => onEdit(customer),   title: 'Editar',   variant: 'primary' },
+                                    { icon: FiTrash2, onClick: () => onDelete(customer), title: 'Eliminar', variant: 'danger'  },
+                                ]} />
                             </td>
                         </tr>
                     ))}

@@ -60,7 +60,7 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar cliente' : 'Nuevo cliente'}
-            tone="dark"
+            tone="dark" accent="var(--bs-success)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear cliente'}

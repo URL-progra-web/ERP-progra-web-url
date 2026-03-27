@@ -50,8 +50,8 @@ INSTALLED_APPS = [
     'products',
     'inventory',
     'orders',
-
-    'receipts.apps.ReceiptsConfig',
+    'receipts',
+    'public',
 ]
 
 MIDDLEWARE = [
@@ -88,6 +88,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_SCHEMA_CLASS': 'backend.schema.CustomAutoSchema',
+    'DEFAULT_THROTTLE_RATES': {
+        'public_order': '5/hour',
+        'public_catalog': '100/minute',
+    },
 }
 
 SPECTACULAR_SETTINGS = {
@@ -184,3 +188,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 CORS_ALLOW_ALL_ORIGINS = True
+
+# ============================================================
+# Email Configuration
+# ============================================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@erp.com')
+
+# ============================================================
+# Cloudflare Turnstile Configuration
+# ============================================================
+TURNSTILE_SECRET_KEY = os.environ.get('TURNSTILE_SECRET_KEY', '')

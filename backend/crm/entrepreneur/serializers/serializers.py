@@ -6,10 +6,10 @@ from users.user.models.models import User
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer para mostrar datos básicos del usuario asignado."""
-    
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+        fields = ('id', 'name', 'email')
 
 
 class EntrepreneurSerializer(serializers.ModelSerializer):

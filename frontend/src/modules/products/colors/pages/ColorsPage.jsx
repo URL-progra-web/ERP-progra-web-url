@@ -5,6 +5,7 @@ import ColorsFilters from '../components/ColorsFilters';
 import ColorsTable from '../components/ColorsTable';
 import ColorModal from '../components/ColorModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 
 const ColorsPage = () => {
@@ -61,44 +62,40 @@ const ColorsPage = () => {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Filtros</h6>
-                </div>
-
-                <div className="p-3 p-md-4 border-bottom">
-                    <ColorsFilters
-                        searchInput={searchInput}
-                        onSearchChange={setSearchInput}
-                        onSearch={handleSearch}
-                    />
-                </div>
-
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Listado</h6>
-                </div>
-
-                <div className="table-responsive bg-body">
-                    <table className="table table-hover mb-0 align-middle">
-                        <thead className="text-uppercase text-muted small">
-                            <tr>
-                                <th className="border-0 px-4 py-3">Color</th>
-                                <th className="border-0 py-3">Código</th>
-                                <th className="border-0 py-3">Vista</th>
-                                <th className="border-0 py-3">Creado</th>
-                                <th className="border-0 px-4 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <ColorsTable
-                            colors={colors}
-                            isLoading={isLoading}
-                            onEdit={handleOpenModal}
-                            onDelete={handleConfirmDelete}
+            <AppCard accent="var(--bs-primary)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <ColorsFilters
+                            searchInput={searchInput}
+                            onSearchChange={setSearchInput}
+                            onSearch={handleSearch}
                         />
-                    </table>
-                </div>
-            </div>
+                    </div>
+                </AppCard.Section>
+
+                <AppCard.Section label="Listado">
+                    <div className="table-responsive bg-body">
+                        <table className="table table-hover mb-0 align-middle">
+                            <thead className="text-uppercase text-muted small">
+                                <tr>
+                                    <th className="border-0 px-4 py-3">Color</th>
+                                    <th className="border-0 py-3">Código</th>
+                                    <th className="border-0 py-3">Vista</th>
+                                    <th className="border-0 py-3">Creado</th>
+                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <ColorsTable
+                                colors={colors}
+                                isLoading={isLoading}
+                                onEdit={handleOpenModal}
+                                onDelete={handleConfirmDelete}
+                            />
+                        </table>
+                    </div>
+                </AppCard.Section>
+            </AppCard>
 
             {isModalOpen && (
                 <ColorModal

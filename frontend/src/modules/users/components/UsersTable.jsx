@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiLock, FiUnlock } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 const StatusBadge = ({ isActive }) =>
     isActive
@@ -43,20 +44,15 @@ const UsersTable = ({ users, isLoading, onEdit, onToggleStatus }) => {
                         <StatusBadge isActive={user.is_active} />
                     </td>
                     <td className="px-4 py-3 text-end">
-                        <button
-                            className="btn btn-sm btn-outline-secondary border-0 me-2"
-                            onClick={() => onEdit(user)}
-                            title="Editar"
-                        >
-                            <FiEdit2 size={14} className="text-primary" />
-                        </button>
-                        <button
-                            className={`btn btn-sm btn-outline-secondary border-0 ${user.is_active ? 'text-danger' : 'text-success'}`}
-                            onClick={() => onToggleStatus(user)}
-                            title={user.is_active ? 'Bloquear Acceso' : 'Desbloquear Acceso'}
-                        >
-                            {user.is_active ? <FiLock size={14} /> : <FiUnlock size={14} />}
-                        </button>
+                        <TableActions actions={[
+                            { icon: FiEdit2,  onClick: () => onEdit(user), title: 'Editar', variant: 'primary' },
+                            {
+                                icon: user.is_active ? FiLock : FiUnlock,
+                                onClick: () => onToggleStatus(user),
+                                title: user.is_active ? 'Bloquear Acceso' : 'Desbloquear Acceso',
+                                variant: user.is_active ? 'danger' : 'success',
+                            },
+                        ]} />
                     </td>
                 </tr>
             ))}

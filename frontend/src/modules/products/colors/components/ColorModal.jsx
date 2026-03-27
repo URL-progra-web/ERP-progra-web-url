@@ -67,7 +67,7 @@ const ColorModal = ({ color, onClose, onSave }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar Color' : 'Nuevo Color'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}

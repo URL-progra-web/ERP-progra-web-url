@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
@@ -46,21 +47,10 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
                     </td>
 
                     <td className="px-4 py-3 text-end">
-                        <button
-                            className="btn btn-sm btn-outline-secondary border-0 me-2"
-                            onClick={() => onEdit(variant)}
-                            title="Editar"
-                        >
-                            <FiEdit2 size={14} className="text-primary" />
-                        </button>
-
-                        <button
-                            className="btn btn-sm btn-outline-secondary border-0"
-                            onClick={() => onDelete(variant)}
-                            title="Eliminar"
-                        >
-                            <FiTrash2 size={14} className="text-danger" />
-                        </button>
+                        <TableActions actions={[
+                            { icon: FiEdit2,  onClick: () => onEdit(variant),   title: 'Editar',   variant: 'primary' },
+                            { icon: FiTrash2, onClick: () => onDelete(variant), title: 'Eliminar', variant: 'danger'  },
+                        ]} />
                     </td>
                 </tr>
             ))}

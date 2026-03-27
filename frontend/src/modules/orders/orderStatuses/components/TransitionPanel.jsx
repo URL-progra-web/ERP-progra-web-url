@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { FiSend, FiShuffle } from 'react-icons/fi';
+import AppCard from '~/core/components/AppCard';
 
 export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflow }) => {
     const [form, setForm] = useState({ order_id: '', target_status: '', notes: '' });
@@ -35,12 +36,9 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
     };
 
     return (
-        <div className="card border-0 shadow-sm">
-            <div className="card-header bg-dark text-white d-flex align-items-center gap-2">
-                <FiShuffle />
-                <span className="fw-semibold">Motor de transiciones</span>
-            </div>
-            <div className="card-body">
+        <AppCard accent="var(--bs-orange)">
+            <AppCard.Section label={<span className="d-flex align-items-center gap-2"><FiShuffle /> Motor de transiciones</span>}>
+            <div className="p-3 p-md-4">
                 <div className="mb-4">
                     <h6 className="text-uppercase text-muted small">Flujo disponible</h6>
                     {isLoadingWorkflow ? (
@@ -125,6 +123,7 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                     </div>
                 </form>
             </div>
-        </div>
+            </AppCard.Section>
+        </AppCard>
     );
 };

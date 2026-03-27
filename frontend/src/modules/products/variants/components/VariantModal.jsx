@@ -78,7 +78,7 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
     return (
         <AppModal
             title={isEditing ? 'Editar Variante' : 'Nueva Variante'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}

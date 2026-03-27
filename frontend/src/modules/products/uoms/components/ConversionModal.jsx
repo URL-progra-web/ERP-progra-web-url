@@ -38,7 +38,7 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
     return (
         <AppModal
             title={conversion ? 'Editar Conversión' : 'Nueva Conversión'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={saving ? 'Guardando...' : (conversion ? 'Guardar cambios' : 'Crear conversión')}

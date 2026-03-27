@@ -1,5 +1,7 @@
 import React from 'react';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { formatCurrency } from '../helpers/formatCurrency';
+import TableActions from '~/core/components/TableActions';
 
 export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
@@ -34,14 +36,10 @@ export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete }) => {
                             <td className="text-end fw-semibold">{formatCurrency(item.line_total)}</td>
                             <td>{item.status_name || `#${item.status}`}</td>
                             <td className="text-end pe-3">
-                                <div className="btn-group">
-                                    <button type="button" className="btn btn-sm btn-outline-dark" onClick={() => onEdit?.(item)}>
-                                        Editar
-                                    </button>
-                                    <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onDelete?.(item)}>
-                                        Eliminar
-                                    </button>
-                                </div>
+                                <TableActions actions={[
+                                    { icon: FiEdit2,  onClick: () => onEdit?.(item),   title: 'Editar',   variant: 'primary' },
+                                    { icon: FiTrash2, onClick: () => onDelete?.(item), title: 'Eliminar', variant: 'danger'  },
+                                ]} />
                             </td>
                         </tr>
                     ))}
