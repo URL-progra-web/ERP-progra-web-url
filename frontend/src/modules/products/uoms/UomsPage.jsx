@@ -67,7 +67,9 @@ const UomsPage = () => {
                             onClick={() => setActiveTab('uoms')}
                         >
                             Unidades de Medida
-                            <span className="badge bg-dark-subtle text-dark ms-2">{uoms.length}</span>
+                            <span className="badge bg-light text-dark ms-2 fw-semibold">
+                                {uoms.length}
+                            </span>
                         </button>
                         <button
                             className={`btn btn-sm px-4 py-2 rounded-3 ${activeTab === 'conversions' ? 'bg-white text-dark fw-semibold shadow-sm border-0' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
@@ -75,7 +77,9 @@ const UomsPage = () => {
                             onClick={() => setActiveTab('conversions')}
                         >
                             Conversiones
-                            <span className="badge bg-dark-subtle text-dark ms-2">{conversions.length}</span>
+                            <span className="badge bg-light text-dark ms-2 fw-semibold">
+                                {conversions.length}
+                            </span>
                         </button>
                     </div>
                 </div>

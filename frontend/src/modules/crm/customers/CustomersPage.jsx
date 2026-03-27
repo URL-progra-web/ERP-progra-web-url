@@ -4,6 +4,8 @@ import { useCustomers } from './hooks/useCustomers';
 import { CustomersFilters } from './components/CustomersFilters';
 import { CustomersTable } from './components/CustomersTable';
 import { CustomerModal } from './components/CustomerModal';
+import { OrderModal } from '~/modules/orders/orders/components/OrderModal';
+import { orderService } from '~/modules/orders/orders/services/orderService';
 import AppAlert from '~/core/components/AppAlert';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
@@ -32,6 +34,9 @@ const CustomersPage = () => {
     const [modalCustomer, setModalCustomer] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [alertConfig, setAlertConfig] = useState(null);
+    const [orderCustomer, setOrderCustomer] = useState(null);
+    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+    const [isOrderSubmitting, setIsOrderSubmitting] = useState(false);
 
     const handleOpenModal = (customer = null) => {
         setModalCustomer(customer);
@@ -67,6 +72,31 @@ const CustomersPage = () => {
                 setAlertConfig(null);
             },
         });
+    };
+
+    const handleOpenOrderModal = (customer) => {
+        setOrderCustomer(customer);
+        setIsOrderModalOpen(true);
+    };
+
+    const handleCloseOrderModal = () => {
+        setOrderCustomer(null);
+        setIsOrderModalOpen(false);
+    };
+
+    const handleCreateOrder = async (payload) => {
+        setIsOrderSubmitting(true);
+        try {
+            await orderService.create(payload);
+            handleCloseOrderModal();
+            return true;
+        } catch (err) {
+            const message = err?.response?.data?.message || err?.response?.data?.error || 'No se pudo crear el pedido.';
+            setError(message);
+            return false;
+        } finally {
+            setIsOrderSubmitting(false);
+        }
     };
 
     return (
@@ -114,6 +144,7 @@ const CustomersPage = () => {
                         isLoading={isLoading}
                         onEdit={handleOpenModal}
                         onDelete={handleDelete}
+                        onCreateOrder={handleOpenOrderModal}
                     />
                 </div>
 
@@ -132,6 +163,14 @@ const CustomersPage = () => {
                     onClose={handleCloseModal}
                 />
             )}
+
+            <OrderModal
+                isOpen={isOrderModalOpen}
+                onClose={handleCloseOrderModal}
+                onSubmit={handleCreateOrder}
+                isSubmitting={isOrderSubmitting}
+                initialCustomer={orderCustomer}
+            />
 
             {alertConfig && (
                 <AppAlert

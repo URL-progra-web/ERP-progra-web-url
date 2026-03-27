@@ -5,7 +5,7 @@ const BUTTON_VARIANTS = {
     dark: 'btn btn-dark fw-semibold text-white',
     primary: 'btn btn-primary fw-semibold text-white',
     secondary: 'btn btn-secondary fw-semibold text-white',
-    light: 'btn btn-outline-light fw-semibold text-white',
+    light: 'btn btn-light fw-semibold text-dark',
 };
 
 const PageHeader = ({
