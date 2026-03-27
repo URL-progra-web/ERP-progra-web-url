@@ -43,7 +43,7 @@ export const EntrepreneursTable = ({ entrepreneurs, isLoading, onEdit, onDelete 
                                     <div className="d-flex align-items-center gap-2">
                                         <FiUser className="text-primary" />
                                         <div>
-                                            <div className="small fw-medium">{entrepreneur.user.username}</div>
+                                            <div className="small fw-medium">{entrepreneur.user.name}</div>
                                             <div className="text-muted" style={{ fontSize: '0.75rem' }}>
                                                 {entrepreneur.user.email}
                                             </div>

@@ -69,7 +69,7 @@ class EntrepreneurViewSet(viewsets.ViewSet, PaginationMixin):
     @action(detail=False, methods=['get'], url_path='users')
     def get_users(self, request):
         """Endpoint para obtener la lista de usuarios disponibles para el dropdown."""
-        users = User.objects.filter(is_active=True).values('id', 'username', 'email', 'first_name', 'last_name')
+        users = User.objects.filter(is_active=True).values('id', 'name', 'email')
         return Response(list(users))
 
     @staticmethod

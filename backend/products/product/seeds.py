@@ -36,9 +36,6 @@ class ProductSeeder(BaseSeeder):
             if not base_uom:
                 print("No base UOM found. Please run UomSeeder first.")
                 return
-        except Entrepreneur.DoesNotExist as e:
-            print(f"Some entrepreneurs not found. Please run EntrepreneurSeeder first: {e}")
-            return
         except Exception as e:
             print(f"Error getting dependencies: {e}")
             return

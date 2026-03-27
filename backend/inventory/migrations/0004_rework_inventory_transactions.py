@@ -46,14 +46,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='inventorytransaction',
             name='conversion_multiplier',
-            field=models.DecimalField(decimal_places=4, max_digits=14, default=1),
-            preserve_default=False,
+            field=models.DecimalField(decimal_places=4, default=1, max_digits=14),
         ),
         migrations.AddField(
             model_name='inventorytransaction',
             name='base_quantity',
-            field=models.DecimalField(decimal_places=4, max_digits=14, default=0),
-            preserve_default=False,
+            field=models.DecimalField(decimal_places=4, default=0, max_digits=14),
         ),
         migrations.AlterField(
             model_name='inventorytransaction',

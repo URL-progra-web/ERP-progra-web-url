@@ -58,7 +58,13 @@ const ProductsPage = () => {
                 isDark
             />
 
-            {error && <div className="alert alert-danger">{error}</div>}
+            {error && (
+                <AppAlert
+                    type="danger"
+                    header="Error"
+                    content={error}
+                />
+            )}
 
             <AppCard accent="var(--bs-primary)">
                 <AppCard.Section label="Filtros">
