@@ -2,6 +2,7 @@ from typing import Dict, Iterable, Optional, Sequence
 
 from django.db import transaction
 
+from inventory.transaction.services.stock_service import InventoryStockService
 from inventory.transaction_type.models.models import TransactionType
 from orders.order.exceptions import OrderNotFound
 from orders.order_item.exceptions import OrderItemStockUnavailable
@@ -44,18 +45,18 @@ class OrderStatusService:
         self.order_repository = order_repository or OrderRepository()
         self.history_repository = history_repository or OrderStatusHistoryRepository()
         self.inventory_transaction_service = inventory_transaction_service or InventoryTransactionService()
+        self.stock_service = InventoryStockService()
 
-    @staticmethod
-    def _validate_confirmation_stock(order) -> None:
+    def _validate_confirmation_stock(self, order) -> None:
         items = list(order.items.select_related('variant').all())
         if not items:
             raise OrderItemStockUnavailable(f'La orden {order.short_id} no tiene items para confirmar')
 
         for item in items:
-            available = int(item.variant.quantity_available or 0)
-            if available < item.quantity:
+            available = self.stock_service.get_variant_stock(item.variant_id)
+            if available < item.base_quantity:
                 raise OrderItemStockUnavailable(
-                    f'Stock insuficiente para {item.variant.sku}. Disponible: {available}, solicitado: {item.quantity}'
+                    f'Stock insuficiente para {item.variant.sku}. Disponible: {available}, solicitado: {item.base_quantity}'
                 )
 
     def _apply_confirmation_inventory(self, order, actor: Optional[User], notes: Optional[str]) -> None:
@@ -73,6 +74,7 @@ class OrderStatusService:
                 variant_id=item.variant_id,
                 transaction_type_name=self.CONFIRMATION_TRANSACTION_TYPE,
                 quantity=item.quantity,
+                selected_uom_id=item.selected_uom_id,
                 user=actor,
                 reference=order.short_id,
                 notes=notes or f'Confirmacion de pedido {order.short_id}',
@@ -92,6 +94,7 @@ class OrderStatusService:
                 variant_id=item.variant_id,
                 transaction_type_name=self.CANCELLATION_RESTORE_TRANSACTION_TYPE,
                 quantity=item.quantity,
+                selected_uom_id=item.selected_uom_id,
                 user=actor,
                 reference=order.short_id,
                 notes=notes or f'Cancelacion de pedido {order.short_id}',

@@ -101,7 +101,7 @@ export const OrderCatalogFilters = ({
                 </div>
 
                 <div className="col-12 col-md-6">
-                    <label className="form-label small text-muted mb-1">Unidad de medida</label>
+                    <label className="form-label small text-muted mb-1">UOM base</label>
                     <select className="form-select" value={uomFilter} onChange={(e) => onUomChange(e.target.value)}>
                         <option value="">Todas</option>
                         {uoms.map((uom) => (

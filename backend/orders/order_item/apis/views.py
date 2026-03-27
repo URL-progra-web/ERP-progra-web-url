@@ -81,6 +81,7 @@ class OrderItemAPIView(APIView):
 				order_id=serializer.validated_data['order_id'].id,
 				variant_id=serializer.validated_data['variant_id'].id,
 				quantity=serializer.validated_data['quantity'],
+				selected_uom=serializer.validated_data['selected_uom_id'],
 				status=serializer.validated_data.get('status_id'),
 			)
 		except OrderNotFound as exc:
@@ -148,6 +149,7 @@ class OrderItemBulkCreateAPIView(APIView):
 			items_payload.append({
 				'variant_id': item['variant_id'].id,
 				'quantity': item['quantity'],
+				'selected_uom': item['selected_uom_id'],
 				'status': item.get('status_id'),
 			})
 
@@ -233,6 +235,7 @@ class OrderItemDetailAPIView(APIView):
 			item = self.service.update_item(
 				item_id=self._parse_pk(pk),
 				quantity=serializer.validated_data.get('quantity'),
+				selected_uom=serializer.validated_data.get('selected_uom_id'),
 				status=serializer.validated_data.get('status_id'),
 			)
 		except OrderItemNotFound as exc:

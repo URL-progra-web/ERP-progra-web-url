@@ -8,11 +8,14 @@ const toNumber = (value, fallback = 0) => {
     return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-const clampQuantity = (quantity, stock) => {
+const clampOperationQuantity = (quantity, stock, conversionMultiplier) => {
     const normalized = Math.max(1, toNumber(quantity, 1));
-    const stockValue = toNumber(stock, normalized);
-    if (stockValue <= 0) return 1;
-    return Math.min(normalized, stockValue);
+    const stockValue = toNumber(stock, 0);
+    const multiplier = Math.max(toNumber(conversionMultiplier, 1), 1);
+    if (stockValue <= 0) return 0;
+    const maxOperationalQuantity = Math.floor(stockValue / multiplier);
+    if (maxOperationalQuantity <= 0) return 0;
+    return Math.min(normalized, maxOperationalQuantity);
 };
 
 const setCookie = (name, value, days) => {
@@ -35,7 +38,7 @@ const normalizeStoredItems = (payload) => {
     return payload
         .map((item) => {
             const variantId = toNumber(item.variant_id, null);
-            const stock = Math.max(1, toNumber(item.stock, 1));
+            const stock = Math.max(0, toNumber(item.stock, 0));
 
             if (!variantId) return null;
 
@@ -45,10 +48,14 @@ const normalizeStoredItems = (payload) => {
                 product_name: item.product_name || 'Producto sin nombre',
                 color_name: item.color_name || '',
                 size_name: item.size_name || '',
-                uom_name: item.uom_name || '',
+                base_uom_name: item.base_uom_name || '',
+                selected_uom_id: toNumber(item.selected_uom_id, null),
+                selected_uom_name: item.selected_uom_name || '',
+                conversion_multiplier: toNumber(item.conversion_multiplier, 1),
+                base_quantity: toNumber(item.base_quantity, 0),
                 unit_price: toNumber(item.unit_price),
                 stock,
-                quantity: clampQuantity(item.quantity, stock),
+                quantity: clampOperationQuantity(item.quantity, stock, item.conversion_multiplier),
             };
         })
         .filter(Boolean);
@@ -80,20 +87,29 @@ export const useOrderCart = () => {
         setCookie(CART_COOKIE_NAME, JSON.stringify(items), CART_COOKIE_DAYS);
     }, [items]);
 
-    const addVariant = useCallback((variant, quantity = 1) => {
+    const addVariant = useCallback((variant, quantity = 1, selectedUom = null) => {
         const stock = toNumber(variant.quantity_available);
-        const nextQuantity = clampQuantity(quantity, stock);
+        const conversionMultiplier = Number(selectedUom?.multiplier || 1);
+        const nextQuantity = clampOperationQuantity(quantity, stock, conversionMultiplier);
+        if (nextQuantity <= 0) return;
+        const selectedUomId = Number(selectedUom?.id || variant.base_uom || 0);
+        const selectedUomName = selectedUom?.name || variant.base_uom_name || '';
 
         setItems((prev) => {
-            const existing = prev.find((item) => Number(item.variant_id) === Number(variant.id));
+            const existing = prev.find(
+                (item) => Number(item.variant_id) === Number(variant.id)
+                    && Number(item.selected_uom_id) === selectedUomId
+            );
             if (existing) {
                 return prev.map((item) => (
-                    Number(item.variant_id) === Number(variant.id)
+                    Number(item.variant_id) === Number(variant.id) && Number(item.selected_uom_id) === selectedUomId
                         ? {
                             ...item,
-                            quantity: clampQuantity(item.quantity + nextQuantity, stock),
+                            quantity: clampOperationQuantity(item.quantity + nextQuantity, stock, conversionMultiplier),
+                            base_quantity: clampOperationQuantity(item.quantity + nextQuantity, stock, conversionMultiplier) * conversionMultiplier,
                             stock,
                             unit_price: toNumber(variant.price, item.unit_price),
+                            conversion_multiplier: conversionMultiplier,
                         }
                         : item
                 ));
@@ -105,39 +121,57 @@ export const useOrderCart = () => {
                 product_name: variant.product_name || 'Producto sin nombre',
                 color_name: variant.color_name || '',
                 size_name: variant.size_name || '',
-                uom_name: variant.uom_name || '',
+                base_uom_name: variant.base_uom_name || '',
+                selected_uom_id: selectedUomId,
+                selected_uom_name: selectedUomName,
+                conversion_multiplier: conversionMultiplier,
                 unit_price: toNumber(variant.price),
                 stock,
                 quantity: nextQuantity,
+                base_quantity: nextQuantity * conversionMultiplier,
             }];
         });
     }, []);
 
-    const removeItem = useCallback((variantId) => {
-        setItems((prev) => prev.filter((item) => Number(item.variant_id) !== Number(variantId)));
+    const removeItem = useCallback((variantId, selectedUomId) => {
+        setItems((prev) => prev.filter(
+            (item) => !(Number(item.variant_id) === Number(variantId) && Number(item.selected_uom_id) === Number(selectedUomId))
+        ));
     }, []);
 
-    const updateQuantity = useCallback((variantId, quantity) => {
+    const updateQuantity = useCallback((variantId, selectedUomId, quantity) => {
         setItems((prev) => prev.map((item) => (
-            Number(item.variant_id) === Number(variantId)
-                ? { ...item, quantity: clampQuantity(quantity, item.stock) }
+            Number(item.variant_id) === Number(variantId) && Number(item.selected_uom_id) === Number(selectedUomId)
+                ? {
+                    ...item,
+                    quantity: clampOperationQuantity(quantity, item.stock, item.conversion_multiplier),
+                    base_quantity: clampOperationQuantity(quantity, item.stock, item.conversion_multiplier) * toNumber(item.conversion_multiplier, 1),
+                }
                 : item
         )));
     }, []);
 
-    const incrementItem = useCallback((variantId) => {
+    const incrementItem = useCallback((variantId, selectedUomId) => {
         setItems((prev) => prev.map((item) => (
-            Number(item.variant_id) === Number(variantId)
-                ? { ...item, quantity: clampQuantity(item.quantity + 1, item.stock) }
+            Number(item.variant_id) === Number(variantId) && Number(item.selected_uom_id) === Number(selectedUomId)
+                ? {
+                    ...item,
+                    quantity: clampOperationQuantity(item.quantity + 1, item.stock, item.conversion_multiplier),
+                    base_quantity: clampOperationQuantity(item.quantity + 1, item.stock, item.conversion_multiplier) * toNumber(item.conversion_multiplier, 1),
+                }
                 : item
         )));
     }, []);
 
-    const decrementItem = useCallback((variantId) => {
+    const decrementItem = useCallback((variantId, selectedUomId) => {
         setItems((prev) => prev.flatMap((item) => {
-            if (Number(item.variant_id) !== Number(variantId)) return [item];
+            if (Number(item.variant_id) !== Number(variantId) || Number(item.selected_uom_id) !== Number(selectedUomId)) return [item];
             if (item.quantity <= 1) return [];
-            return [{ ...item, quantity: item.quantity - 1 }];
+            return [{
+                ...item,
+                quantity: item.quantity - 1,
+                base_quantity: (item.quantity - 1) * toNumber(item.conversion_multiplier, 1),
+            }];
         }));
     }, []);
 
@@ -146,7 +180,7 @@ export const useOrderCart = () => {
     }, []);
 
     const summary = useMemo(() => {
-        const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+        const totalQuantity = items.reduce((sum, item) => sum + item.base_quantity, 0);
         const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
 
         return {

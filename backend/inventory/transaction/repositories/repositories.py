@@ -9,28 +9,39 @@ from inventory.transaction_type.models.models import TransactionType
 class InventoryTransactionRepository:
     def get_by_id(self, transaction_id: int) -> Optional[InventoryTransaction]:
         try:
-            return InventoryTransaction.objects.get(id=transaction_id)
+            return InventoryTransaction.objects.select_related(
+                'variant', 'user', 'transaction_type', 'selected_uom', 'base_uom'
+            ).get(id=transaction_id)
         except ObjectDoesNotExist:
             return None
 
     def get_all(self) -> QuerySet[InventoryTransaction]:
-        return TransactionType.objects.select_related('variant', 'user', 'transaction_type').all()
+        return InventoryTransaction.objects.select_related(
+            'variant', 'user', 'transaction_type', 'selected_uom', 'base_uom'
+        ).all()
 
     def get_filtered(self, variant_id: int = None, transaction_type_name: str = None):
-        qs = InventoryTransaction.objects.select_related('variant', 'user', 'transaction_type').all()
+        qs = InventoryTransaction.objects.select_related(
+            'variant', 'user', 'transaction_type', 'selected_uom', 'base_uom'
+        ).all()
         if variant_id is not None:
             qs = qs.filter(variant_id=variant_id)
         if transaction_type_name is not None:
             qs = qs.filter(transaction_type__name=transaction_type_name)
         return qs
 
-    def create(self, variant: ProductVariant, user: User, transaction_type: TransactionType, 
-               quantity: int, reference: str = None, notes: str = None) -> InventoryTransaction:
+    def create(self, variant: ProductVariant, user: User, transaction_type: TransactionType,
+               selected_uom, base_uom, quantity, conversion_multiplier, base_quantity,
+               reference: str = None, notes: str = None) -> InventoryTransaction:
         return InventoryTransaction.objects.create(
             variant=variant,
             user=user,
             transaction_type=transaction_type,
+            selected_uom=selected_uom,
+            base_uom=base_uom,
             quantity=quantity,
+            conversion_multiplier=conversion_multiplier,
+            base_quantity=base_quantity,
             reference=reference,
             notes=notes
         )

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
 
-const ProductModal = ({ product, categories, entrepreneurs, businessUnits, onClose, onSave }) => {
+const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms, onClose, onSave }) => {
     const isEditing = !!product;
 
     const [formData, setFormData] = useState({
@@ -10,6 +10,7 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, onClo
         category: '',
         entrepreneur: '',
         business_unit: '',
+        base_uom: '',
     });
 
     const [error, setError] = useState('');
@@ -23,6 +24,7 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, onClo
                 category: product.category || '',
                 entrepreneur: product.entrepreneur || '',
                 business_unit: product.business_unit || '',
+                base_uom: product.base_uom || '',
             });
         }
     }, [product]);
@@ -51,6 +53,11 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, onClo
             return;
         }
 
+        if (!formData.base_uom) {
+            setError('Debes seleccionar una unidad base para el producto.');
+            return;
+        }
+
         try {
             setIsSubmitting(true);
             const dataToSubmit = {
@@ -59,6 +66,7 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, onClo
                 category: formData.category || null,
                 entrepreneur: formData.entrepreneur,
                 business_unit: formData.business_unit,
+                base_uom: formData.base_uom,
             };
             await onSave(dataToSubmit);
         } catch (err) {
@@ -148,6 +156,24 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, onClo
                     </select>
                     <div className="form-text">
                         Persona o empresa que suministra este producto.
+                    </div>
+                </div>
+
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">Unidad base *</label>
+                    <select
+                        name="base_uom"
+                        className="form-select"
+                        value={formData.base_uom}
+                        onChange={handleChange}
+                    >
+                        <option value="">Seleccionar...</option>
+                        {uoms.map((uom) => (
+                            <option key={uom.id} value={uom.id}>{uom.name}</option>
+                        ))}
+                    </select>
+                    <div className="form-text">
+                        Unidad atómica del stock. Las conversiones de venta y kardex se calculan desde esta base.
                     </div>
                 </div>
 

@@ -17,6 +17,7 @@ export const OrderItemModal = ({
 
     const [formData, setFormData] = useState({
         variant_id: '',
+        selected_uom_id: '',
         quantity: 1,
         status_id: '',
     });
@@ -32,6 +33,7 @@ export const OrderItemModal = ({
         if (item) {
             setFormData({
                 variant_id: item.variant || '',
+                selected_uom_id: item.selected_uom || '',
                 quantity: item.quantity || 1,
                 status_id: item.status || '',
             });
@@ -40,6 +42,7 @@ export const OrderItemModal = ({
 
         setFormData({
             variant_id: '',
+            selected_uom_id: '',
             quantity: 1,
             status_id: '',
         });
@@ -105,6 +108,7 @@ export const OrderItemModal = ({
         if (!isEdit) {
             if (!selectedVariant) return;
             payload.variant_id = Number(selectedVariant.id);
+            payload.selected_uom_id = Number(formData.selected_uom_id || selectedVariant.base_uom);
         }
 
         if (formData.status_id) {
@@ -181,7 +185,24 @@ export const OrderItemModal = ({
                             <div><strong>SKU:</strong> {selectedVariant.sku}</div>
                             <div><strong>Producto:</strong> {selectedVariant.product_name || '-'}</div>
                             <div><strong>Precio:</strong> {formatCurrency(selectedVariant.price)}</div>
-                            <div><strong>Stock:</strong> {selectedVariant.quantity_available ?? 0}</div>
+                            <div><strong>Stock:</strong> {selectedVariant.quantity_available ?? 0} {selectedVariant.base_uom_name || ''}</div>
+                        </div>
+                    )}
+
+                    {selectedVariant && (
+                        <div className="mb-3">
+                            <label className="form-label">UOM de operacion *</label>
+                            <select
+                                className="form-select"
+                                name="selected_uom_id"
+                                value={formData.selected_uom_id || selectedVariant.base_uom || ''}
+                                onChange={handleChange}
+                            >
+                                <option value={selectedVariant.base_uom}>{selectedVariant.base_uom_name}</option>
+                            </select>
+                            <div className="form-text">
+                                Por ahora el item usa la UOM base del producto. Luego puedes ampliar a conversiones configuradas.
+                            </div>
                         </div>
                     )}
                 </>

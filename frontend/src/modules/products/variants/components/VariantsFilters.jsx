@@ -126,7 +126,7 @@ const VariantsFilters = ({
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
-                        <label className="form-label small text-muted mb-1">Unidad de medida</label>
+                        <label className="form-label small text-muted mb-1">UOM base</label>
                         <select
                             className="form-select bg-body shadow-none text-body"
                             value={uomFilter}

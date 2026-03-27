@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { variantService } from '~/modules/products/variants/services/variantService';
+import { uomService } from '~/modules/products/uoms/services/uomService';
 
 const normalize = (result) => Array.isArray(result) ? result : result?.results || [];
 
@@ -11,6 +12,7 @@ export const useVariantCatalog = () => {
     const [colors, setColors] = useState([]);
     const [sizes, setSizes] = useState([]);
     const [uoms, setUoms] = useState([]);
+    const [conversionsByBaseUom, setConversionsByBaseUom] = useState({});
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -70,6 +72,30 @@ export const useVariantCatalog = () => {
     }, []);
 
     useEffect(() => {
+        const loadApplicableConversions = async () => {
+            const baseUomIds = [...new Set(variants.map((variant) => variant.base_uom).filter(Boolean))];
+            if (!baseUomIds.length) {
+                setConversionsByBaseUom({});
+                return;
+            }
+
+            try {
+                const responses = await Promise.all(
+                    baseUomIds.map(async (baseUomId) => {
+                        const result = await uomService.getApplicableConversions(baseUomId);
+                        return [baseUomId, normalize(result)];
+                    })
+                );
+                setConversionsByBaseUom(Object.fromEntries(responses));
+            } catch {
+                setError((prev) => prev || 'No se pudieron cargar las conversiones aplicables.');
+            }
+        };
+
+        loadApplicableConversions();
+    }, [variants]);
+
+    useEffect(() => {
         fetchVariants();
     }, [fetchVariants]);
 
@@ -100,6 +126,7 @@ export const useVariantCatalog = () => {
         colors,
         sizes,
         uoms,
+        conversionsByBaseUom,
         isLoading,
         error,
         setError,
