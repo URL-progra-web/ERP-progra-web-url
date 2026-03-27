@@ -164,79 +164,116 @@ export const CatalogPage = () => {
       <main style={{ 
         flex: 1,
         display: 'flex',
-        width: '100%'
+        width: '100%',
+        minHeight: 'calc(100vh - 60px)'
       }}>
-        {/* FILTROS - 25% width (2/8), crece con el contenido */}
-        <aside className="d-none d-lg-block" style={{ 
-          width: '25%',
+        {/* SIDEBAR IZQUIERDA - Navegación y Filtros */}
+        <aside className="d-none d-lg-flex" style={{
+          width: '280px',
+          minWidth: '280px',
           borderRight: '1px solid var(--bs-border-color, #dee2e6)',
           backgroundColor: 'var(--bs-body-bg, #fff)',
-          padding: '0.5rem',
+          padding: '1.5rem 1rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.5rem',
-          fontSize: '0.875rem'
+          gap: '1.5rem',
+          overflowY: 'auto',
+          position: 'sticky',
+          top: 0,
+          height: '100vh'
         }}>
+          {/* Navegación por categorías */}
           <div>
-            <span className="store-kicker" style={{ fontSize: '0.7rem', opacity: 0.7 }}>NAVEGACIÓN</span>
+            <h3 className="store-kicker mb-3" style={{ 
+              fontSize: '0.7rem', 
+              letterSpacing: '0.05em',
+              fontFamily: 'var(--font-mono)'
+            }}>
+              CATEGORÍAS
+            </h3>
+            <CategoryTree
+              categories={categoriesTree}
+              selectedId={params.category ? Number(params.category) : null}
+              onSelect={handleCategorySelect}
+            />
           </div>
 
-          <CategoryTree
-            categories={categoriesTree}
-            selectedId={params.category ? Number(params.category) : null}
-            onSelect={handleCategorySelect}
-          />
-
+          {/* Divisor */}
           <div style={{
             height: '1px',
             backgroundColor: 'var(--bs-border-color, #dee2e6)',
-            margin: '0.25rem 0'
+            margin: '0'
           }} />
 
+          {/* Filtros */}
           <div>
-            <span className="store-kicker" style={{ fontSize: '0.7rem', opacity: 0.7 }}>FILTROS</span>
-          </div>
+            <div className="d-flex align-items-center justify-content-between mb-3">
+              <h3 className="store-kicker mb-0" style={{ 
+                fontSize: '0.7rem', 
+                letterSpacing: '0.05em',
+                fontFamily: 'var(--font-mono)'
+              }}>
+                FILTROS
+              </h3>
+              {hasActiveFilters && (
+                <button 
+                  type="button" 
+                  className="btn btn-link p-0 text-decoration-none" 
+                  onClick={handleClearAllFilters}
+                  style={{ fontSize: '0.75rem', fontWeight: 600 }}
+                >
+                  <FiX size={12} className="me-1" />
+                  Limpiar
+                </button>
+              )}
+            </div>
 
-          {filtersLoading ? (
-            <div className="store-muted" style={{ fontSize: '0.8rem' }}>Cargando...</div>
-          ) : (
-            <FilterSidebar
-              filters={filters}
-              selectedFilters={selectedFilters}
-              onToggleSize={toggleSize}
-              onToggleColor={toggleColor}
-              onPriceChange={setPriceRange}
-              onClearFilters={handleClearAllFilters}
-              hasActiveFilters={hasActiveFilters}
-            />
-          )}
+            {filtersLoading ? (
+              <div className="store-muted" style={{ fontSize: '0.8rem' }}>Cargando filtros...</div>
+            ) : (
+              <FilterSidebar
+                filters={filters}
+                selectedFilters={selectedFilters}
+                onToggleSize={toggleSize}
+                onToggleColor={toggleColor}
+                onPriceChange={setPriceRange}
+                onClearFilters={handleClearAllFilters}
+                hasActiveFilters={hasActiveFilters}
+              />
+            )}
+          </div>
         </aside>
 
-        {/* BUSCADOR + GRID - 75% width (6/8) */}
+        {/* CONTENIDO PRINCIPAL - Búsqueda + Grid de productos */}
         <section style={{ 
-          width: '75%',
-          overflowY: 'auto',
+          flex: 1,
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          width: '100%',
+          minWidth: 0
         }}>
-          {/* BUSCADOR - Fijo arriba */}
+          {/* Cabecera con búsqueda - sin fondo, flotante */}
           <div style={{ 
-            padding: '1rem',
-            borderBottom: '1px solid var(--bs-border-color, #dee2e6)',
-            backgroundColor: 'var(--bs-body-bg, #fff)'
+            padding: '1rem 1.5rem 0.75rem',
+            position: 'sticky',
+            top: 0,
+            zIndex: 10
           }}>
             <Breadcrumb path={categoryPath} onNavigate={handleCategorySelect} />
 
-            <form onSubmit={handleSearch} className="store-search mb-2 mt-2">
-              <FiSearch size={18} className="store-search__icon" />
-              <div className="d-flex flex-column flex-md-row gap-2">
-                <input
-                  type="text"
-                  className="form-control form-control-sm"
-                  placeholder="Buscar productos..."
-                  value={searchInput}
-                  onChange={(event) => setSearchInput(event.target.value)}
-                />
+            <form onSubmit={handleSearch} className="store-search mt-3">
+              <div className="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                <div className="flex-grow-1 position-relative">
+                  <FiSearch size={16} className="store-search__icon" />
+                  <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Buscar productos por nombre..."
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    style={{ paddingLeft: '44px' }}
+                  />
+                </div>
 
                 {searchInput && (
                   <button
@@ -246,14 +283,15 @@ export const CatalogPage = () => {
                       setSearchInput('');
                       setSearch('');
                     }}
+                    aria-label="Limpiar búsqueda"
                   >
-                    <FiX size={16} />
+                    <FiX size={14} />
                   </button>
                 )}
 
                 <button type="submit" className="btn btn-store-primary btn-sm">
+                  <FiArrowRight size={14} className="me-1" />
                   Buscar
-                  <FiArrowRight size={16} />
                 </button>
 
                 <button
@@ -261,55 +299,42 @@ export const CatalogPage = () => {
                   className="btn btn-store-secondary btn-sm d-lg-none"
                   onClick={() => setShowMobileFilters(true)}
                 >
-                  <FiFilter size={16} />
+                  <FiFilter size={14} className="me-1" />
                   Filtros
-                  {hasActiveFilters && <span className="badge bg-primary rounded-pill">{activeFilterCount}</span>}
+                  {hasActiveFilters && (
+                    <span className="badge bg-primary rounded-pill ms-1" style={{ fontSize: '0.625rem' }}>
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </form>
-
-            {leadingCategories.length > 0 && (
-              <div className="store-chip-row">
-                {leadingCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    type="button"
-                    className="store-chip"
-                    onClick={() => handleCategorySelect(category.id)}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* GRID - Scroll infinito */}
-          <div style={{ padding: '2rem 1rem' }}>
-            <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div className="store-section__header">
+          {/* Área de productos con scroll */}
+          <div style={{ 
+            flex: 1,
+            overflowY: 'auto',
+            padding: '1.5rem 1.5rem 2rem'
+          }}>
+            {/* Cabecera de resultados */}
+            <div className="store-section__header mb-3">
               <div>
                 <span className="store-kicker">
-                  <FiSliders size={12} /> Resultado actual
+                  <FiSliders size={11} /> CATÁLOGO ACTIVO
                 </span>
-                <h2 className="store-section__title mt-2">Coleccion disponible</h2>
-                <p className="store-section__subtitle mb-0">
-                  {products.length} producto{products.length !== 1 ? 's' : ''} encontrado{products.length !== 1 ? 's' : ''}
-                  {params.search ? ` para "${params.search}"` : ''}.
+                <h2 className="store-section__title mt-2" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                  {params.category ? categoryPath[categoryPath.length - 1]?.name : 'Toda la colección'}
+                </h2>
+                <p className="store-section__subtitle mb-0" style={{ fontSize: '0.875rem' }}>
+                  {products.length} producto{products.length !== 1 ? 's' : ''} {params.search ? `para "${params.search}"` : 'disponibles'}
                 </p>
-              </div>
-
-              <div className="store-section__actions">
-                {hasActiveFilters && (
-                  <button type="button" className="btn btn-store-secondary" onClick={handleClearAllFilters}>
-                    <FiX size={16} /> Limpiar filtros
-                  </button>
-                )}
               </div>
             </div>
 
+            {/* Chips de filtros activos */}
             {activeChips.length > 0 && (
-              <div className="store-chip-row mt-3">
+              <div className="store-chip-row mb-3">
                 {activeChips.map((chip) => (
                   <div key={chip.key} className="store-chip">
                     <span>{chip.label}</span>
@@ -321,13 +346,16 @@ export const CatalogPage = () => {
               </div>
             )}
 
+            {/* Grid de productos o estados vacíos */}
             <div className="mt-4">
               {loading && <CatalogSkeletonGrid />}
 
               {error && (
                 <div className="store-empty-state">
-                  <span className="store-kicker">Error de carga</span>
-                  <h3 className="store-section__title mt-2 mb-3">No pudimos cargar el catalogo.</h3>
+                  <span className="store-kicker">ERROR DE CARGA</span>
+                  <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                    No pudimos cargar el catálogo
+                  </h3>
                   <p className="store-lead mx-auto mb-4">{error}</p>
                   <button type="button" className="btn btn-store-primary" onClick={handleClearAllFilters}>
                     Reintentar limpiando filtros
@@ -339,10 +367,12 @@ export const CatalogPage = () => {
                 <>
                   {products.length === 0 ? (
                     <div className="store-empty-state">
-                      <span className="store-kicker">Sin resultados</span>
-                      <h3 className="store-section__title mt-2 mb-3">No encontramos productos para esta combinacion.</h3>
+                      <span className="store-kicker">SIN RESULTADOS</span>
+                      <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                        No encontramos productos
+                      </h3>
                       <p className="store-lead mx-auto mb-4">
-                        Prueba otro termino de busqueda o reinicia los filtros para volver al flujo completo del catalogo.
+                        Intenta con otro término de búsqueda o reinicia los filtros para ver el catálogo completo.
                       </p>
                       <div className="store-btn-group justify-content-center">
                         {hasActiveFilters && (
@@ -351,7 +381,7 @@ export const CatalogPage = () => {
                           </button>
                         )}
                         <button type="button" className="btn btn-store-secondary" onClick={() => setSearch('')}>
-                          Ver todo el catalogo
+                          Ver todo el catálogo
                         </button>
                       </div>
                     </div>
@@ -366,8 +396,7 @@ export const CatalogPage = () => {
               )}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
     </main>
 
     {/* Panel móvil de filtros */}

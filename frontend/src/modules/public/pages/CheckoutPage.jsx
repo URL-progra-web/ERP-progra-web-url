@@ -102,27 +102,37 @@ export const CheckoutPage = () => {
     return (
       <div className="store-success-card">
         <div className="store-success-mark">
-          <FiCheck size={42} />
+          <FiCheck size={38} />
         </div>
-        <span className="store-kicker">Solicitud enviada</span>
-        <h2 className="store-section__title mt-2 mb-3">Tu pedido ya esta en revision.</h2>
+        <span className="store-kicker">SOLICITUD ENVIADA</span>
+        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+          Tu pedido está en revisión
+        </h2>
         <p className="store-lead mx-auto mb-4">
-          Recibimos la orden <strong>{success.order?.short_id}</strong>. En breve te escribiremos por WhatsApp para confirmar disponibilidad, entrega y total final.
+          Recibimos la orden <strong>{success.order?.short_id}</strong>. Pronto te contactaremos por WhatsApp para confirmar disponibilidad, entrega y el total final.
         </p>
 
         <div className="store-success-grid">
           <div className="store-info-card">
-            <span className="store-info-card__icon"><FiMessageCircle size={18} /></span>
+            <span className="store-info-card__icon"><FiMessageCircle size={16} /></span>
             <div>
-              <strong className="d-block text-body mb-1">Siguiente paso</strong>
-              <span className="store-muted">Un asesor valida variantes y coordina contigo el cierre del pedido.</span>
+              <strong className="d-block text-body mb-1" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                Siguiente paso
+              </strong>
+              <span className="store-muted" style={{ fontSize: '0.82rem' }}>
+                Un asesor validará las variantes y coordinará contigo el cierre del pedido.
+              </span>
             </div>
           </div>
           <div className="store-info-card">
-            <span className="store-info-card__icon"><FiClock size={18} /></span>
+            <span className="store-info-card__icon"><FiClock size={16} /></span>
             <div>
-              <strong className="d-block text-body mb-1">Seguimiento agil</strong>
-              <span className="store-muted">Tu referencia queda registrada para continuar la conversacion sin fricciones.</span>
+              <strong className="d-block text-body mb-1" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                Seguimiento ágil
+              </strong>
+              <span className="store-muted" style={{ fontSize: '0.82rem' }}>
+                Tu referencia queda registrada para continuar sin fricciones.
+              </span>
             </div>
           </div>
         </div>
@@ -139,10 +149,12 @@ export const CheckoutPage = () => {
   if (cart.items.length === 0) {
     return (
       <div className="store-empty-state">
-        <span className="store-kicker">Checkout vacio</span>
-        <h2 className="store-section__title mt-2 mb-3">Todavia no hay productos para solicitar.</h2>
+        <span className="store-kicker">CHECKOUT VACÍO</span>
+        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+          No hay productos para solicitar
+        </h2>
         <p className="store-lead mx-auto mb-4">
-          Explora el catalogo, agrega variantes al carrito y vuelve aqui para enviar tu pedido asistido.
+          Explora el catálogo, agrega variantes al carrito y vuelve aquí para enviar tu pedido asistido.
         </p>
         <Link to="/tienda" className="btn btn-store-primary text-decoration-none">
           Ver productos
@@ -155,44 +167,56 @@ export const CheckoutPage = () => {
     <div className="container">
     <div className="d-grid gap-4">
       <Link to="/tienda" className="btn-store-ghost d-inline-flex align-items-center gap-2 text-decoration-none">
-        <FiArrowLeft size={16} /> Seguir comprando
+        <FiArrowLeft size={14} /> Seguir comprando
       </Link>
 
       <section className="store-shell store-hero">
         <div className="store-hero__layout">
           <div className="store-hero__content d-grid gap-3">
-            <span className="store-kicker">Confirmacion del pedido</span>
-            <h1 className="store-display">
+            <span className="store-kicker">CONFIRMACIÓN DEL PEDIDO</span>
+            <h1 className="store-display" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
               Finaliza tu <span>solicitud</span>
             </h1>
             <p className="store-lead mb-0">
-              Este checkout esta pensado como un flujo asistido: nos compartes tus datos, validamos seguridad y coordinamos el cierre final por WhatsApp.
+              Este checkout funciona como flujo asistido: compartes tus datos, validamos seguridad y coordinamos el cierre final por WhatsApp.
             </p>
           </div>
 
           <div className="store-hero__aside">
             <div className="store-highlight d-grid gap-3">
-              <span className="store-kicker">Que sucede despues</span>
+              <span className="store-kicker">QUÉ SUCEDE DESPUÉS</span>
               <div className="store-trust-grid">
                 <div className="store-info-card">
-                  <span className="store-info-card__icon"><FiMessageCircle size={18} /></span>
+                  <span className="store-info-card__icon"><FiMessageCircle size={16} /></span>
                   <div>
-                    <strong className="d-block text-body mb-1">Contacto directo</strong>
-                    <span className="store-muted">Te escribimos para validar existencias y entrega.</span>
+                    <strong className="d-block text-body mb-1" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                      Contacto directo
+                    </strong>
+                    <span className="store-muted" style={{ fontSize: '0.82rem' }}>
+                      Te escribimos para validar existencias y entrega.
+                    </span>
                   </div>
                 </div>
                 <div className="store-info-card">
-                  <span className="store-info-card__icon"><FiShield size={18} /></span>
+                  <span className="store-info-card__icon"><FiShield size={16} /></span>
                   <div>
-                    <strong className="d-block text-body mb-1">Verificacion segura</strong>
-                    <span className="store-muted">La solicitud se protege antes de entrar al flujo operativo.</span>
+                    <strong className="d-block text-body mb-1" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                      Verificación segura
+                    </strong>
+                    <span className="store-muted" style={{ fontSize: '0.82rem' }}>
+                      La solicitud se protege antes del flujo operativo.
+                    </span>
                   </div>
                 </div>
                 <div className="store-info-card">
-                  <span className="store-info-card__icon"><FiTruck size={18} /></span>
+                  <span className="store-info-card__icon"><FiTruck size={16} /></span>
                   <div>
-                    <strong className="d-block text-body mb-1">Entrega coordinada</strong>
-                    <span className="store-muted">Se confirma costo final segun zona y disponibilidad real.</span>
+                    <strong className="d-block text-body mb-1" style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                      Entrega coordinada
+                    </strong>
+                    <span className="store-muted" style={{ fontSize: '0.82rem' }}>
+                      Confirmamos costo final según zona y disponibilidad.
+                    </span>
                   </div>
                 </div>
               </div>
