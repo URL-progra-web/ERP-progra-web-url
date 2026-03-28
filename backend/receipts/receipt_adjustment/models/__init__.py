@@ -1,1 +1,1 @@
-from orders.receipt_adjustment.models.models import ReceiptAdjustment
+from receipts.receipt_adjustment.models.models import ReceiptAdjustment

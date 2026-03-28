@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'inventory',
     'orders',
 
-    'receipts',
+    'receipts.apps.ReceiptsConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,94 +1,48 @@
-import React, { useState, useMemo } from "react";
-import { receiptsMocks } from "../../receipts.mocks";
+import React from 'react';
 
-const ReceiptsTable = ({ fromDate, toDate }) => {
-  const data = receiptsMocks.receipts;
+const ReceiptsTable = ({ receipts, isLoading, onViewDetail }) => {
+    if (isLoading) {
+        return <div className="p-3 text-muted">Cargando recibos...</div>;
+    }
 
-  // 🔹 PAGINACIÓN
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
-
-  // 🔹 FILTRO POR FECHA
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      const date = new Date(item.issued_at);
-
-      if (fromDate && new Date(fromDate) > date) return false;
-      if (toDate && new Date(toDate) < date) return false;
-
-      return true;
-    });
-  }, [data, fromDate, toDate]);
-
-  // 🔹 PAGINACIÓN LÓGICA
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  const start = (page - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-
-  const paginatedData = filteredData.slice(start, end);
-
-  return (
-    <div className="card">
-      <div className="card-body">
-        {/* TABLA */}
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th># Recibo</th>
-              <th>Emitido por</th>
-              <th>Total</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {paginatedData.length > 0 ? (
-              paginatedData.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.receipt_number}</td>
-                  <td>{item.issued_by.name}</td>
-                  <td>Q {item.grand_total}</td>
-                  <td>
-                    {new Date(item.issued_at).toLocaleDateString()}
-                  </td>
+    return (
+        <table className="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th># Recibo</th>
+                    <th>Cliente</th>
+                    <th>Método de Pago</th>
+                    <th>Emitido por</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center">
-                  No hay datos
-                </td>
-              </tr>
-            )}
-          </tbody>
+            </thead>
+            <tbody>
+                {receipts.length > 0 ? (
+                    receipts.map((item) => (
+                        <tr
+                            key={item.id}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => onViewDetail(item.id)}
+                        >
+                            <td>{item.receipt_number}</td>
+                            <td>{item.customer?.name ?? '—'}</td>
+                            <td>{item.payment_method_name ?? '—'}</td>
+                            <td>{item.issued_by_name ?? '—'}</td>
+                            <td>Q {Number(item.grand_total).toFixed(2)}</td>
+                            <td>{new Date(item.issued_at).toLocaleDateString()}</td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan="6" className="text-center text-muted py-4">
+                            No hay recibos registrados.
+                        </td>
+                    </tr>
+                )}
+            </tbody>
         </table>
-
-        {/* PAGINACIÓN */}
-        <div className="d-flex justify-content-between">
-          <button
-            className="btn btn-outline-primary"
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-          >
-            Anterior
-          </button>
-
-          <span>
-            Página {page} de {totalPages || 1}
-          </span>
-
-          <button
-            className="btn btn-outline-primary"
-            disabled={page === totalPages || totalPages === 0}
-            onClick={() => setPage(page + 1)}
-          >
-            Siguiente
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ReceiptsTable;

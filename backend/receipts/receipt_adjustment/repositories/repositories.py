@@ -1,6 +1,6 @@
 from typing import Optional
 from django.db.models import QuerySet
-from orders.receipt_adjustment.models.models import ReceiptAdjustment
+from receipts.receipt_adjustment.models.models import ReceiptAdjustment
 
 
 class ReceiptAdjustmentRepository:

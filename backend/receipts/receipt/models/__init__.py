@@ -1,1 +1,1 @@
-from orders.receipt.models.models import Receipt
+from receipts.receipt.models.models import Receipt
