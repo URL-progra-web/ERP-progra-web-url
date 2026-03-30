@@ -3,12 +3,13 @@ import api from '~/core/api/api';
 const BASE_URL = '/receipts/';
 
 export const receiptsService = {
-    async list({ page, page_size, issued_at_after, issued_at_before } = {}) {
+    async list({ page, page_size, issued_at_after, issued_at_before,client } = {}) {
         const params = {};
         if (page) params.page = page;
         if (page_size) params.page_size = page_size;
         if (issued_at_after) params.issued_at_after = issued_at_after;
         if (issued_at_before) params.issued_at_before = issued_at_before;
+        if (client) params.client = client;
         const response = await api.get(BASE_URL, { params });
         return response.data;
     },

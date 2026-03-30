@@ -23,7 +23,7 @@ const ReceiptsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [client, setClient] = useState('');
-
+    
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
@@ -34,6 +34,7 @@ const ReceiptsPage = () => {
                     issued_at_before: toDate || undefined,
                     client: client || undefined,
                 });
+
                 setReceipts(data.results ?? data);
                 setCount(data.count ?? (data.results ?? data).length);
                 setNumPages(data.num_pages ?? 1);
@@ -79,11 +80,11 @@ const ReceiptsPage = () => {
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label">Cliente</label>
+                                <label className="form-label">Buscar</label>
                                 <input
                                     type="text"
                                     className="form-control"
-                                    placeholder="Buscar cliente..."
+                                    placeholder="Buscar cliente o número de recibo..."
                                     value={client}
                                     onChange={(e) => { setClient(e.target.value); setPage(1); }}
                                 />

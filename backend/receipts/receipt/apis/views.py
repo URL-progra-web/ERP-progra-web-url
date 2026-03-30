@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from receipts.receipt.serializers.serializers import ReceiptSerializer
 from receipts.receipt.services.services import ReceiptService
+from django.db.models import Q
 
 PAGE_SIZE = 10
 
@@ -21,10 +22,16 @@ class ReceiptViewSet(viewsets.ViewSet):
 
         after = request.query_params.get('issued_at_after')
         before = request.query_params.get('issued_at_before')
+        client = request.query_params.get('client')
         if after:
             qs = qs.filter(issued_at__date__gte=after)
         if before:
             qs = qs.filter(issued_at__date__lte=before)
+        if client:
+            qs = qs.filter(
+                Q(order__customer__name__icontains=client) |
+                Q(receipt_number__icontains=client)
+            )
 
         count = qs.count()
         try:
