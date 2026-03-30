@@ -22,6 +22,7 @@ const ReceiptsPage = () => {
     const [toDate, setToDate] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [client, setClient] = useState('');
 
     useEffect(() => {
         const load = async () => {
@@ -31,6 +32,7 @@ const ReceiptsPage = () => {
                     page,
                     issued_at_after: fromDate || undefined,
                     issued_at_before: toDate || undefined,
+                    client: client || undefined,
                 });
                 setReceipts(data.results ?? data);
                 setCount(data.count ?? (data.results ?? data).length);
@@ -42,7 +44,7 @@ const ReceiptsPage = () => {
             }
         };
         load();
-    }, [page, fromDate, toDate]);
+    }, [page, fromDate, toDate,client]);
 
     return (
         <div className="container-fluid p-0">
@@ -74,6 +76,16 @@ const ReceiptsPage = () => {
                                     className="form-control"
                                     value={toDate}
                                     onChange={(e) => { setToDate(e.target.value); setPage(1); }}
+                                />
+                            </div>
+                            <div className="col-md-4">
+                                <label className="form-label">Cliente</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Buscar cliente..."
+                                    value={client}
+                                    onChange={(e) => { setClient(e.target.value); setPage(1); }}
                                 />
                             </div>
                         </div>
