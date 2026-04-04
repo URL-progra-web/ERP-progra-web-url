@@ -106,33 +106,33 @@ const ReceiptsPage = () => {
 
             <div className="d-flex flex-column gap-4">
                 {/* FILTROS */}
-                <div className="card border-0 shadow-sm" style={{ backgroundColor: '#1a1d21' }}>
+                <div className="card border-0 shadow-sm">
                     <div className="card-body py-3">
-                        <h6 className="mb-3 text-uppercase text-white-50 small fw-bold">Filtros</h6>
+                        <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
                         <div className="row g-2">
                             <div className="col-md-4">
-                                <label className="form-label text-white-50 small">Desde</label>
+                                <label className="form-label small text-muted">Desde</label>
                                 <input
                                     type="date"
-                                    className="form-control form-control-sm bg-dark border-secondary text-white"
+                                    className="form-control form-control-sm"
                                     value={fromDate}
                                     onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label text-white-50 small">Hasta</label>
+                                <label className="form-label small text-muted">Hasta</label>
                                 <input
                                     type="date"
-                                    className="form-control form-control-sm bg-dark border-secondary text-white"
+                                    className="form-control form-control-sm"
                                     value={toDate}
                                     onChange={(e) => { setToDate(e.target.value); setPage(1); }}
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label text-white-50 small">Buscar</label>
+                                <label className="form-label small text-muted">Buscar</label>
                                 <input
                                     type="text"
-                                    className="form-control form-control-sm bg-dark border-secondary text-white"
+                                    className="form-control form-control-sm"
                                     placeholder="Buscar cliente o número..."
                                     value={client}
                                     onChange={(e) => { setClient(e.target.value); setPage(1); }}
