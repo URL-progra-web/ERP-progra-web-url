@@ -6,6 +6,7 @@ import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import { receiptsService } from '../services/receiptsService';
+import ReceiptPDFButton from '../components/ReceiptPDFButton'; 
 
 const ReceiptDetailPage = () => {
     const { receiptId } = useParams();
@@ -52,14 +53,29 @@ const ReceiptDetailPage = () => {
 
     return (
         <div className="container-fluid p-0">
-            <PageHeader
-                title={receipt.receipt_number}
-                subtitle={`Orden ${receipt.order_short_id} • ${receipt.order_status}`}
-                icon={FiFileText}
-                actionLabel="Volver"
-                actionIcon={FiArrowLeft}
-                onAction={() => navigate(listPath)}
-            />
+                    <PageHeader
+                    title={receipt.receipt_number}
+                    subtitle={`Orden ${receipt.order_short_id} • ${receipt.order_status}`}
+                    icon={FiFileText}
+                    actions={
+                        <>
+                        {/* Botón Volver */}
+                        <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => navigate(listPath)}
+                        >
+                            <FiArrowLeft className="me-1" />
+                            Volver
+                        </button>
+
+                        {/* Botón PDF */}
+                        <ReceiptPDFButton
+                            receipt={receipt}
+                            className="btn btn-sm btn-outline-primary"
+                        />
+                        </>
+                    }
+                />
 
             <div className="d-flex flex-column gap-4">
                 {/* DATOS GENERALES */}
