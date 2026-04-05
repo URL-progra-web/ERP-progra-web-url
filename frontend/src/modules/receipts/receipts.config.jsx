@@ -1,7 +1,8 @@
 import React from 'react';
-import { FiFileText } from 'react-icons/fi';
+import { FiFileText, FiBarChart2 } from 'react-icons/fi';
 import ReceiptsPage from './receipt/pages/ReceiptsPage';
 import ReceiptDetailPage from './receipt/pages/ReceiptDetailPage';
+import BillingReportsPage from './reports/pages/BillingReportsPage';
 
 export const receiptsFeature = {
     id: 'receipts',
@@ -21,6 +22,13 @@ export const receiptsFeature = {
             roles: ['MANAGER', 'ADMIN'],
             element: <ReceiptDetailPage />,
             hidden: true,
+        },
+        {
+            text: 'Reportes',
+            path: 'receipts/reports',
+            icon: FiBarChart2,
+            roles: ['MANAGER', 'ADMIN'],
+            element: <BillingReportsPage />,
         },
     ],
 };
