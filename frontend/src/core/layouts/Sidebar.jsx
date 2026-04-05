@@ -28,6 +28,7 @@ const SidebarNavItem = ({ item, isCollapsed, onItemClick, userRole }) => {
             <NavLink
                 to={item.path}
                 onClick={onItemClick}
+                end
                 title={isCollapsed ? item.text : undefined}
                 className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
             >

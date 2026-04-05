@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FiBarChart2, FiDownload, FiUsers, FiUser, FiCalendar } from 'react-icons/fi';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import { useBillingReports } from '../hooks/useBillingReports';
+import { userService } from '~/modules/users/services/userService';
 
 const fmt = (n) => `Q ${Number(n ?? 0).toFixed(2)}`;
 
@@ -21,11 +22,20 @@ const SummaryCard = ({ label, value, sub }) => (
 const BillingReportsPage = () => {
     const [dateAfter, setDateAfter] = useState('');
     const [dateBefore, setDateBefore] = useState('');
+    const [userId, setUserId] = useState('');
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        userService.getUsers({ page_size: 100 })
+            .then(data => setUsers(data.results ?? data))
+            .catch(() => {});
+    }, []);
 
     const filters = useMemo(() => ({
         date_after: dateAfter || undefined,
         date_before: dateBefore || undefined,
-    }), [dateAfter, dateBefore]);
+        user_id: userId || undefined,
+    }), [dateAfter, dateBefore, userId]);
 
     const { summary, byDay, byMonth, byCustomer, byUser, isLoading, error } = useBillingReports(filters);
 
@@ -36,7 +46,11 @@ const BillingReportsPage = () => {
         doc.text('REPORTE DE FACTURACIÓN', 14, 20);
         doc.setFontSize(10);
         doc.setTextColor(100);
-        doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 28);
+
+        const usuarioLabel = userId
+            ? `Usuario: ${users.find(u => String(u.id) === String(userId))?.name ?? '—'}`
+            : 'Todos los usuarios';
+        doc.text(`Generado el: ${new Date().toLocaleString()} · ${usuarioLabel}`, 14, 28);
 
         const headStyle = { fillColor: [26, 29, 33], textColor: [255, 255, 255], fontSize: 8, fontStyle: 'bold' };
         const bodyStyle = { fontSize: 8, cellPadding: 3 };
@@ -111,7 +125,7 @@ const BillingReportsPage = () => {
                     <div className="card-body py-3">
                         <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
                         <div className="row g-2">
-                            <div className="col-md-4">
+                            <div className="col-md-3">
                                 <label className="form-label small text-muted">Desde</label>
                                 <input
                                     type="date"
@@ -120,7 +134,7 @@ const BillingReportsPage = () => {
                                     onChange={(e) => setDateAfter(e.target.value)}
                                 />
                             </div>
-                            <div className="col-md-4">
+                            <div className="col-md-3">
                                 <label className="form-label small text-muted">Hasta</label>
                                 <input
                                     type="date"
@@ -129,7 +143,20 @@ const BillingReportsPage = () => {
                                     onChange={(e) => setDateBefore(e.target.value)}
                                 />
                             </div>
-                            <div className="col-md-4 d-flex align-items-end">
+                            <div className="col-md-3">
+                                <label className="form-label small text-muted">Usuario</label>
+                                <select
+                                    className="form-select form-select-sm"
+                                    value={userId}
+                                    onChange={(e) => setUserId(e.target.value)}
+                                >
+                                    <option value="">Todos los usuarios</option>
+                                    {users.map(u => (
+                                        <option key={u.id} value={u.id}>{u.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="col-md-3 d-flex align-items-end">
                                 <button
                                     type="button"
                                     className="btn btn-danger btn-sm d-flex align-items-center gap-2 px-3 shadow-sm w-100"
