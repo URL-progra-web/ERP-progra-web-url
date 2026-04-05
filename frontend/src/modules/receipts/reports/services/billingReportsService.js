@@ -2,11 +2,12 @@ import api from '~/core/api/api';
 
 const BASE_URL = '/receipts/reports/';
 
-const buildParams = ({ date_after, date_before, user_id } = {}) => {
+const buildParams = ({ date_after, date_before, user_id, entrepreneur_id } = {}) => {
     const params = {};
     if (date_after) params.date_after = date_after;
     if (date_before) params.date_before = date_before;
     if (user_id) params.user_id = user_id;
+    if (entrepreneur_id) params.entrepreneur_id = entrepreneur_id;
     return params;
 };
 
@@ -33,6 +34,11 @@ export const billingReportsService = {
 
     async byUser(filters = {}) {
         const response = await api.get(`${BASE_URL}by-user/`, { params: buildParams(filters) });
+        return response.data;
+    },
+
+    async byEntrepreneur(filters = {}) {
+        const response = await api.get(`${BASE_URL}by-entrepreneur/`, { params: buildParams(filters) });
         return response.data;
     },
 };

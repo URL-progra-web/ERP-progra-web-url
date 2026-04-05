@@ -17,6 +17,7 @@ class BillingReportViewSet(viewsets.ViewSet):
             'date_after': request.query_params.get('date_after'),
             'date_before': request.query_params.get('date_before'),
             'user_id': request.query_params.get('user_id'),
+            'entrepreneur_id': request.query_params.get('entrepreneur_id'),
         }
 
     @action(detail=False, methods=['get'], url_path='summary')
@@ -47,4 +48,10 @@ class BillingReportViewSet(viewsets.ViewSet):
     def by_user(self, request):
         filters = self._get_filters(request)
         data = self.service.by_user(**filters)
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='by-entrepreneur')
+    def by_entrepreneur(self, request):
+        filters = self._get_filters(request)
+        data = self.service.by_entrepreneur(**filters)
         return Response(data, status=status.HTTP_200_OK)

@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { FiBarChart2, FiDownload, FiUsers, FiUser, FiCalendar } from 'react-icons/fi';
+import { FiBarChart2, FiDownload, FiUsers, FiUser, FiCalendar, FiBriefcase } from 'react-icons/fi';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import { useBillingReports } from '../hooks/useBillingReports';
 import { userService } from '~/modules/users/services/userService';
+import { entrepreneurService } from '~/modules/crm/entrepreneurs/services/entrepreneurService';
 
 const fmt = (n) => `Q ${Number(n ?? 0).toFixed(2)}`;
 
@@ -23,11 +24,16 @@ const BillingReportsPage = () => {
     const [dateAfter, setDateAfter] = useState('');
     const [dateBefore, setDateBefore] = useState('');
     const [userId, setUserId] = useState('');
+    const [entrepreneurId, setEntrepreneurId] = useState('');
     const [users, setUsers] = useState([]);
+    const [entrepreneurs, setEntrepreneurs] = useState([]);
 
     useEffect(() => {
         userService.getUsers({ page_size: 100 })
             .then(data => setUsers(data.results ?? data))
+            .catch(() => {});
+        entrepreneurService.list({ page_size: 200 })
+            .then(data => setEntrepreneurs(data.results ?? data))
             .catch(() => {});
     }, []);
 
@@ -35,9 +41,10 @@ const BillingReportsPage = () => {
         date_after: dateAfter || undefined,
         date_before: dateBefore || undefined,
         user_id: userId || undefined,
-    }), [dateAfter, dateBefore, userId]);
+        entrepreneur_id: entrepreneurId || undefined,
+    }), [dateAfter, dateBefore, userId, entrepreneurId]);
 
-    const { summary, byDay, byMonth, byCustomer, byUser, isLoading, error } = useBillingReports(filters);
+    const { summary, byDay, byMonth, byCustomer, byUser, byEntrepreneur, isLoading, error } = useBillingReports(filters);
 
     const downloadPDF = () => {
         const doc = new jsPDF();
@@ -50,7 +57,10 @@ const BillingReportsPage = () => {
         const usuarioLabel = userId
             ? `Usuario: ${users.find(u => String(u.id) === String(userId))?.name ?? '—'}`
             : 'Todos los usuarios';
-        doc.text(`Generado el: ${new Date().toLocaleString()} · ${usuarioLabel}`, 14, 28);
+        const emprendedorLabel = entrepreneurId
+            ? `Emprendedor: ${entrepreneurs.find(e => String(e.id) === String(entrepreneurId))?.company_name ?? '—'}`
+            : 'Todos los emprendedores';
+        doc.text(`Generado el: ${new Date().toLocaleString()} · ${usuarioLabel} · ${emprendedorLabel}`, 14, 28);
 
         const headStyle = { fillColor: [26, 29, 33], textColor: [255, 255, 255], fontSize: 8, fontStyle: 'bold' };
         const bodyStyle = { fontSize: 8, cellPadding: 3 };
@@ -73,6 +83,17 @@ const BillingReportsPage = () => {
             ]],
             headStyles: headStyle,
             styles: bodyStyle,
+        });
+
+        y = doc.lastAutoTable.finalY + 8;
+        doc.text('Ventas por Emprendedor', 14, y);
+        autoTable(doc, {
+            startY: y + 4,
+            head: [['Emprendedor', 'Recibos', 'Total Vendido']],
+            body: byEntrepreneur.map(r => [r.entrepreneur_name, r.count, fmt(r.total)]),
+            headStyles: headStyle,
+            styles: bodyStyle,
+            columnStyles: { 2: { halign: 'right' } },
         });
 
         y = doc.lastAutoTable.finalY + 8;
@@ -125,7 +146,7 @@ const BillingReportsPage = () => {
                     <div className="card-body py-3">
                         <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
                         <div className="row g-2">
-                            <div className="col-md-3">
+                            <div className="col-md-2">
                                 <label className="form-label small text-muted">Desde</label>
                                 <input
                                     type="date"
@@ -134,7 +155,7 @@ const BillingReportsPage = () => {
                                     onChange={(e) => setDateAfter(e.target.value)}
                                 />
                             </div>
-                            <div className="col-md-3">
+                            <div className="col-md-2">
                                 <label className="form-label small text-muted">Hasta</label>
                                 <input
                                     type="date"
@@ -142,6 +163,19 @@ const BillingReportsPage = () => {
                                     value={dateBefore}
                                     onChange={(e) => setDateBefore(e.target.value)}
                                 />
+                            </div>
+                            <div className="col-md-3">
+                                <label className="form-label small text-muted">Emprendedor</label>
+                                <select
+                                    className="form-select form-select-sm"
+                                    value={entrepreneurId}
+                                    onChange={(e) => setEntrepreneurId(e.target.value)}
+                                >
+                                    <option value="">Todos los emprendedores</option>
+                                    {entrepreneurs.map(e => (
+                                        <option key={e.id} value={e.id}>{e.company_name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-md-3">
                                 <label className="form-label small text-muted">Usuario</label>
@@ -156,7 +190,7 @@ const BillingReportsPage = () => {
                                     ))}
                                 </select>
                             </div>
-                            <div className="col-md-3 d-flex align-items-end">
+                            <div className="col-md-2 d-flex align-items-end">
                                 <button
                                     type="button"
                                     className="btn btn-danger btn-sm d-flex align-items-center gap-2 px-3 shadow-sm w-100"
@@ -191,6 +225,36 @@ const BillingReportsPage = () => {
                             </div>
                             <div className="col-6 col-md-4">
                                 <SummaryCard label="Total Descuentos" value={fmt(summary?.total_discounts)} />
+                            </div>
+                        </div>
+
+                        {/* VENTAS POR EMPRENDEDOR */}
+                        <div className="card border-0 shadow-sm">
+                            <div className="card-header bg-body py-3 d-flex align-items-center gap-2">
+                                <FiBriefcase className="text-muted" />
+                                <h6 className="mb-0 text-uppercase text-muted small fw-bold">Ventas por Emprendedor</h6>
+                            </div>
+                            <div className="table-responsive">
+                                <table className="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Emprendedor</th>
+                                            <th>Recibos</th>
+                                            <th className="text-end">Total Vendido</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {byEntrepreneur.length > 0 ? byEntrepreneur.map((row) => (
+                                            <tr key={row.entrepreneur_id}>
+                                                <td>{row.entrepreneur_name}</td>
+                                                <td>{row.count}</td>
+                                                <td className="text-end">{fmt(row.total)}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr><td colSpan="3" className="text-center text-muted py-3">Sin datos.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
