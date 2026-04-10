@@ -58,7 +58,7 @@ const VariantsPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Variantes de Productos"
-                subtitle={`${variants.length} variante(s) registrada(s)`}
+                subtitle={`${variants.length} variante(s) con stock independiente`}
                 icon={FiLayers}
                 actionLabel="Nueva Variante"
                 actionIcon={FiPlus}

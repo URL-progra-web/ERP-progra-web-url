@@ -1,5 +1,34 @@
 import api from '~/core/api/api';
 
+const buildVariantPayload = (data) => {
+    const formData = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined) return;
+
+        if (key === 'image') {
+            if (value instanceof File) {
+                formData.append(key, value);
+            }
+            return;
+        }
+
+        if (value === null) {
+            formData.append(key, '');
+            return;
+        }
+
+        if (typeof value === 'boolean') {
+            formData.append(key, value ? 'true' : 'false');
+            return;
+        }
+
+        formData.append(key, value);
+    });
+
+    return formData;
+};
+
 export const variantService = {
     getVariants: async ({ search, is_active } = {}) => {
         const params = {};
@@ -16,12 +45,12 @@ export const variantService = {
     },
 
     createVariant: async (data) => {
-        const response = await api.post('/products/variants/', data);
+        const response = await api.post('/products/variants/', buildVariantPayload(data));
         return response.data;
     },
 
     updateVariant: async (id, data) => {
-        const response = await api.put(`/products/variants/${id}/`, data);
+        const response = await api.put(`/products/variants/${id}/`, buildVariantPayload(data));
         return response.data;
     },
 
