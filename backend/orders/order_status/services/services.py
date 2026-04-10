@@ -2,7 +2,11 @@ from typing import Dict, Iterable, Optional, Sequence
 
 from django.db import transaction
 
+from inventory.transaction.services.stock_service import InventoryStockService
+from inventory.transaction_type.models.models import TransactionType
 from orders.order.exceptions import OrderNotFound
+from orders.order_item.exceptions import OrderItemStockUnavailable
+from inventory.transaction.services.services import InventoryTransactionService
 from orders.order.repositories.repositories import OrderRepository
 from orders.order_history.repositories.repositories import OrderStatusHistoryRepository
 from orders.order_status.exceptions import (
@@ -18,6 +22,9 @@ from users.user.models.models import User
 
 
 class OrderStatusService:
+    CONFIRMATION_TRANSACTION_TYPE = 'Salida'
+    CANCELLATION_RESTORE_TRANSACTION_TYPE = 'Entrada'
+
     allowed_transitions: Dict[str, Sequence[str]] = {
         'SOLICITADO': ('CONFIRMADO',),
         'CONFIRMADO': ('ENVIADO', 'CANCELADO'),
@@ -32,10 +39,66 @@ class OrderStatusService:
         repository: Optional[OrderStatusRepository] = None,
         order_repository: Optional[OrderRepository] = None,
         history_repository: Optional[OrderStatusHistoryRepository] = None,
+        inventory_transaction_service: Optional[InventoryTransactionService] = None,
     ):
         self.repository = repository or OrderStatusRepository()
         self.order_repository = order_repository or OrderRepository()
         self.history_repository = history_repository or OrderStatusHistoryRepository()
+        self.inventory_transaction_service = inventory_transaction_service or InventoryTransactionService()
+        self.stock_service = InventoryStockService()
+
+    def _validate_confirmation_stock(self, order) -> None:
+        items = list(order.items.select_related('variant').all())
+        if not items:
+            raise OrderItemStockUnavailable(f'La orden {order.short_id} no tiene items para confirmar')
+
+        for item in items:
+            available = self.stock_service.get_variant_stock(item.variant_id)
+            if available < item.base_quantity:
+                raise OrderItemStockUnavailable(
+                    f'Stock insuficiente para {item.variant.sku}. Disponible: {available}, solicitado: {item.base_quantity}'
+                )
+
+    def _apply_confirmation_inventory(self, order, actor: Optional[User], notes: Optional[str]) -> None:
+        self._validate_confirmation_stock(order)
+        TransactionType.objects.get_or_create(
+            name=self.CONFIRMATION_TRANSACTION_TYPE,
+            defaults={
+                'factor': -1,
+                'description': 'Salida por confirmacion de pedido',
+            },
+        )
+
+        for item in order.items.select_related('variant').all():
+            self.inventory_transaction_service.create_transaction(
+                variant_id=item.variant_id,
+                transaction_type_name=self.CONFIRMATION_TRANSACTION_TYPE,
+                quantity=item.quantity,
+                selected_uom_id=item.selected_uom_id,
+                user=actor,
+                reference=order.short_id,
+                notes=notes or f'Confirmacion de pedido {order.short_id}',
+            )
+
+    def _restore_inventory_for_cancellation(self, order, actor: Optional[User], notes: Optional[str]) -> None:
+        TransactionType.objects.get_or_create(
+            name=self.CANCELLATION_RESTORE_TRANSACTION_TYPE,
+            defaults={
+                'factor': 1,
+                'description': 'Entrada por cancelacion de pedido',
+            },
+        )
+
+        for item in order.items.select_related('variant').all():
+            self.inventory_transaction_service.create_transaction(
+                variant_id=item.variant_id,
+                transaction_type_name=self.CANCELLATION_RESTORE_TRANSACTION_TYPE,
+                quantity=item.quantity,
+                selected_uom_id=item.selected_uom_id,
+                user=actor,
+                reference=order.short_id,
+                notes=notes or f'Cancelacion de pedido {order.short_id}',
+            )
 
     def list_statuses(self, search: Optional[str] = None):
         return self.repository.list(search=search)
@@ -122,6 +185,10 @@ class OrderStatusService:
             )
 
         with transaction.atomic():
+            if current_status_name == 'SOLICITADO' and target_status.name == 'CONFIRMADO':
+                self._apply_confirmation_inventory(order, actor=actor, notes=notes)
+            if current_status_name == 'CONFIRMADO' and target_status.name == 'CANCELADO':
+                self._restore_inventory_for_cancellation(order, actor=actor, notes=notes)
             self.order_repository.update_status(order, target_status)
             self.history_repository.create(order=order, status=target_status, user=actor, notes=notes)
 

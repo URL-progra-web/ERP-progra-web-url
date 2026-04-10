@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiPower, FiEdit2, FiTrash2, FiLock } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 export const PaymentMethodsTable = ({
     records,
@@ -49,30 +50,22 @@ export const PaymentMethodsTable = ({
                                 </span>
                             </td>
                             <td className="text-end px-4">
-                                <div className="btn-group btn-group-sm">
-                                    <button
-                                        className={`btn px-3 ${method.is_active ? 'btn-outline-warning' : 'btn-outline-success'}`}
-                                        onClick={() => onToggle(method)}
-                                        title={method.is_active ? 'Desactivar' : 'Activar'}
-                                    >
-                                        <FiPower />
-                                    </button>
-                                    <button
-                                        className="btn btn-outline-primary px-3"
-                                        onClick={() => onEdit(method)}
-                                        title="Editar"
-                                    >
-                                        <FiEdit2 />
-                                    </button>
-                                    <button
-                                        className="btn btn-outline-danger px-3"
-                                        onClick={() => onDelete(method)}
-                                        disabled={method.is_protected}
-                                        title={method.is_protected ? 'No se puede eliminar un método de sistema' : 'Eliminar'}
-                                    >
-                                        <FiTrash2 />
-                                    </button>
-                                </div>
+                                <TableActions actions={[
+                                    {
+                                        icon: FiPower,
+                                        onClick: () => onToggle(method),
+                                        title: method.is_active ? 'Desactivar' : 'Activar',
+                                        variant: method.is_active ? 'warning' : 'success',
+                                    },
+                                    { icon: FiEdit2,  onClick: () => onEdit(method),   title: 'Editar',   variant: 'primary' },
+                                    {
+                                        icon: FiTrash2,
+                                        onClick: () => onDelete(method),
+                                        title: method.is_protected ? 'No se puede eliminar un método de sistema' : 'Eliminar',
+                                        variant: 'danger',
+                                        disabled: method.is_protected,
+                                    },
+                                ]} />
                             </td>
                         </tr>
                     ))}

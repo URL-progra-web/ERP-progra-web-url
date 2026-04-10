@@ -65,7 +65,7 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}
-            tone="dark"
+            tone="dark" accent="var(--bs-info)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}

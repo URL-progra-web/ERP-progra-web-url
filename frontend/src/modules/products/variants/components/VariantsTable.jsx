@@ -1,0 +1,61 @@
+import React from 'react';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
+
+const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
+    if (isLoading) {
+        return (
+            <tbody>
+                <tr>
+                    <td colSpan="10" className="text-center py-5">
+                        <div className="spinner-border text-primary spinner-border-sm me-2"></div>
+                        <span className="text-muted">Cargando...</span>
+                    </td>
+                </tr>
+            </tbody>
+        );
+    }
+
+    return (
+        <tbody>
+            {variants.length === 0 ? (
+                <tr>
+                    <td colSpan="10" className="text-center py-5 text-muted">
+                        No se encontraron variantes. Crea una nueva para empezar.
+                    </td>
+                </tr>
+            ) : variants.map(variant => (
+                <tr key={variant.id} className="border-bottom border-light-subtle">
+                    <td className="px-4 py-3">
+                        <div className="fw-bold text-body">{variant.product_name}</div>
+                        <small className="text-muted">SKU: {variant.sku}</small>
+                    </td>
+
+                    <td className="py-3">{variant.color_name || '—'}</td>
+                    <td className="py-3 text-secondary">{variant.entrepreneur_name || '—'}</td>
+                    <td className="py-3 text-secondary">{variant.business_unit_name || '—'}</td>
+                    <td className="py-3">{variant.size_name || '—'}</td>
+                    <td className="py-3">{variant.base_uom_name || '—'}</td>
+                    <td className="py-3">Q {variant.cost}</td>
+                    <td className="py-3">Q {variant.price}</td>
+                    <td className="py-3">
+                        <span className="me-2">{variant.quantity_available}</span>
+                        {variant.is_active
+                            ? <span className="badge rounded-pill bg-success bg-opacity-10 text-success border border-success-subtle px-2 py-1">Activa</span>
+                            : <span className="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle px-2 py-1">Inactiva</span>
+                        }
+                    </td>
+
+                    <td className="px-4 py-3 text-end">
+                        <TableActions actions={[
+                            { icon: FiEdit2,  onClick: () => onEdit(variant),   title: 'Editar',   variant: 'primary' },
+                            { icon: FiTrash2, onClick: () => onDelete(variant), title: 'Eliminar', variant: 'danger'  },
+                        ]} />
+                    </td>
+                </tr>
+            ))}
+        </tbody>
+    );
+};
+
+export default VariantsTable;

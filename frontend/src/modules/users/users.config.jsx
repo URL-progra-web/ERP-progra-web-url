@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiUsers } from 'react-icons/fi';
-import UsersList from './pages/UsersList';
+
+const UsersList = React.lazy(() => import('./pages/UsersList'));
 
 /**
  * Cada módulo exporta esta configuración:

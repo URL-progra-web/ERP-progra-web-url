@@ -2,79 +2,77 @@ import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import BottomNav from './BottomNav';
 import './DashboardLayout.css';
 
+const MobileOverlay = ({ onClick }) => (
+    <div
+        onClick={onClick}
+        style={{
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(2px)',
+            zIndex: 1040,
+        }}
+    />
+);
+
 const DashboardLayout = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen]         = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setIsSidebarCollapsed(false);
-            }
+            if (window.innerWidth < 768) setIsSidebarCollapsed(false);
         };
-
         handleResize();
         window.addEventListener('resize', handleResize);
-
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    const openSidebar  = () => setIsSidebarOpen(true);
+    const closeSidebar = () => setIsSidebarOpen(false);
+    const toggleCollapse = () => setIsSidebarCollapsed(prev => !prev);
 
-    const closeSidebarView = () => {
-        if (isSidebarOpen) setIsSidebarOpen(false);
-    };
-
-    const toggleSidebarSize = () => {
-        setIsSidebarCollapsed((prev) => !prev);
-    };
+    const sidebarWidth = isSidebarCollapsed
+        ? 'var(--sidebar-collapsed-width)'
+        : 'var(--sidebar-width)';
 
     return (
         <div className="d-flex bg-body text-body min-vh-100 position-relative" style={{ overflow: 'hidden' }}>
-            
-            {/* Mobile Overlay */}
-            {isSidebarOpen && (
-                <div 
-                    className="position-fixed w-100 h-100" 
-                    style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1040, top: 0, left: 0 }}
-                    onClick={closeSidebarView}
-                ></div>
-            )}
 
-            {/* Sidebar Container */}
-            <div 
+            {isSidebarOpen && <MobileOverlay onClick={closeSidebar} />}
+
+            {/* Sidebar */}
+            <div
                 className={`sidebar-container ${isSidebarOpen ? 'show' : ''} ${isSidebarCollapsed ? 'collapsed' : ''}`}
-                style={{ width: isSidebarCollapsed ? '88px' : '260px', flexShrink: 0, zIndex: 1050 }}
+                style={{ width: sidebarWidth }}
             >
-                <Sidebar 
-                    onItemClick={closeSidebarView} 
+                <Sidebar
+                    onItemClick={closeSidebar}
                     isCollapsed={isSidebarCollapsed}
-                    onToggleCollapse={toggleSidebarSize}
+                    onToggleCollapse={toggleCollapse}
                 />
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-grow-1 d-flex flex-column main-content-area" style={{ flexShrink: 1, minWidth: 0 }}>
-                <Topbar 
-                    onMenuClick={toggleSidebar} 
-                    onSidebarSizeToggle={toggleSidebarSize}
-                    isSidebarCollapsed={isSidebarCollapsed}
-                />
-                
-                {/* Fixed scrolling area for the outlet */}
-                <main className="flex-grow-1 overflow-auto p-3 p-md-4 bg-body-tertiary w-100" style={{ height: 'calc(100vh - var(--topbar-height))' }}>
+            {/* Main area */}
+            <div className="flex-grow-1 d-flex flex-column main-content-area" style={{ minWidth: 0 }}>
+                <Topbar onMenuClick={openSidebar} />
+
+                <main
+                    className="flex-grow-1 overflow-auto p-3 p-md-4 has-bottom-nav page-enter"
+                    style={{ height: `calc(100vh - var(--topbar-height))`, background: 'var(--bs-body-bg)' }}
+                >
                     <Outlet />
-                    
-                    {/* Minimal Footer */}
-                    <footer className="mt-5 pt-4 pb-2 border-top text-center text-muted small">
-                        &copy; 2026 ERP System - All rights reserved.
+
+                    <footer className="mt-5 pt-4 pb-2 border-top text-center small" style={{ color: 'var(--bs-tertiary-color)' }}>
+                        &copy; 2026 ERP System
                     </footer>
                 </main>
             </div>
+
+            {/* Mobile bottom navigation */}
+            <BottomNav onMenuClick={openSidebar} />
         </div>
     );
 };

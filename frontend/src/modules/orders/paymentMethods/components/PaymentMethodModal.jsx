@@ -52,7 +52,7 @@ export const PaymentMethodModal = ({ method, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar método de pago' : 'Nuevo método de pago'}
-            tone="dark"
+            tone="dark" accent="var(--bs-orange)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear método'}

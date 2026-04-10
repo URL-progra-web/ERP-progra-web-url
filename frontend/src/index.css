@@ -1,16 +1,111 @@
-/* Clean minimalist reset */
+/* ============================================================
+   DESIGN SYSTEM — ERP Command Interface
+   Aesthetic: Refined Industrial / Command & Control
+   Fonts: Outfit (display) · Plus Jakarta Sans (body) · JetBrains Mono
+   ============================================================ */
+
+/* ── Design Tokens ──────────────────────────────────────────── */
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+  --font-display:  'Outfit', sans-serif;
+  --font-body:     'Plus Jakarta Sans', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
+
+  --topbar-height:              60px;
+  --sidebar-width:              256px;
+  --sidebar-collapsed-width:    72px;
+  --mobile-nav-height:          62px;
+
+  --radius-xs:  4px;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  24px;
+
+  --transition:      0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Let Bootstrap handle the background and text color based on data-bs-theme */
+/* ── Bootstrap Dark Mode Token Overrides ────────────────────── */
+[data-bs-theme='dark'] {
+  --bs-body-font-family:       var(--font-body);
+  --bs-body-bg:                #07101f;
+  --bs-body-bg-rgb:            7, 16, 31;
+  --bs-body-color:             #dde6f4;
+  --bs-body-color-rgb:         221, 230, 244;
+  --bs-secondary-bg:           #0f1c30;
+  --bs-secondary-bg-rgb:       15, 28, 48;
+  --bs-tertiary-bg:            #162240;
+  --bs-tertiary-bg-rgb:        22, 34, 64;
+  --bs-border-color:           rgba(255, 255, 255, 0.07);
+  --bs-border-color-translucent: rgba(255, 255, 255, 0.07);
+  --bs-secondary-color:        #7a8fa8;
+  --bs-tertiary-color:         #3d5070;
+
+  --bs-primary:                #6573f8;
+  --bs-primary-rgb:            101, 115, 248;
+  --bs-link-color:             #6573f8;
+  --bs-link-hover-color:       #8f9bfa;
+
+  --bs-dark:                   #162240;
+  --bs-dark-rgb:               22, 34, 64;
+
+  --bs-card-bg:                #0f1c30;
+  --bs-card-border-color:      rgba(255, 255, 255, 0.06);
+
+  --bs-table-bg:               transparent;
+  --bs-table-striped-bg:       rgba(255,255,255,0.025);
+  --bs-table-hover-bg:         rgba(101, 115, 248, 0.06);
+  --bs-table-border-color:     rgba(255,255,255,0.06);
+
+  color-scheme: dark;
+}
+
+/* ── Bootstrap Light Mode Token Overrides ───────────────────── */
+[data-bs-theme='light'] {
+  --bs-body-font-family:       var(--font-body);
+  --bs-body-bg:                #edf0f7;
+  --bs-body-bg-rgb:            237, 240, 247;
+  --bs-body-color:             #0e1628;
+  --bs-body-color-rgb:         14, 22, 40;
+  --bs-secondary-bg:           #ffffff;
+  --bs-secondary-bg-rgb:       255, 255, 255;
+  --bs-tertiary-bg:            #f4f6fb;
+  --bs-tertiary-bg-rgb:        244, 246, 251;
+  --bs-border-color:           rgba(0, 0, 0, 0.07);
+  --bs-border-color-translucent: rgba(0, 0, 0, 0.07);
+  --bs-secondary-color:        #5e6e84;
+  --bs-tertiary-color:         #9baabb;
+
+  --bs-primary:                #4b42e0;
+  --bs-primary-rgb:            75, 66, 224;
+  --bs-link-color:             #4b42e0;
+  --bs-link-hover-color:       #3730b0;
+
+  --bs-dark:                   #1a2540;
+  --bs-dark-rgb:               26, 37, 64;
+
+  --bs-card-bg:                #ffffff;
+  --bs-card-border-color:      rgba(0, 0, 0, 0.07);
+
+  --bs-table-bg:               transparent;
+  --bs-table-striped-bg:       rgba(0,0,0,0.018);
+  --bs-table-hover-bg:         rgba(75, 66, 224, 0.04);
+  --bs-table-border-color:     rgba(0,0,0,0.06);
+
+  color-scheme: light;
+}
+
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 15px; }
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition), color var(--transition);
 }
 
 #root {
@@ -20,21 +115,260 @@ body {
   flex-direction: column;
 }
 
-* {
-  box-sizing: border-box;
+/* ── Typography ───────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
-/* Custom scrollbar for dark mode if needed */
-[data-bs-theme='dark'] ::-webkit-scrollbar {
-  width: 10px;
+.fw-bold, .fw-semibold, .modal-title {
+  font-family: var(--font-display);
 }
-[data-bs-theme='dark'] ::-webkit-scrollbar-track {
-  background: #212529;
+
+code, pre, .font-mono, kbd {
+  font-family: var(--font-mono);
 }
-[data-bs-theme='dark'] ::-webkit-scrollbar-thumb {
-  background: #373b3e;
-  border-radius: 5px;
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar              { width: 5px; height: 5px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover  { background: rgba(255,255,255,0.18); }
+
+[data-bs-theme='light'] ::-webkit-scrollbar-thumb       { background: rgba(0,0,0,0.1); }
+[data-bs-theme='light'] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-[data-bs-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-  background: #495057;
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes orbFloat {
+  0%,  100% { transform: translate(0,    0)    scale(1);    }
+  33%        { transform: translate(22px, -18px) scale(1.06); }
+  66%        { transform: translate(-14px, 12px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+  0%,  100% { transform: translate(0,   0)    scale(1);    }
+  40%        { transform: translate(-18px, 20px) scale(1.08); }
+  75%        { transform: translate(16px, -10px) scale(0.94); }
+}
+
+@keyframes gridScroll {
+  0%   { background-position: 0 0; }
+  100% { background-position: 44px 44px; }
+}
+
+@keyframes shimmerText {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  18%       { transform: translateX(-7px); }
+  36%       { transform: translateX(7px); }
+  54%       { transform: translateX(-5px); }
+  72%       { transform: translateX(5px); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+.page-enter {
+  animation: fadeSlideUp 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ── Bootstrap Component Refinements ─────────────────────────── */
+
+/* Buttons */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: var(--bs-primary);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0);
+}
+.btn-primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 4px 16px rgba(var(--bs-primary-rgb), 0.35);
+}
+.btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.35);
+}
+
+.btn-outline-secondary {
+  border-color: var(--bs-border-color);
+  color: var(--bs-secondary-color);
+}
+.btn-outline-secondary:hover {
+  background: var(--bs-tertiary-bg);
+  border-color: var(--bs-border-color);
+  color: var(--bs-body-color);
+}
+
+/* Cards */
+.card {
+  border-radius: var(--radius-lg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Form controls */
+.form-control,
+.form-select {
+  font-family: var(--font-body);
+  border-radius: var(--radius-sm);
+  border-color: var(--bs-border-color);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.15);
+}
+
+/* Input groups */
+.input-group .form-control:focus {
+  z-index: 3;
+}
+
+/* Tables */
+.table {
+  --bs-table-color: var(--bs-body-color);
+}
+.table > thead {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Badges */
+.badge {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-xs);
+}
+
+/* Alerts */
+.alert {
+  border-radius: var(--radius-md);
+  border: none;
+}
+
+/* Modal */
+.modal-content {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--bs-border-color) !important;
+  overflow: hidden;
+}
+
+[data-bs-theme='dark'] .modal-content {
+  background: #0f1c30;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+}
+
+[data-bs-theme='light'] .modal-content {
+  background: #ffffff;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+}
+
+/* Nav links */
+.nav-link {
+  transition: all var(--transition);
+}
+
+/* Rounded-4 override for consistency */
+.rounded-4 { border-radius: var(--radius-lg) !important; }
+
+/* ── Utility Classes ─────────────────────────────────────────── */
+.font-display { font-family: var(--font-display) !important; }
+.font-mono    { font-family: var(--font-mono) !important; }
+
+.text-accent  { color: var(--bs-primary) !important; }
+.bg-accent    { background-color: var(--bs-primary) !important; }
+
+/* Glassy surface effect */
+[data-bs-theme='dark'] .glass-surface {
+  background: rgba(15, 28, 48, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+[data-bs-theme='light'] .glass-surface {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.07);
+}
+
+/* Sector divider — replaces bg-dark headers */
+.section-header {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--bs-border-color);
+  color: var(--card-accent, var(--bs-secondary-color));
+  box-shadow: inset 3px 0 0 var(--card-accent, transparent);
+}
+
+[data-bs-theme='dark'] .section-header {
+  background: rgba(255,255,255,0.03);
+}
+
+[data-bs-theme='light'] .section-header {
+  background: var(--bs-tertiary-bg);
+}
+
+/* ── Mobile bottom nav spacing ───────────────────────────────── */
+@media (max-width: 767.98px) {
+  .has-bottom-nav {
+    padding-bottom: var(--mobile-nav-height) !important;
+  }
 }
