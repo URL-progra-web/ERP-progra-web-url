@@ -1,0 +1,370 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { FiArrowLeft, FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
+import PageHeader from '~/core/components/PageHeader';
+import AppAlert from '~/core/components/AppAlert';
+import { useAuth } from '~/core/auth/AuthContext';
+import { getDashboardPath } from '~/core/registry/dashboardPaths';
+import { useOrders } from './hooks/useOrders';
+import { useOrderItems } from './hooks/useOrderItems';
+import { orderService } from './services/orderService';
+import { orderStatusesService } from '../orderStatuses/services/orderStatusesService';
+import { formatCurrency } from './helpers/formatCurrency';
+import { normalizeList } from './helpers/normalizeList';
+import { OrderItemsTable } from './components/OrderItemsTable';
+import { OrderItemModal } from './components/OrderItemModal';
+
+const OrderDetailPage = () => {
+    const { orderId } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const ordersListPath = `${getDashboardPath(user?.role?.name)}/orders/list`;
+
+    const {
+        fetchOrderDetail,
+        updateOrder,
+        deleteOrder,
+        error,
+        setError,
+    } = useOrders({ autoFetch: false });
+    const {
+        items,
+        isLoadingItems,
+        error: itemsError,
+        setError: setItemsError,
+        createItem,
+        updateItem,
+        deleteItem,
+    } = useOrderItems({ orderId });
+
+    const [order, setOrder] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [catalogs, setCatalogs] = useState({ payment_methods: [] });
+    const [statusOptions, setStatusOptions] = useState([]);
+    const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [itemToEdit, setItemToEdit] = useState(null);
+    const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+    const [isSubmittingItem, setIsSubmittingItem] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || '');
+    const [formData, setFormData] = useState({
+        payment_method_id: '',
+        shipping_address: '',
+        shipping_cost: '',
+        notes: '',
+    });
+
+    useEffect(() => {
+        const load = async () => {
+            setIsLoading(true);
+            const [detail, catalogData, statusesData] = await Promise.all([
+                fetchOrderDetail(orderId),
+                orderService.catalogs().catch(() => ({ payment_methods: [] })),
+                orderStatusesService.list({ search: undefined }).catch(() => ({ results: [] })),
+            ]);
+
+            if (detail) {
+                setOrder(detail);
+                setFormData({
+                    payment_method_id: detail.payment_method || '',
+                    shipping_address: detail.shipping_address || '',
+                    shipping_cost: detail.shipping_cost ?? '',
+                    notes: detail.notes || '',
+                });
+            } else {
+                setError('No se pudo cargar el detalle del pedido.');
+            }
+
+            setCatalogs({ payment_methods: normalizeList(catalogData?.payment_methods) });
+            setStatusOptions(normalizeList(statusesData));
+            setIsLoading(false);
+        };
+
+        load();
+    }, [fetchOrderDetail, orderId, setError]);
+
+    useEffect(() => {
+        if (!location.state?.successMessage) return;
+        navigate(location.pathname, { replace: true, state: {} });
+    }, [location.pathname, location.state, navigate]);
+
+    const subtitle = useMemo(() => {
+        if (!order) return 'Detalle del pedido';
+        return `${order.customer_name || `Cliente #${order.customer}`} • ${order.status_name || 'Sin estado'}`;
+    }, [order]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        if (!order) return;
+
+        const payload = {
+            shipping_address: formData.shipping_address || null,
+            notes: formData.notes || null,
+        };
+
+        if (formData.payment_method_id) {
+            payload.payment_method_id = Number(formData.payment_method_id);
+        }
+
+        if (formData.shipping_cost !== '' && formData.shipping_cost !== null) {
+            payload.shipping_cost = Number(formData.shipping_cost);
+        }
+
+        setIsSaving(true);
+        const updated = await updateOrder(order.id, payload);
+        setIsSaving(false);
+
+        if (updated) {
+            setOrder(updated);
+            setSuccessMessage('Pedido actualizado correctamente.');
+        }
+    };
+
+    const confirmDelete = async () => {
+        if (!order) return;
+        const ok = await deleteOrder(order.id);
+        if (ok) {
+            navigate(ordersListPath);
+        }
+        setShowDeleteAlert(false);
+    };
+
+    const handleOpenCreateItem = () => {
+        setItemToEdit(null);
+        setIsItemModalOpen(true);
+    };
+
+    const handleOpenEditItem = (item) => {
+        setItemToEdit(item);
+        setIsItemModalOpen(true);
+    };
+
+    const handleSubmitItem = async (payload, itemId) => {
+        setIsSubmittingItem(true);
+        const ok = itemId
+            ? await updateItem(itemId, payload)
+            : await createItem(payload);
+        setIsSubmittingItem(false);
+        if (ok) {
+            const refreshed = await fetchOrderDetail(orderId);
+            if (refreshed) setOrder(refreshed);
+            setSuccessMessage(itemId ? 'Item actualizado correctamente.' : 'Item agregado correctamente.');
+        }
+        return ok;
+    };
+
+    const handleConfirmDeleteItem = async () => {
+        if (!itemToDelete) return;
+        const ok = await deleteItem(itemToDelete.id);
+        if (ok) {
+            const refreshed = await fetchOrderDetail(orderId);
+            if (refreshed) setOrder(refreshed);
+            setSuccessMessage('Item eliminado correctamente.');
+        }
+        setItemToDelete(null);
+    };
+
+    if (isLoading) {
+        return <div className="p-3">Cargando detalle del pedido...</div>;
+    }
+
+    if (!order) {
+        return (
+            <div className="p-3">
+                <div className="alert alert-warning">No se encontró el pedido solicitado.</div>
+                <button type="button" className="btn btn-outline-dark" onClick={() => navigate(ordersListPath)}>
+                    Volver al listado
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="container-fluid p-0">
+            <PageHeader
+                title={`Pedido ${order.short_id}`}
+                subtitle={subtitle}
+                icon={FiSave}
+                actionLabel="Volver"
+                actionIcon={FiArrowLeft}
+                onAction={() => navigate(ordersListPath)}
+            />
+
+            {successMessage && (
+                <div className="alert alert-success" role="alert">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <span>{successMessage}</span>
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => setSuccessMessage('')}
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <div className="card border-0 shadow-sm">
+                <div className="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                    <h6 className="mb-0 text-uppercase text-muted small">Detalle</h6>
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => setShowDeleteAlert(true)}
+                    >
+                        <FiTrash2 className="me-2" />
+                        Eliminar
+                    </button>
+                </div>
+
+                <form className="card-body" onSubmit={handleSave}>
+                    <div className="row g-3">
+                        <div className="col-md-6">
+                            <label className="form-label">Cliente</label>
+                            <input className="form-control" value={order.customer_name || `#${order.customer}`} disabled />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label">Estado</label>
+                            <input className="form-control" value={order.status_name || `#${order.status}`} disabled />
+                        </div>
+
+                        <div className="col-md-6">
+                            <label className="form-label">Método de Pago</label>
+                            <select
+                                className="form-select"
+                                name="payment_method_id"
+                                value={formData.payment_method_id}
+                                onChange={handleChange}
+                            >
+                                <option value="">(Ninguno / Por definir)</option>
+                                {catalogs.payment_methods.map((pm) => (
+                                    <option key={pm.id} value={pm.id}>{pm.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="col-md-6">
+                            <label className="form-label">Costo de Envío</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                className="form-control"
+                                name="shipping_cost"
+                                value={formData.shipping_cost}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="col-12">
+                            <label className="form-label">Dirección de Envío</label>
+                            <textarea
+                                className="form-control"
+                                rows="2"
+                                name="shipping_address"
+                                value={formData.shipping_address}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="col-12">
+                            <label className="form-label">Notas</label>
+                            <textarea
+                                className="form-control"
+                                rows="3"
+                                name="notes"
+                                value={formData.notes}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="col-12 d-flex justify-content-end">
+                            <button type="submit" className="btn btn-dark" disabled={isSaving}>
+                                {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div className="card border-0 shadow-sm mt-4">
+                <div className="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 className="mb-0 text-uppercase text-muted small">Items del Pedido</h6>
+                        <small className="text-muted">
+                            {items.length} item(s) • Total: {formatCurrency(order.total_amount)}
+                        </small>
+                    </div>
+                    <button type="button" className="btn btn-sm btn-dark" onClick={handleOpenCreateItem}>
+                        <FiPlus className="me-2" />Agregar Item
+                    </button>
+                </div>
+                <OrderItemsTable
+                    items={items}
+                    isLoading={isLoadingItems}
+                    onEdit={handleOpenEditItem}
+                    onDelete={(item) => setItemToDelete(item)}
+                />
+            </div>
+
+            {error && (
+                <AppAlert
+                    type="danger"
+                    header="Error"
+                    content={error}
+                    onClose={() => setError(null)}
+                />
+            )}
+
+            {showDeleteAlert && (
+                <AppAlert
+                    type="danger"
+                    header="¿Eliminar pedido?"
+                    content={`Esta acción eliminará el pedido ${order.short_id}.`}
+                    confirmLabel="Sí, eliminar"
+                    onConfirm={confirmDelete}
+                    onClose={() => setShowDeleteAlert(false)}
+                />
+            )}
+
+            {itemsError && (
+                <AppAlert
+                    type="warning"
+                    header="Atención"
+                    content={itemsError}
+                    onClose={() => setItemsError(null)}
+                />
+            )}
+
+            <OrderItemModal
+                isOpen={isItemModalOpen}
+                onClose={() => setIsItemModalOpen(false)}
+                onSubmit={handleSubmitItem}
+                isSubmitting={isSubmittingItem}
+                item={itemToEdit}
+                statusOptions={statusOptions}
+                orderId={order?.id}
+            />
+
+            {itemToDelete && (
+                <AppAlert
+                    type="danger"
+                    header="¿Eliminar item del pedido?"
+                    content={`Se eliminará el item ${itemToDelete.variant_sku || `#${itemToDelete.id}`}.`}
+                    confirmLabel="Sí, eliminar item"
+                    onConfirm={handleConfirmDeleteItem}
+                    onClose={() => setItemToDelete(null)}
+                />
+            )}
+        </div>
+    );
+};
+
+export default OrderDetailPage;

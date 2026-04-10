@@ -1,12 +1,5 @@
 import React from 'react';
 
-const BUTTON_VARIANTS = {
-    dark: 'btn btn-dark fw-semibold text-white',
-    primary: 'btn btn-primary fw-semibold text-white',
-    secondary: 'btn btn-secondary fw-semibold text-white',
-    light: 'btn btn-outline-light fw-semibold text-white',
-};
-
 const PageHeader = ({
     title,
     subtitle,
@@ -16,42 +9,83 @@ const PageHeader = ({
     actionLabel,
     actionIcon: ActionIcon,
     actionVariant,
-    isDark = false,
     onAction,
     className = '',
 }) => {
-    // When in dark mode, default to 'light' variant for contrast; otherwise default to 'dark'
-    const effectiveVariant = actionVariant ?? (isDark ? 'light' : 'dark');
-    const buttonClass = BUTTON_VARIANTS[effectiveVariant] ?? BUTTON_VARIANTS.dark;
-    
     return (
-        <div className={`bg-body border rounded-4 shadow-sm p-3 p-md-4 mb-4 ${className} ${isDark ? 'bg-dark text-white' : ''}`}>
-            <div className="d-flex align-items-start flex-wrap gap-3 justify-content-between">
-                <div className="d-flex align-items-center gap-3">
-                    {Icon && (
-                        <div className={`rounded-3 ${isDark ? 'bg-white' : 'bg-dark'} ${isDark ? 'text-dark' : 'text-white'} d-flex align-items-center justify-content-center`} style={{ width: 48, height: 48 }}>
-                            <Icon size={22} />
-                        </div>
-                    )}
-                    <div>
-                        <h2 className={`fw-bold mb-1 ${isDark ? 'text-white' : ''}`}>{title}</h2>
-                        {subtitle && <small className={`${isDark ? 'text-white-50' : 'text-muted'}`}>{subtitle}</small>}
+        <div
+            className={`mb-4 ${className}`}
+            style={{
+                background: 'var(--bs-secondary-bg)',
+                border: '1px solid var(--bs-border-color)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '20px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '16px',
+                flexWrap: 'wrap',
+            }}
+        >
+            {/* Left: icon + title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                {Icon && (
+                    <div
+                        style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: 'var(--radius-md)',
+                            background: 'rgba(var(--bs-primary-rgb), 0.14)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Icon size={20} style={{ color: 'var(--bs-primary)' }} />
                     </div>
-                </div>
-                <div className="d-flex align-items-center gap-2 flex-wrap ms-auto">
-                    {helper}
-                    {actions}
-                    {actionLabel && (
-                        <button
-                            type="button"
-                            className={`${buttonClass} d-flex align-items-center gap-2 shadow-sm`}
-                            onClick={onAction}
+                )}
+                <div>
+                    <h2
+                        style={{
+                            margin: 0,
+                            fontSize: '1.15rem',
+                            fontWeight: 700,
+                            lineHeight: 1.2,
+                            color: 'var(--bs-body-color)',
+                        }}
+                    >
+                        {title}
+                    </h2>
+                    {subtitle && (
+                        <p
+                            style={{
+                                margin: '3px 0 0',
+                                fontSize: '12px',
+                                color: 'var(--bs-secondary-color)',
+                                fontFamily: 'var(--font-mono)',
+                            }}
                         >
-                            {ActionIcon && <ActionIcon size={16} />}
-                            {actionLabel}
-                        </button>
+                            {subtitle}
+                        </p>
                     )}
                 </div>
+            </div>
+
+            {/* Right: helper + actions */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginLeft: 'auto' }}>
+                {helper}
+                {actions}
+                {actionLabel && (
+                    <button
+                        type="button"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
+                        onClick={onAction}
+                    >
+                        {ActionIcon && <ActionIcon size={15} />}
+                        {actionLabel}
+                    </button>
+                )}
             </div>
         </div>
     );

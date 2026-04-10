@@ -6,6 +6,7 @@ const DEFAULT_FORM = {
     phone: '',
     email: '',
     address: '',
+    customer_type: 'RETAIL',
 };
 
 export const CustomerModal = ({ customer, onSave, onClose }) => {
@@ -20,6 +21,7 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
                 phone: customer.phone,
                 email: customer.email || '',
                 address: customer.address || '',
+                customer_type: customer.customer_type || 'RETAIL',
             });
         } else {
             setForm(DEFAULT_FORM);
@@ -49,6 +51,7 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
                 phone: form.phone.trim(),
                 email: form.email.trim() || null,
                 address: form.address.trim() || null,
+                customer_type: form.customer_type,
             },
             customer?.id
         );
@@ -57,7 +60,7 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar cliente' : 'Nuevo cliente'}
-            tone="dark"
+            tone="dark" accent="var(--bs-success)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear cliente'}
@@ -104,6 +107,18 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
                     value={form.address}
                     onChange={handleChange}
                 />
+            </div>
+            <div className="mb-3 mt-3">
+                <label className="form-label">Tipo de cliente *</label>
+                <select
+                    className="form-select"
+                    name="customer_type"
+                    value={form.customer_type}
+                    onChange={handleChange}
+                >
+                    <option value="RETAIL">Minorista</option>
+                    <option value="WHOLESALE">Mayorista</option>
+                </select>
             </div>
         </AppModal>
     );

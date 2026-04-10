@@ -6,9 +6,14 @@ from core.mixins import PaginationMixin
 from orders.payment_method.serializers.serializers import (
     PaymentMethodSerializer,
     PaymentMethodStatusSerializer,
+    PaymentMethodWriteSerializer,
 )
 from orders.payment_method.services.services import PaymentMethodService
-from orders.payment_method.exceptions import PaymentMethodNotFound
+from orders.payment_method.exceptions import (
+    PaymentMethodAlreadyExists,
+    PaymentMethodInUse,
+    PaymentMethodNotFound,
+)
 from users.permissions import HasRole
 
 
@@ -42,33 +47,40 @@ class PaymentMethodViewSet(viewsets.ViewSet, PaginationMixin):
         return Response(serializer.data)
 
     def create(self, request):
-        return Response(
-            {'error': 'La creación de métodos de pago está deshabilitada.'},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
+        serializer = PaymentMethodWriteSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            method = self.service.create_method(**serializer.validated_data)
+        except (ValueError, PaymentMethodAlreadyExists) as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(PaymentMethodSerializer(method).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
-        return Response(
-            {'error': 'Utiliza PATCH para actualizar el estado.'},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
-
-    def partial_update(self, request, pk=None):
-        serializer = PaymentMethodStatusSerializer(data=request.data)
+        serializer = PaymentMethodWriteSerializer(data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         try:
             method_id = self._parse_pk(pk)
-            method = self.service.set_active_state(method_id, serializer.validated_data['is_active'])
+            method = self.service.update_method(method_id, **serializer.validated_data)
         except PaymentMethodNotFound as exc:
             return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+        except (ValueError, PaymentMethodAlreadyExists) as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(PaymentMethodSerializer(method).data)
 
+    def partial_update(self, request, pk=None):
+        return self.update(request, pk)
+
     def destroy(self, request, pk=None):
-        return Response(
-            {'error': 'No se permite eliminar métodos de pago.'},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
+        try:
+            method_id = self._parse_pk(pk)
+            self.service.delete_method(method_id)
+        except PaymentMethodNotFound as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+        except (ValueError, PaymentMethodInUse) as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @staticmethod
     def _parse_pk(pk) -> int:

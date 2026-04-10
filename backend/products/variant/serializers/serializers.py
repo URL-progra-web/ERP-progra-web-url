@@ -1,12 +1,19 @@
 from rest_framework import serializers
+from inventory.transaction.services.stock_service import InventoryStockService
 from products.variant.models.models import ProductVariant
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
+    entrepreneur = serializers.IntegerField(source='product.entrepreneur_id', read_only=True)
+    entrepreneur_name = serializers.CharField(source='product.entrepreneur.company_name', read_only=True)
+    business_unit = serializers.IntegerField(source='product.business_unit_id', read_only=True)
+    business_unit_name = serializers.CharField(source='product.business_unit.name', read_only=True)
     size_name = serializers.CharField(source='size.name', read_only=True)
     color_name = serializers.CharField(source='color.name', read_only=True)
-    uom_name = serializers.CharField(source='uom.name', read_only=True)
+    base_uom = serializers.IntegerField(source='product.base_uom_id', read_only=True)
+    base_uom_name = serializers.CharField(source='product.base_uom.name', read_only=True)
+    quantity_available = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField(read_only=True)
     remove_image = serializers.BooleanField(write_only=True, required=False, default=False)
 
@@ -16,13 +23,17 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             'id',
             'product',
             'product_name',
+            'entrepreneur',
+            'entrepreneur_name',
+            'business_unit',
+            'business_unit_name',
             'sku',
             'size',
             'size_name',
             'color',
             'color_name',
-            'uom',
-            'uom_name',
+            'base_uom',
+            'base_uom_name',
             'cost',
             'price',
             'quantity_available',
@@ -59,38 +70,13 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El precio no puede ser negativo.")
         return value
 
-    def validate_quantity_available(self, value):
-        if value < 0:
-            raise serializers.ValidationError("La cantidad disponible no puede ser negativa.")
-        return value
-
     def validate(self, attrs):
         cost = attrs.get('cost')
         price = attrs.get('price')
-        product = attrs.get('product', getattr(self.instance, 'product', None))
-        size = attrs.get('size', getattr(self.instance, 'size', None))
-        color = attrs.get('color', getattr(self.instance, 'color', None))
 
         if cost is not None and price is not None and price < cost:
             raise serializers.ValidationError({
                 'price': 'El precio no puede ser menor que el costo.'
-            })
-
-        if product is None:
-            return attrs
-
-        duplicate = ProductVariant.objects.filter(
-            product=product,
-            size=size,
-            color=color,
-        )
-
-        if self.instance:
-            duplicate = duplicate.exclude(pk=self.instance.pk)
-
-        if duplicate.exists():
-            raise serializers.ValidationError({
-                'size': 'Ya existe una variante con esta combinación de producto, talla y color.'
             })
 
         return attrs
@@ -106,3 +92,9 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             instance.image.delete(save=False)
 
         return super().update(instance, validated_data)
+
+    def get_quantity_available(self, obj):
+        annotated = getattr(obj, 'stock_available', None)
+        if annotated is not None:
+            return annotated
+        return InventoryStockService.get_variant_stock(obj.id)

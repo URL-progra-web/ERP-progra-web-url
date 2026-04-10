@@ -1,13 +1,14 @@
 import React from 'react';
 import { FiBox, FiGrid, FiPackage, FiDroplet } from 'react-icons/fi';
-import UomsPage from './uoms/UomsPage';
-import CategoriesPage from './categories/pages/CategoriesPage';
-import ProductsPage from './products/pages/ProductsPage';
-import ColorsPage from './colors/pages/ColorsPage';
-import SizesPage from './sizes/pages/SizesPage';
 import { FiTag } from 'react-icons/fi';
-import VariantsPage from './variants/pages/VariantsPage';
 import { FiLayers } from 'react-icons/fi';
+
+const UomsPage = React.lazy(() => import('./uoms/UomsPage'));
+const CategoriesPage = React.lazy(() => import('./categories/pages/CategoriesPage'));
+const ProductsPage = React.lazy(() => import('./products/pages/ProductsPage'));
+const ColorsPage = React.lazy(() => import('./colors/pages/ColorsPage'));
+const SizesPage = React.lazy(() => import('./sizes/pages/SizesPage'));
+const VariantsPage = React.lazy(() => import('./variants/pages/VariantsPage'));
 
 export const productsFeature = {
     id: 'products',

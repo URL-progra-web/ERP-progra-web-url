@@ -42,7 +42,7 @@ export const OrderStatusModal = ({ statusRecord, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar Estado' : 'Nuevo Estado'}
-            tone="dark"
+            tone="dark" accent="var(--bs-orange)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar' : 'Crear estado'}

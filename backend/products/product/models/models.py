@@ -1,12 +1,14 @@
 from django.db import models
 from crm.entrepreneur.models.models import Entrepreneur
 from inventory.business_unit.models.models import BusinessUnit
+from inventory.uom.models.models import UoM
 from products.category.models.models import Category
 
 class Product(models.Model):
     entrepreneur = models.ForeignKey(Entrepreneur, on_delete=models.RESTRICT)
     business_unit = models.ForeignKey(BusinessUnit, on_delete=models.RESTRICT)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    base_uom = models.ForeignKey(UoM, on_delete=models.RESTRICT)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='products/', null=True, blank=True)

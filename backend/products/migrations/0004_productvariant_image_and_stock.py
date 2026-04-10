@@ -4,15 +4,10 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0003_size_created_at'),
+        ('products', '0002_move_uom_to_product'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='productvariant',
-            name='quantity_available',
-            field=models.PositiveIntegerField(default=0),
-        ),
         migrations.AddField(
             model_name='productvariant',
             name='image',

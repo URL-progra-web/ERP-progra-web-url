@@ -13,8 +13,18 @@ export const paymentMethodsService = {
         return response.data;
     },
 
+    async create(payload) {
+        const response = await api.post(BASE_URL, payload);
+        return response.data;
+    },
+
     async updateState(id, payload) {
         const response = await api.patch(`${BASE_URL}${id}/`, payload);
+        return response.data;
+    },
+
+    async delete(id) {
+        const response = await api.delete(`${BASE_URL}${id}/`);
         return response.data;
     },
 };

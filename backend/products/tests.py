@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -9,6 +10,8 @@ from django.test.utils import override_settings
 from crm.entrepreneur.models.models import Entrepreneur
 from inventory.business_unit.models.models import BusinessUnit
 from inventory.uom.models.models import UoM
+from inventory.transaction_type.models.models import TransactionType
+from inventory.transaction.models.models import InventoryTransaction
 from products.product.models.models import Product
 from products.product.serializers.serializers import ProductSerializer
 from products.size.models.models import Size
@@ -46,86 +49,27 @@ class ProductVariantSerializerTests(ProductSerializerBaseTestCase):
     def setUp(self):
         super().setUp()
         self.uom = UoM.objects.create(code='und', name='Unidad')
+        self.inbound_type, _ = TransactionType.objects.get_or_create(
+            name='Entrada',
+            defaults={'factor': 1},
+        )
         self.product = Product.objects.create(
             entrepreneur=self.entrepreneur,
             business_unit=self.business_unit,
+            base_uom=self.uom,
             name='Camisa Polo',
         )
         self.size_s = Size.objects.create(name='S')
         self.size_m = Size.objects.create(name='M')
-        self.size_l = Size.objects.create(name='L')
         self.color_blue = Color.objects.create(name='Azul')
-
-    def test_keeps_stock_independent_for_each_size(self):
-        serializer_s = ProductVariantSerializer(data={
-            'product': self.product.id,
-            'sku': 'POLO-S',
-            'size': self.size_s.id,
-            'color': self.color_blue.id,
-            'uom': self.uom.id,
-            'cost': '50.00',
-            'price': '75.00',
-            'quantity_available': 4,
-            'is_active': True,
-        })
-        self.assertTrue(serializer_s.is_valid(), serializer_s.errors)
-        variant_s = serializer_s.save()
-
-        serializer_l = ProductVariantSerializer(data={
-            'product': self.product.id,
-            'sku': 'POLO-L',
-            'size': self.size_l.id,
-            'color': self.color_blue.id,
-            'uom': self.uom.id,
-            'cost': '50.00',
-            'price': '75.00',
-            'quantity_available': 7,
-            'is_active': True,
-        })
-        self.assertTrue(serializer_l.is_valid(), serializer_l.errors)
-        variant_l = serializer_l.save()
-
-        self.assertEqual(ProductVariant.objects.get(pk=variant_s.pk).quantity_available, 4)
-        self.assertEqual(ProductVariant.objects.get(pk=variant_l.pk).quantity_available, 7)
-
-    def test_rejects_duplicate_product_size_color_combination(self):
-        serializer = ProductVariantSerializer(data={
-            'product': self.product.id,
-            'sku': 'POLO-S-1',
-            'size': self.size_s.id,
-            'color': self.color_blue.id,
-            'uom': self.uom.id,
-            'cost': '50.00',
-            'price': '75.00',
-            'quantity_available': 4,
-            'is_active': True,
-        })
-        self.assertTrue(serializer.is_valid(), serializer.errors)
-        serializer.save()
-
-        duplicate = ProductVariantSerializer(data={
-            'product': self.product.id,
-            'sku': 'POLO-S-2',
-            'size': self.size_s.id,
-            'color': self.color_blue.id,
-            'uom': self.uom.id,
-            'cost': '50.00',
-            'price': '75.00',
-            'quantity_available': 9,
-            'is_active': True,
-        })
-        self.assertFalse(duplicate.is_valid())
-        self.assertIn('size', duplicate.errors)
 
     def test_exposes_image_url_when_variant_has_image(self):
         serializer = ProductVariantSerializer(data={
             'product': self.product.id,
             'sku': 'POLO-IMG',
             'size': self.size_s.id,
-            'uom': self.uom.id,
             'cost': '50.00',
             'price': '75.00',
-            'quantity_available': 3,
             'image': self.make_image('variant.gif'),
             'is_active': True,
         })
@@ -135,15 +79,40 @@ class ProductVariantSerializerTests(ProductSerializerBaseTestCase):
         response_data = ProductVariantSerializer(instance=variant).data
         self.assertIn('/media/product_variants/', response_data['image_url'])
 
+    def test_reports_stock_with_image_fields_present(self):
+        serializer = ProductVariantSerializer(data={
+            'product': self.product.id,
+            'sku': 'POLO-STOCK',
+            'size': self.size_s.id,
+            'color': self.color_blue.id,
+            'cost': '50.00',
+            'price': '75.00',
+            'image': self.make_image('variant-stock.gif'),
+            'is_active': True,
+        })
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        variant = serializer.save()
+
+        InventoryTransaction.objects.create(
+            variant=variant,
+            transaction_type=self.inbound_type,
+            selected_uom=self.uom,
+            base_uom=self.uom,
+            quantity='4.0000',
+            conversion_multiplier='1.0000',
+            base_quantity='4.0000',
+        )
+
+        response_data = ProductVariantSerializer(instance=variant).data
+        self.assertEqual(response_data['quantity_available'], Decimal('4.0000'))
+
     def test_can_replace_and_remove_variant_image(self):
         serializer = ProductVariantSerializer(data={
             'product': self.product.id,
             'sku': 'POLO-IMG-EDIT',
             'size': self.size_m.id,
-            'uom': self.uom.id,
             'cost': '40.00',
             'price': '60.00',
-            'quantity_available': 2,
             'image': self.make_image('variant-original.gif'),
             'is_active': True,
         })
@@ -177,12 +146,17 @@ class ProductVariantSerializerTests(ProductSerializerBaseTestCase):
 
 
 class ProductSerializerTests(ProductSerializerBaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.uom = UoM.objects.create(code='kg', name='Kilogramo')
+
     def test_exposes_image_url_when_product_has_image(self):
         serializer = ProductSerializer(data={
             'name': 'Cafe Molido',
             'description': 'Paquete de 500g',
             'entrepreneur': self.entrepreneur.id,
             'business_unit': self.business_unit.id,
+            'base_uom': self.uom.id,
             'image': self.make_image('product.gif'),
         })
         self.assertTrue(serializer.is_valid(), serializer.errors)
@@ -196,6 +170,7 @@ class ProductSerializerTests(ProductSerializerBaseTestCase):
             'name': 'Cafe en grano',
             'entrepreneur': self.entrepreneur.id,
             'business_unit': self.business_unit.id,
+            'base_uom': self.uom.id,
             'image': self.make_image('product-remove.gif'),
         })
         self.assertTrue(serializer.is_valid(), serializer.errors)

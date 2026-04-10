@@ -1,7 +1,8 @@
 import React from 'react';
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
-export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
+export const CustomersTable = ({ customers, isLoading, onEdit, onDelete, onCreateOrder }) => {
     if (isLoading) {
         return (
             <div className="text-center py-5">
@@ -21,6 +22,7 @@ export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
                     <tr>
                         <th className="border-0 px-4">Cliente</th>
                         <th className="border-0">Contacto</th>
+                        <th className="border-0">Tipo</th>
                         <th className="border-0">Creado</th>
                         <th className="border-0 text-end px-4">Acciones</th>
                     </tr>
@@ -37,19 +39,21 @@ export const CustomersTable = ({ customers, isLoading, onEdit, onDelete }) => {
                                 <div className="text-muted small">{customer.email || '—'}</div>
                             </td>
                             <td>
+                                <span className={`badge ${customer.customer_type === 'WHOLESALE' ? 'bg-warning-subtle text-warning-emphasis' : 'bg-info-subtle text-info-emphasis'}`}>
+                                    {customer.customer_type === 'WHOLESALE' ? 'Mayorista' : 'Minorista'}
+                                </span>
+                            </td>
+                            <td>
                                 <span className="badge bg-primary-subtle text-primary-emphasis">
                                     {new Date(customer.created_at).toLocaleDateString()}
                                 </span>
                             </td>
                             <td className="text-end px-4">
-                                <div className="btn-group btn-group-sm">
-                                    <button className="btn btn-outline-primary" onClick={() => onEdit(customer)}>
-                                        <FiEdit2 />
-                                    </button>
-                                    <button className="btn btn-outline-danger" onClick={() => onDelete(customer)}>
-                                        <FiTrash2 />
-                                    </button>
-                                </div>
+                                <TableActions actions={[
+                                    ...(onCreateOrder ? [{ icon: FiShoppingCart, onClick: () => onCreateOrder(customer), title: 'Nuevo pedido', variant: 'success' }] : []),
+                                    { icon: FiEdit2,  onClick: () => onEdit(customer),   title: 'Editar',   variant: 'primary' },
+                                    { icon: FiTrash2, onClick: () => onDelete(customer), title: 'Eliminar', variant: 'danger'  },
+                                ]} />
                             </td>
                         </tr>
                     ))}

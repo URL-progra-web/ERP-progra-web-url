@@ -5,6 +5,7 @@ import UsersFilters from '../components/UsersFilters';
 import UsersTable from '../components/UsersTable';
 import UserModal from '../components/UserModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
 
@@ -53,58 +54,54 @@ const UsersList = () => {
                 actionLabel="Nuevo Usuario"
                 actionIcon={FiPlus}
                 onAction={() => handleOpenModal()}
-                isDark
             />
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Filtros</h6>
-                </div>
-                <div className="p-3 p-md-4 border-bottom">
-                    <UsersFilters
-                        searchInput={searchInput}
-                        onSearchChange={setSearchInput}
-                        roleFilter={roleFilter}
-                        onRoleChange={setRoleFilter}
-                        statusFilter={statusFilter}
-                        onStatusChange={setStatusFilter}
-                        roles={roles}
-                    />
-                </div>
-
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Listado</h6>
-                </div>
-                <div className="table-responsive bg-body">
-                    <table className="table table-hover mb-0 align-middle">
-                        <thead className="text-uppercase text-muted small">
-                            <tr>
-                                <th className="border-0 px-4 py-3">Nombre</th>
-                                <th className="border-0 py-3">Email</th>
-                                <th className="border-0 py-3">Rol</th>
-                                <th className="border-0 py-3">Estado</th>
-                                <th className="border-0 px-4 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <UsersTable
-                            users={users}
-                            isLoading={isLoading}
-                            onEdit={handleOpenModal}
-                            onToggleStatus={handleConfirmToggle}
+            <AppCard accent="var(--bs-info)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <UsersFilters
+                            searchInput={searchInput}
+                            onSearchChange={setSearchInput}
+                            roleFilter={roleFilter}
+                            onRoleChange={setRoleFilter}
+                            statusFilter={statusFilter}
+                            onStatusChange={setStatusFilter}
+                            roles={roles}
                         />
-                    </table>
-                </div>
+                    </div>
+                </AppCard.Section>
 
-                <AppPagination
-                    page={page}
-                    numPages={numPages}
-                    count={count}
-                    onPageChange={setPage}
-                    isDark
-                />
-            </div>
+                <AppCard.Section label="Listado">
+                    <div className="table-responsive bg-body">
+                        <table className="table table-hover mb-0 align-middle">
+                            <thead className="text-uppercase text-muted small">
+                                <tr>
+                                    <th className="border-0 px-4 py-3">Nombre</th>
+                                    <th className="border-0 py-3">Email</th>
+                                    <th className="border-0 py-3">Rol</th>
+                                    <th className="border-0 py-3">Estado</th>
+                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <UsersTable
+                                users={users}
+                                isLoading={isLoading}
+                                onEdit={handleOpenModal}
+                                onToggleStatus={handleConfirmToggle}
+                            />
+                        </table>
+                    </div>
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
+                </AppCard.Section>
+            </AppCard>
 
             {/* Create/Edit Modal */}
             {isModalOpen && (

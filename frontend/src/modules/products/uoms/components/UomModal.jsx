@@ -24,7 +24,7 @@ export function UomModal({ uom, onClose, onSave }) {
     return (
         <AppModal
             title={uom ? 'Editar Unidad de Medida' : 'Nueva Unidad de Medida'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={saving ? 'Guardando...' : (uom ? 'Guardar cambios' : 'Crear UOM')}

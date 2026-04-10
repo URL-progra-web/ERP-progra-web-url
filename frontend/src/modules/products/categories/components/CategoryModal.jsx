@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
+import CategoryCascadeSelector from './CategoryCascadeSelector';
 
 const CategoryModal = ({ category, categories, onClose, onSave }) => {
     const isEditing = !!category;
@@ -61,12 +62,10 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
         }
     };
 
-    const parentOptions = categories.filter(c => !isEditing || c.id !== category?.id);
-
     return (
         <AppModal
             title={isEditing ? 'Editar Categoría' : 'Nueva Categoría'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Guardar'}
@@ -90,17 +89,13 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
 
                 <div className="mb-3">
                     <label className="form-label fw-semibold">Pertenece a</label>
-                    <select
-                        name="parent"
-                        className="form-select"
+                    <CategoryCascadeSelector
+                        categories={categories}
                         value={formData.parent}
-                        onChange={handleChange}
-                    >
-                        <option value="">Ninguna (es una categoría principal)</option>
-                        {parentOptions.map(c => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                    </select>
+                        onChange={(newParentId) => setFormData(prev => ({ ...prev, parent: newParentId }))}
+                        disabled={isSubmitting}
+                        excludeIds={category?.id ? [category.id] : []}
+                    />
                     <div className="form-text">
                         Si esta categoría es parte de otra, selecciónala aquí.
                         Ej: "Cítricos" pertenece a "Frutas".

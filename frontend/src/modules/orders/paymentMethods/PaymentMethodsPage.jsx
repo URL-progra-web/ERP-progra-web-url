@@ -1,8 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { FiCreditCard, FiFilter } from 'react-icons/fi';
+import { FiCreditCard, FiPlus } from 'react-icons/fi';
 import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { PaymentMethodsTable } from './components/PaymentMethodsTable';
+import { PaymentMethodModal } from './components/PaymentMethodModal';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
+import AppPagination from '~/core/components/AppPagination';
+import FilterTabs from '~/core/components/FilterTabs';
 import PageHeader from '~/core/components/PageHeader';
 
 const STATUS_FILTERS = [
@@ -26,9 +30,49 @@ const PaymentMethodsPage = () => {
         error,
         setError,
         toggleActive,
+        savePaymentMethod,
+        deletePaymentMethod,
     } = usePaymentMethods();
 
     const [alertConfig, setAlertConfig] = useState(null);
+    const [modalRecord, setModalRecord] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = (record = null) => {
+        setModalRecord(record);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalRecord(null);
+        setIsModalOpen(false);
+    };
+
+    const handleSave = async (payload, id) => {
+        try {
+            await savePaymentMethod(payload, id);
+            handleCloseModal();
+        } catch (err) {
+            const message = err?.response?.data?.error || 'No se pudo guardar el método.';
+            setError(message);
+        }
+    };
+
+    const handleDelete = (record) => {
+        setAlertConfig({
+            type: 'danger',
+            header: 'Eliminar método',
+            content: `¿Eliminar "${record.name}"? Esta acción no se puede deshacer.`,
+            confirmLabel: 'Eliminar',
+            onConfirm: async () => {
+                const errMsg = await deletePaymentMethod(record.id);
+                if (errMsg) {
+                    setError(errMsg);
+                }
+                setAlertConfig(null);
+            },
+        });
+    };
 
     const pageSummary = useMemo(() => {
         const active = records.filter((r) => r.is_active).length;
@@ -56,80 +100,67 @@ const PaymentMethodsPage = () => {
                 title="Métodos de Pago"
                 subtitle={`${count} registro(s) total · ${pageSummary}`}
                 icon={FiCreditCard}
-                helper={(
-                    <div className="alert alert-info mb-0 py-2 px-3 shadow-sm">
-                        Los métodos disponibles están predefinidos. Solo puedes activar o desactivar su uso.
-                    </div>
-                )}
-                isDark
+                actionLabel="Nuevo Método"
+                actionIcon={FiPlus}
+                onAction={() => handleOpenModal()}
             />
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Filtros</h6>
-                </div>
-                <div className="p-3 p-md-4 border-bottom">
-                    <div className="row g-3 align-items-end">
-                        <div className="col-md-5">
-                            <label className="form-label text-muted small mb-1">Buscar</label>
-                            <input
-                                type="search"
-                                className="form-control"
-                                placeholder="Nombre del método"
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setPage(1);
-                                }}
-                            />
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label text-muted small mb-1">Estado</label>
-                            <div className="btn-group w-100" role="group">
-                                {STATUS_FILTERS.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        type="button"
-                                        className={`btn btn-outline-secondary ${statusFilter === option.value ? 'active' : ''}`}
-                                        onClick={() => {
-                                            setStatusFilter(option.value);
-                                            setPage(1);
-                                        }}
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
+            <AppCard accent="var(--bs-orange)">
+                <AppCard.Section label="Filtros">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <div className="row g-3 align-items-end">
+                            <div className="col-md-5">
+                                <label className="form-label text-muted small mb-1">Buscar</label>
+                                <input
+                                    type="search"
+                                    className="form-control"
+                                    placeholder="Nombre del método"
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setPage(1);
+                                    }}
+                                />
+                            </div>
+                            <div className="col-md-4">
+                                <label className="form-label text-muted small mb-1">Estado</label>
+                                <div>
+                                    <FilterTabs
+                                        options={STATUS_FILTERS}
+                                        value={statusFilter}
+                                        onChange={(val) => { setStatusFilter(val); setPage(1); }}
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div className="col-md-3 text-md-end">
-                            <span className="badge rounded-pill bg-primary-subtle text-primary-emphasis">
-                                <FiFilter className="me-1" /> Página {page} / {numPages}
-                            </span>
-                        </div>
                     </div>
-                </div>
+                </AppCard.Section>
 
-                <div className="bg-dark text-white px-4 py-3 border-bottom">
-                    <h6 className="mb-0 text-uppercase">Listado</h6>
-                </div>
-                <PaymentMethodsTable
-                    records={records}
-                    isLoading={isLoading}
-                    onToggle={handleToggle}
+                <AppCard.Section label="Listado">
+                    <PaymentMethodsTable
+                        records={records}
+                        isLoading={isLoading}
+                        onToggle={handleToggle}
+                        onEdit={handleOpenModal}
+                        onDelete={handleDelete}
+                    />
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
+                </AppCard.Section>
+            </AppCard>
+
+            {isModalOpen && (
+                <PaymentMethodModal
+                    method={modalRecord}
+                    onSave={handleSave}
+                    onClose={handleCloseModal}
                 />
-
-                <div className="bg-dark text-white px-4 py-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-3">
-                    <small className="text-white-50">Mostrando {records.length} de {count} registros</small>
-                    <div className="btn-group">
-                        <button className="btn btn-outline-light" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                            Anterior
-                        </button>
-                        <button className="btn btn-outline-light" disabled={page >= numPages} onClick={() => setPage(page + 1)}>
-                            Siguiente
-                        </button>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {alertConfig && (
                 <AppAlert

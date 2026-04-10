@@ -1,26 +1,67 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiShieldOff } from 'react-icons/fi';
+import { FiShieldOff, FiArrowLeft } from 'react-icons/fi';
 
-const ForbiddenPage = () => {
-    return (
-        <div className="d-flex flex-column justify-content-center align-items-center vh-100 text-center bg-light p-4">
-            <div className="bg-white p-5 rounded shadow-sm border" style={{ maxWidth: '500px' }}>
-                <div className="mb-4">
-                    <FiShieldOff size={80} className="text-danger opacity-75" />
-                </div>
-                <h1 className="display-4 font-weight-bold text-dark mb-2">403</h1>
-                <h3 className="text-secondary mb-4">Acceso Denegado</h3>
-                <p className="text-muted mb-4">
-                    Lo sentimos, pero no tienes los permisos necesarios para acceder a esta sección del sistema. 
-                    Si crees que esto es un error, contacta con tu administrador.
-                </p>
-                <Link to="/" className="btn btn-primary btn-lg px-5 font-weight-bold shadow-sm">
-                    Ir al Inicio
-                </Link>
-            </div>
+const ForbiddenPage = () => (
+    <div
+        className="page-enter"
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '70vh',
+            textAlign: 'center',
+            gap: '16px',
+        }}
+    >
+        <div
+            style={{
+                width: 72, height: 72,
+                borderRadius: 'var(--radius-lg)',
+                background: 'rgba(239,68,68,0.1)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+        >
+            <FiShieldOff size={32} style={{ color: '#ef4444' }} />
         </div>
-    );
-};
+
+        <div>
+            <h1 style={{
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 500,
+                fontSize: '3.5rem',
+                color: 'var(--bs-border-color)',
+                margin: '0 0 4px',
+                letterSpacing: '-0.04em',
+            }}>
+                403
+            </h1>
+            <h3 style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                margin: '0 0 8px',
+                color: 'var(--bs-body-color)',
+            }}>
+                Acceso denegado
+            </h3>
+            <p style={{
+                margin: 0,
+                color: 'var(--bs-secondary-color)',
+                fontSize: '14px',
+                maxWidth: 360,
+                lineHeight: 1.6,
+            }}>
+                No tienes permisos para acceder a esta sección. Contacta con tu administrador si crees que es un error.
+            </p>
+        </div>
+
+        <Link to="/" className="btn btn-primary d-flex align-items-center gap-2 mt-2">
+            <FiArrowLeft size={16} />
+            Ir al inicio
+        </Link>
+    </div>
+);
 
 export default ForbiddenPage;

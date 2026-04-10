@@ -1,12 +1,17 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
 
-const SizesFilters = ({ searchInput, onSearchChange }) => {
+const SizesFilters = ({ searchInput, onSearchChange, onSearch }) => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSearch();
+    };
+
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-md-6">
-                    <div className="input-group">
+                <div className="col-md">
+                    <form onSubmit={handleSubmit} className="input-group">
                         <span className="input-group-text bg-body border-end-0 text-muted">
                             <FiSearch size={14} />
                         </span>
@@ -17,7 +22,13 @@ const SizesFilters = ({ searchInput, onSearchChange }) => {
                             value={searchInput}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
-                    </div>
+                        <button 
+                            className="btn btn-primary" 
+                            type="submit"
+                        >
+                            Buscar
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
