@@ -1,0 +1,1 @@
+from receipts.receipt.models.models import Receipt
