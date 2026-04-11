@@ -20,9 +20,34 @@ const SummaryCard = ({ label, value, sub }) => (
     </div>
 );
 
+const TIME_RANGES = [
+    { value: 'semanal', label: 'Semanal' },
+    { value: 'mensual', label: 'Mensual' },
+    { value: 'trimestral', label: 'Trimestral' },
+    { value: 'semestral', label: 'Semestral' },
+    { value: 'anual', label: 'Anual' },
+];
+
+const toDateStr = (d) => d.toISOString().split('T')[0];
+
+const calcStartDate = (range, refDate) => {
+    const ref = refDate ? new Date(refDate + 'T00:00:00') : new Date();
+    const start = new Date(ref);
+    switch (range) {
+        case 'semanal':    start.setDate(start.getDate() - 6); break;
+        case 'mensual':    start.setMonth(start.getMonth() - 1); break;
+        case 'trimestral': start.setMonth(start.getMonth() - 3); break;
+        case 'semestral':  start.setMonth(start.getMonth() - 6); break;
+        case 'anual':      start.setFullYear(start.getFullYear() - 1); break;
+        default: return null;
+    }
+    return toDateStr(start);
+};
+
 const BillingReportsPage = () => {
     const [dateAfter, setDateAfter] = useState('');
     const [dateBefore, setDateBefore] = useState('');
+    const [timeRange, setTimeRange] = useState('');
     const [userId, setUserId] = useState('');
     const [entrepreneurId, setEntrepreneurId] = useState('');
     const [users, setUsers] = useState([]);
@@ -36,6 +61,28 @@ const BillingReportsPage = () => {
             .then(data => setEntrepreneurs(data.results ?? data))
             .catch(() => {});
     }, []);
+
+    const handleTimeRangeChange = (range) => {
+        const next = range === timeRange ? '' : range;
+        setTimeRange(next);
+        if (next) {
+            const ref = dateBefore || toDateStr(new Date());
+            setDateBefore(ref);
+            setDateAfter(calcStartDate(next, ref));
+        }
+    };
+
+    const handleDateBeforeChange = (val) => {
+        setDateBefore(val);
+        if (timeRange && val) {
+            setDateAfter(calcStartDate(timeRange, val));
+        }
+    };
+
+    const handleDateAfterChange = (val) => {
+        setDateAfter(val);
+        setTimeRange('');
+    };
 
     const filters = useMemo(() => ({
         date_after: dateAfter || undefined,
@@ -146,13 +193,28 @@ const BillingReportsPage = () => {
                     <div className="card-body py-3">
                         <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
                         <div className="row g-2">
+                            <div className="col-12">
+                                <label className="form-label small text-muted">Rango rápido</label>
+                                <div className="btn-group btn-group-sm d-flex flex-wrap gap-1" role="group">
+                                    {TIME_RANGES.map(({ value, label }) => (
+                                        <button
+                                            key={value}
+                                            type="button"
+                                            className={`btn ${timeRange === value ? 'btn-range-active' : 'btn-outline-secondary'}`}
+                                            onClick={() => handleTimeRangeChange(value)}
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <div className="col-md-2">
                                 <label className="form-label small text-muted">Desde</label>
                                 <input
                                     type="date"
                                     className="form-control form-control-sm"
                                     value={dateAfter}
-                                    onChange={(e) => setDateAfter(e.target.value)}
+                                    onChange={(e) => handleDateAfterChange(e.target.value)}
                                 />
                             </div>
                             <div className="col-md-2">
@@ -161,7 +223,7 @@ const BillingReportsPage = () => {
                                     type="date"
                                     className="form-control form-control-sm"
                                     value={dateBefore}
-                                    onChange={(e) => setDateBefore(e.target.value)}
+                                    onChange={(e) => handleDateBeforeChange(e.target.value)}
                                 />
                             </div>
                             <div className="col-md-3">
