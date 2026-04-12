@@ -73,6 +73,30 @@ export function useInventoryAdjustments() {
     return normalize(response);
   };
 
+  const fetchTransactionTypes = useCallback(async () => {
+    try {
+      const result = await inventoryService.getTransactionTypes();
+      setTransactionTypes(normalize(result));
+    } catch {
+      setError('Error al cargar tipos de transacción.');
+    }
+  }, []);
+
+  const createTransactionType = async (data) => {
+    await inventoryService.createTransactionType(data);
+    fetchTransactionTypes();
+  };
+
+  const updateTransactionType = async (name, data) => {
+    await inventoryService.updateTransactionType(name, data);
+    fetchTransactionTypes();
+  };
+
+  const deleteTransactionType = async (name) => {
+    await inventoryService.deleteTransactionType(name);
+    fetchTransactionTypes();
+  };
+
   return {
     products,
     categories,
@@ -86,5 +110,9 @@ export function useInventoryAdjustments() {
     setCategoryFilter,
     createAdjustment,
     getProductVariants,
+    fetchTransactionTypes,
+    createTransactionType,
+    updateTransactionType,
+    deleteTransactionType,
   };
 }
