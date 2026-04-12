@@ -103,6 +103,7 @@ export function useInventoryAdjustments() {
     transactionTypes,
     isLoading,
     error,
+    setError,
     searchInput,
     setSearchInput,
     handleSearch,
