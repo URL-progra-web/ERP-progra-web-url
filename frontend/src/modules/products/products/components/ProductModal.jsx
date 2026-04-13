@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
 
+const emptyForm = {
+    name: '',
+    description: '',
+    category: '',
+    entrepreneur: '',
+    business_unit: '',
+    base_uom: '',
+    image: null,
+    remove_image: false,
+};
+
 const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms, onClose, onSave }) => {
     const isEditing = !!product;
 
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        category: '',
-        entrepreneur: '',
-        business_unit: '',
-        base_uom: '',
-    });
+    const [formData, setFormData] = useState(emptyForm);
 
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState('');
 
     useEffect(() => {
         if (product) {
@@ -25,13 +30,61 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 entrepreneur: product.entrepreneur || '',
                 business_unit: product.business_unit || '',
                 base_uom: product.base_uom || '',
+                image: null,
+                remove_image: false,
             });
+            setPreviewUrl(product.image_url || '');
+            return;
         }
+
+        setFormData(emptyForm);
+        setPreviewUrl('');
     }, [product]);
 
+    useEffect(() => () => {
+        if (previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+        }
+    }, [previewUrl]);
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, files, type } = e.target;
+
+        if (type === 'file') {
+            const file = files?.[0] || null;
+            setFormData(prev => ({
+                ...prev,
+                image: file,
+                remove_image: false,
+            }));
+
+            setPreviewUrl((currentUrl) => {
+                if (currentUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(currentUrl);
+                }
+                return file ? URL.createObjectURL(file) : (product?.image_url || '');
+            });
+            return;
+        }
+
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleRemoveImageChange = (e) => {
+        const shouldRemove = e.target.checked;
+
+        setFormData(prev => ({
+            ...prev,
+            image: null,
+            remove_image: shouldRemove,
+        }));
+
+        setPreviewUrl((currentUrl) => {
+            if (currentUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(currentUrl);
+            }
+            return shouldRemove ? '' : (product?.image_url || '');
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -67,6 +120,8 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 entrepreneur: formData.entrepreneur,
                 business_unit: formData.business_unit,
                 base_uom: formData.base_uom,
+                image: formData.image,
+                remove_image: formData.remove_image,
             };
             await onSave(dataToSubmit);
         } catch (err) {
@@ -120,6 +175,47 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                         placeholder="Breve descripción del producto..."
                     />
                 </div>
+
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">Imagen del producto</label>
+                    <input
+                        type="file"
+                        name="image"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={handleChange}
+                    />
+                    <div className="form-text">
+                        Foto principal del producto. Las variantes pueden tener su propia imagen aparte.
+                    </div>
+                </div>
+
+                {previewUrl && (
+                    <div className="mb-3">
+                        <div className="small text-muted mb-2">Vista previa</div>
+                        <img
+                            src={previewUrl}
+                            alt="Vista previa del producto"
+                            className="rounded-3 border"
+                            style={{ width: '96px', height: '96px', objectFit: 'cover' }}
+                        />
+                    </div>
+                )}
+
+                {isEditing && product?.image_url && (
+                    <div className="form-check mb-3">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="removeProductImage"
+                            checked={formData.remove_image}
+                            onChange={handleRemoveImageChange}
+                        />
+                        <label className="form-check-label" htmlFor="removeProductImage">
+                            Quitar imagen actual
+                        </label>
+                    </div>
+                )}
 
                 <div className="mb-3">
                     <label className="form-label fw-semibold">Categoría</label>
