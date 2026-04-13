@@ -97,6 +97,7 @@ const OrderDetailPage = () => {
 
     const canMutateOrder = useMemo(() => (
         ['SOLICITADO', 'BORRADOR'].includes(String(order?.status_name || '').toUpperCase())
+        String(order?.status_name || '').toUpperCase() === 'SOLICITADO'
     ), [order?.status_name]);
 
     const handleChange = (e) => {
@@ -222,6 +223,7 @@ const OrderDetailPage = () => {
             {!canMutateOrder && (
                 <div className="alert alert-info" role="alert">
                     Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados fuera de SOLICITADO o BORRADOR.
+                    Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados.
                 </div>
             )}
 
@@ -234,6 +236,7 @@ const OrderDetailPage = () => {
                         onClick={() => setShowDeleteAlert(true)}
                         disabled={!canMutateOrder}
                         title={canMutateOrder ? 'Eliminar pedido' : 'Solo editable en estado SOLICITADO o BORRADOR'}
+                        title={canMutateOrder ? 'Eliminar pedido' : 'Solo editable en estado SOLICITADO'}
                     >
                         <FiTrash2 className="me-2" />
                         Eliminar
@@ -299,6 +302,7 @@ const OrderDetailPage = () => {
                             />
                         </div>
                         <div className="col-md-6">
+
                             <label className="form-label" htmlFor="orderDetailStatus">Estado</label>
                             <input
                                 id="orderDetailStatus"
@@ -394,6 +398,7 @@ const OrderDetailPage = () => {
                         onClick={handleOpenCreateItem}
                         disabled={!canMutateOrder}
                         title={canMutateOrder ? 'Agregar item' : 'Solo editable en estado SOLICITADO o BORRADOR'}
+                        title={canMutateOrder ? 'Agregar item' : 'Solo editable en estado SOLICITADO'}
                     >
                         <FiPlus className="me-2" />Agregar Item
                     </button>
