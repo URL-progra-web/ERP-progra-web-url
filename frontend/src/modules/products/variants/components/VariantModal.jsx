@@ -141,11 +141,13 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
         >
             {error && <div className="alert alert-danger small py-2">{error}</div>}
 
-            <form onSubmit={handleSubmit} id="variantForm">
+            <div>
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Producto *</label>
+                    <label className="form-label fw-semibold" htmlFor="variantProductSelect">Producto *</label>
                     <select
+                        id="variantProductSelect"
                         name="product"
+                        autoComplete="off"
                         className="form-select"
                         value={formData.product}
                         onChange={handleChange}
@@ -161,10 +163,12 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">SKU *</label>
+                    <label className="form-label fw-semibold" htmlFor="variantSkuInput">SKU *</label>
                     <input
+                        id="variantSkuInput"
                         type="text"
                         name="sku"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.sku}
                         onChange={handleChange}
@@ -173,10 +177,12 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Imagen de la variante</label>
+                    <label className="form-label fw-semibold" htmlFor="variantImageInput">Imagen de la variante</label>
                     <input
+                        id="variantImageInput"
                         type="file"
                         name="image"
+                        autoComplete="off"
                         className="form-control"
                         accept="image/*"
                         onChange={handleChange}
@@ -215,9 +221,11 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
 
                 <div className="row g-3">
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Color</label>
+                        <label className="form-label fw-semibold" htmlFor="variantColorSelect">Color</label>
                         <select
+                            id="variantColorSelect"
                             name="color"
+                            autoComplete="off"
                             className="form-select"
                             value={formData.color}
                             onChange={handleChange}
@@ -230,9 +238,11 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                     </div>
 
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Talla</label>
+                        <label className="form-label fw-semibold" htmlFor="variantSizeSelect">Talla</label>
                         <select
+                            id="variantSizeSelect"
                             name="size"
+                            autoComplete="off"
                             className="form-select"
                             value={formData.size}
                             onChange={handleChange}
@@ -247,12 +257,14 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
 
                 <div className="row g-3">
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Costo *</label>
+                        <label className="form-label fw-semibold" htmlFor="variantCostInput">Costo *</label>
                         <input
+                            id="variantCostInput"
                             type="number"
                             step="0.01"
                             min="0"
                             name="cost"
+                            autoComplete="off"
                             className="form-control"
                             value={formData.cost}
                             onChange={handleChange}
@@ -260,12 +272,14 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                     </div>
 
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Precio *</label>
+                        <label className="form-label fw-semibold" htmlFor="variantPriceInput">Precio *</label>
                         <input
+                            id="variantPriceInput"
                             type="number"
                             step="0.01"
                             min="0"
                             name="price"
+                            autoComplete="off"
                             className="form-control"
                             value={formData.price}
                             onChange={handleChange}
@@ -286,7 +300,7 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                         Variante activa
                     </label>
                 </div>
-            </form>
+            </div>
         </AppModal>
     );
 };

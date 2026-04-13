@@ -102,9 +102,12 @@ export const FilterSidebar = ({
 
           <div className="d-flex gap-2 mt-1">
             <div className="flex-fill">
-              <label className="store-form-label" style={{ fontSize: '0.7rem' }}>Mín</label>
+              <label className="store-form-label" htmlFor="catalogMinPrice" style={{ fontSize: '0.7rem' }}>Mín</label>
               <input
+                id="catalogMinPrice"
                 type="number"
+                name="catalog_min_price"
+                autoComplete="off"
                 className="form-control form-control-sm store-price-input"
                 style={{ fontSize: '0.8rem' }}
                 value={localMinPrice}
@@ -114,9 +117,12 @@ export const FilterSidebar = ({
               />
             </div>
             <div className="flex-fill">
-              <label className="store-form-label" style={{ fontSize: '0.7rem' }}>Máx</label>
+              <label className="store-form-label" htmlFor="catalogMaxPrice" style={{ fontSize: '0.7rem' }}>Máx</label>
               <input
+                id="catalogMaxPrice"
                 type="number"
+                name="catalog_max_price"
+                autoComplete="off"
                 className="form-control form-control-sm store-price-input"
                 style={{ fontSize: '0.8rem' }}
                 value={localMaxPrice}

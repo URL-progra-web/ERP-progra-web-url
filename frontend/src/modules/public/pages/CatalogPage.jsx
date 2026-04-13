@@ -264,9 +264,15 @@ export const CatalogPage = () => {
             <form onSubmit={handleSearch} className="store-search mt-3">
               <div className="d-flex flex-column flex-md-row gap-2 align-items-stretch">
                 <div className="flex-grow-1 position-relative">
+                  <label className="visually-hidden" htmlFor="catalogSearchInput">
+                    Buscar productos por nombre
+                  </label>
                   <FiSearch size={16} className="store-search__icon" />
                   <input
+                    id="catalogSearchInput"
                     type="text"
+                    name="catalog_search"
+                    autoComplete="off"
                     className="form-control form-control-sm"
                     placeholder="Buscar productos por nombre..."
                     value={searchInput}

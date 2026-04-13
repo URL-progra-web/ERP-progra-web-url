@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { entrepreneurService } from '../services/entrepreneurService';
-
-const PAGE_SIZE = 12;
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 export const useEntrepreneurs = () => {
     const [entrepreneurs, setEntrepreneurs] = useState([]);
@@ -31,7 +30,7 @@ export const useEntrepreneurs = () => {
                 created_from: appliedCreatedFrom || undefined,
                 created_to: appliedCreatedTo || undefined,
                 page,
-                page_size: PAGE_SIZE,
+                page_size: DEFAULT_PAGE_SIZE,
             });
             setEntrepreneurs(data.results);
             setCount(data.count);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { userService } from '../services/userService';
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 function useDebounce(value, delay = 400) {
     const [debounced, setDebounced] = useState(value);
@@ -9,8 +10,6 @@ function useDebounce(value, delay = 400) {
     }, [value, delay]);
     return debounced;
 }
-
-const PAGE_SIZE = 15;
 
 export function useUsers() {
     const [data, setData] = useState({ results: [], count: 0, num_pages: 1, page: 1 });
@@ -31,7 +30,7 @@ export function useUsers() {
             setIsLoading(true);
             const result = await userService.getUsers({
                 page,
-                page_size: PAGE_SIZE,
+                page_size: DEFAULT_PAGE_SIZE,
                 search: debouncedSearch || undefined,
                 role_id: roleFilter || undefined,
                 is_active:

@@ -86,20 +86,20 @@ const ReceiptDetailPage = () => {
                     <div className="card-body">
                         <div className="row g-3">
                             <div className="col-md-6">
-                                <label className="form-label text-muted small">Cliente</label>
+                                <div className="text-muted small">Cliente</div>
                                 <p className="mb-0 fw-semibold">{receipt.customer?.name ?? '—'}</p>
                                 <small className="text-muted">{receipt.customer?.email ?? ''}</small>
                             </div>
                             <div className="col-md-6">
-                                <label className="form-label text-muted small">Método de Pago</label>
+                                <div className="text-muted small">Método de Pago</div>
                                 <p className="mb-0">{receipt.payment_method_name ?? '—'}</p>
                             </div>
                             <div className="col-md-6">
-                                <label className="form-label text-muted small">Emitido por</label>
+                                <div className="text-muted small">Emitido por</div>
                                 <p className="mb-0">{receipt.issued_by_name ?? '—'}</p>
                             </div>
                             <div className="col-md-6">
-                                <label className="form-label text-muted small">Fecha de emisión</label>
+                                <div className="text-muted small">Fecha de emisión</div>
                                 <p className="mb-0">{new Date(receipt.issued_at).toLocaleString()}</p>
                             </div>
                         </div>

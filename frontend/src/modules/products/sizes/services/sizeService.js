@@ -1,9 +1,11 @@
 import api from '~/core/api/api';
 
 export const sizeService = {
-    getSizes: async ({ search } = {}) => {
+    getSizes: async ({ search, page, page_size } = {}) => {
         const params = {};
         if (search) params.search = search;
+        if (page) params.page = page;
+        if (page_size) params.page_size = page_size;
 
         const response = await api.get('/products/sizes/', { params });
         return response.data;

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { paymentMethodsService } from '../services/paymentMethodsService';
-
-const PAGE_SIZE = 10;
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 export const usePaymentMethods = () => {
     const [records, setRecords] = useState([]);
@@ -26,7 +25,7 @@ export const usePaymentMethods = () => {
                 search: search || undefined,
                 is_active: typeof isActiveFilter === 'boolean' ? isActiveFilter : undefined,
                 page,
-                page_size: PAGE_SIZE,
+                page_size: DEFAULT_PAGE_SIZE,
             });
             setRecords(data.results);
             setCount(data.count);

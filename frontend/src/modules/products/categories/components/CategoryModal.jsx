@@ -73,12 +73,14 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
         >
             {error && <div className="alert alert-danger small py-2">{error}</div>}
 
-            <form onSubmit={handleSubmit} id="categoryForm">
+            <div>
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Nombre de la categoría *</label>
+                    <label className="form-label fw-semibold" htmlFor="categoryNameInput">Nombre de la categoría *</label>
                     <input
                         type="text"
+                        id="categoryNameInput"
                         name="name"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.name}
                         onChange={handleChange}
@@ -88,7 +90,7 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Pertenece a</label>
+                    <div className="form-label fw-semibold">Pertenece a</div>
                     <CategoryCascadeSelector
                         categories={categories}
                         value={formData.parent}
@@ -119,7 +121,7 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
                         Desactívalo si solo agrupa otras subcategorías.
                     </div>
                 </div>
-            </form>
+            </div>
         </AppModal>
     );
 };

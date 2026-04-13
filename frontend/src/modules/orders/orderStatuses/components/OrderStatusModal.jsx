@@ -48,10 +48,12 @@ export const OrderStatusModal = ({ statusRecord, onSave, onClose }) => {
             submitLabel={isEditing ? 'Guardar' : 'Crear estado'}
         >
             <div className="mb-3">
-                <label className="form-label fw-semibold">Nombre *</label>
+                <label className="form-label fw-semibold" htmlFor="orderStatusNameInput">Nombre *</label>
                 <input
+                    id="orderStatusNameInput"
                     name="name"
                     type="text"
+                    autoComplete="off"
                     className={`form-control text-uppercase ${errors.name ? 'is-invalid' : ''}`}
                     placeholder="SOLICITADO"
                     value={form.name}
@@ -61,9 +63,11 @@ export const OrderStatusModal = ({ statusRecord, onSave, onClose }) => {
                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
             <div>
-                <label className="form-label">Descripción</label>
+                <label className="form-label" htmlFor="orderStatusDescriptionInput">Descripción</label>
                 <textarea
+                    id="orderStatusDescriptionInput"
                     name="description"
+                    autoComplete="off"
                     className="form-control"
                     rows={3}
                     placeholder="Describe el estado..."

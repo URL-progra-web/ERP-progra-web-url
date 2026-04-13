@@ -1,16 +1,21 @@
 import api from '~/core/api/api';
 
 export const inventoryService = {
-    getProducts: async ({ search, category } = {}) => {
+    getProducts: async ({ search, category, page, page_size } = {}) => {
         const params = {};
         if (search) params.search = search;
         if (category) params.category = category;
+        if (page) params.page = page;
+        if (page_size) params.page_size = page_size;
         const response = await api.get('/products/products/', { params });
         return response.data;
     },
 
-    getTransactionTypes: async () => {
-        const response = await api.get('/inventory/transaction-types/');
+    getTransactionTypes: async ({ page, page_size } = {}) => {
+        const params = {};
+        if (page) params.page = page;
+        if (page_size) params.page_size = page_size;
+        const response = await api.get('/inventory/transaction-types/', { params });
         return response.data;
     },
 

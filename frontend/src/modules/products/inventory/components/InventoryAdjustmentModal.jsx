@@ -133,9 +133,12 @@ const InventoryAdjustmentModal = ({
             size="md"
         >
             <div className="mb-3">
-                <label className="form-label fw-semibold">Producto</label>
+                <label className="form-label fw-semibold" htmlFor="inventoryAdjustmentProductInput">Producto</label>
                 <input
+                    id="inventoryAdjustmentProductInput"
+                    name="inventory_adjustment_product"
                     type="text"
+                    autoComplete="off"
                     className="form-control"
                     value={product?.name || ''}
                     disabled
@@ -143,7 +146,7 @@ const InventoryAdjustmentModal = ({
             </div>
 
             <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="inventoryAdjustmentVariantSelect">
                     Variante {hasVariants ? `(${variants.length} disponible(s))` : '(Sin variantes)'}
                 </label>
                 {isLoadingVariants ? (
@@ -153,6 +156,9 @@ const InventoryAdjustmentModal = ({
                     </div>
                 ) : hasVariants ? (
                     <select
+                        id="inventoryAdjustmentVariantSelect"
+                        name="inventory_adjustment_variant"
+                        autoComplete="off"
                         className="form-select"
                         value={selectedVariant}
                         onChange={(e) => setSelectedVariant(e.target.value)}
@@ -183,11 +189,14 @@ const InventoryAdjustmentModal = ({
             </div>
 
             <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="inventoryAdjustmentTypeSelect">
                     {isAddStock ? 'Tipo de Entrada' : 'Tipo de Salida'}
                 </label>
                 {filteredTypes.length > 0 ? (
                     <select
+                        id="inventoryAdjustmentTypeSelect"
+                        name="inventory_adjustment_type"
+                        autoComplete="off"
                         className="form-select"
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
@@ -208,14 +217,17 @@ const InventoryAdjustmentModal = ({
             </div>
 
             <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="inventoryAdjustmentQuantityInput">
                     Cantidad
                     {!isAddStock && selectedVariantData && (
                         <span className="text-muted fw-normal"> (máx: {selectedVariantData.quantity_available ?? 0})</span>
                     )}
                 </label>
                 <input
+                    id="inventoryAdjustmentQuantityInput"
                     type="number"
+                    name="inventory_adjustment_quantity"
+                    autoComplete="off"
                     className="form-control"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
@@ -226,8 +238,11 @@ const InventoryAdjustmentModal = ({
             </div>
 
             <div className="mb-0">
-                <label className="form-label fw-semibold">Nota / Motivo (opcional)</label>
+                <label className="form-label fw-semibold" htmlFor="inventoryAdjustmentReasonInput">Nota / Motivo (opcional)</label>
                 <textarea
+                    id="inventoryAdjustmentReasonInput"
+                    name="inventory_adjustment_reason"
+                    autoComplete="off"
                     className="form-control"
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}

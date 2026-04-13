@@ -11,13 +11,22 @@ import TransactionTypeList from "../components/TransactionTypeList";
 import { TransactionsTab } from "../components/TransactionsTab";
 import AppAlert from "~/core/components/AppAlert";
 import AppCard from "~/core/components/AppCard";
+import AppPagination from "~/core/components/AppPagination";
 import PageHeader from "~/core/components/PageHeader";
 
 const InventoryAdjustmentsPage = () => {
   const {
     products,
+    productsCount,
+    productsNumPages,
+    productsPage,
+    setProductsPage,
     categories,
     transactionTypes,
+    typesCount,
+    typesNumPages,
+    typesPage,
+    setTypesPage,
     isLoading,
     error,
     setError,
@@ -76,12 +85,12 @@ const InventoryAdjustmentsPage = () => {
     {
       value: "adjustments",
       label: "Ajuste de Inventario",
-      badge: products.length,
+      badge: productsCount,
     },
     {
       value: "types",
       label: "Tipos de Transacción",
-      badge: transactionTypes.length,
+      badge: typesCount,
     },
   ];
 
@@ -102,7 +111,7 @@ const InventoryAdjustmentsPage = () => {
           type="danger"
           header="Error"
           content={error}
-          onClose={() => {}}
+          onClose={() => setError(null)}
         />
       )}
 
@@ -172,13 +181,20 @@ const InventoryAdjustmentsPage = () => {
                   <TransactionTypeList
                     types={transactionTypes}
                     onEdit={setTypeModal}
-                    onDelete={handleDeleteType}
+                    onDelete={(type) => handleDeleteType(type.name)}
                     isLoading={isLoading}
                   />
                 </table>
               </div>
             )}
           </div>
+
+          <AppPagination
+            page={activeTab === "adjustments" ? productsPage : typesPage}
+            numPages={activeTab === "adjustments" ? productsNumPages : typesNumPages}
+            count={activeTab === "adjustments" ? productsCount : typesCount}
+            onPageChange={activeTab === "adjustments" ? setProductsPage : setTypesPage}
+          />
         </AppCard.Section>
       </AppCard>
 

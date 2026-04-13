@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { uomService } from '../services/uomService';
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 export function useUoms() {
     const [uoms, setUoms] = useState([]);
@@ -22,7 +23,7 @@ export function useUoms() {
     const fetchUoms = useCallback(async () => {
         try {
             setIsLoadingUoms(true);
-            const data = await uomService.getUoms({ page: uomPage });
+            const data = await uomService.getUoms({ page: uomPage, page_size: DEFAULT_PAGE_SIZE });
             setUoms(data.results);
             setUomCount(data.count);
             setUomNumPages(data.num_pages);
@@ -65,6 +66,7 @@ export function useUoms() {
                 from_uom_id: fromUomFilter || undefined,
                 to_uom_id: toUomFilter || undefined,
                 page: convPage,
+                page_size: DEFAULT_PAGE_SIZE,
             });
             setConversions(data.results);
             setConvCount(data.count);
@@ -78,6 +80,10 @@ export function useUoms() {
     }, [fromUomFilter, toUomFilter, convPage]);
 
     useEffect(() => { fetchConversions(); }, [fetchConversions]);
+
+    useEffect(() => {
+        setConvPage(1);
+    }, [fromUomFilter, toUomFilter]);
 
     const createConversion = async (data) => {
         await uomService.createConversion(data);

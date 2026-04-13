@@ -8,6 +8,7 @@ import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import AppPagination from '~/core/components/AppPagination';
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 import ReceiptsTable from '../components/ReceiptsTable';
 import { receiptsService } from '../services/receiptsService';
 
@@ -32,6 +33,7 @@ const ReceiptsPage = () => {
             try {
                 const data = await receiptsService.list({
                     page,
+                    page_size: DEFAULT_PAGE_SIZE,
                     issued_at_after: fromDate || undefined,
                     issued_at_before: toDate || undefined,
                     client: client || undefined,
@@ -111,8 +113,9 @@ const ReceiptsPage = () => {
                         <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
                         <div className="row g-2">
                             <div className="col-md-4">
-                                <label className="form-label small text-muted">Desde</label>
+                                <label htmlFor="receipts-from-date" className="form-label small text-muted">Desde</label>
                                 <input
+                                    id="receipts-from-date"
                                     type="date"
                                     className="form-control form-control-sm"
                                     value={fromDate}
@@ -120,8 +123,9 @@ const ReceiptsPage = () => {
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label small text-muted">Hasta</label>
+                                <label htmlFor="receipts-to-date" className="form-label small text-muted">Hasta</label>
                                 <input
+                                    id="receipts-to-date"
                                     type="date"
                                     className="form-control form-control-sm"
                                     value={toDate}
@@ -129,8 +133,9 @@ const ReceiptsPage = () => {
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label small text-muted">Buscar</label>
+                                <label htmlFor="receipts-search" className="form-label small text-muted">Buscar</label>
                                 <input
+                                    id="receipts-search"
                                     type="text"
                                     className="form-control form-control-sm"
                                     placeholder="Buscar cliente o número..."

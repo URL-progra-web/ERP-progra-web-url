@@ -78,11 +78,14 @@ const TransactionTypeModal = ({
                 size="sm"
             >
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">
+                    <label className="form-label fw-semibold" htmlFor="transactionTypeNameInput">
                         Nombre <span className="text-danger">*</span>
                     </label>
                     <input
+                        id="transactionTypeNameInput"
                         type="text"
+                        name="transaction_type_name"
+                        autoComplete="off"
                         className="form-control"
                         value={name}
                         onChange={(e) => setName(e.target.value.toUpperCase())}
@@ -95,10 +98,13 @@ const TransactionTypeModal = ({
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">
+                    <label className="form-label fw-semibold" htmlFor="transactionTypeFactorSelect">
                         Factor <span className="text-danger">*</span>
                     </label>
                     <select
+                        id="transactionTypeFactorSelect"
+                        name="transaction_type_factor"
+                        autoComplete="off"
                         className="form-select"
                         value={factor}
                         onChange={(e) => setFactor(e.target.value)}
@@ -113,8 +119,11 @@ const TransactionTypeModal = ({
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Descripción</label>
+                    <label className="form-label fw-semibold" htmlFor="transactionTypeDescriptionInput">Descripción</label>
                     <textarea
+                        id="transactionTypeDescriptionInput"
+                        name="transaction_type_description"
+                        autoComplete="off"
                         className="form-control"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}

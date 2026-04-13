@@ -15,28 +15,12 @@ class BusinessUnitSeeder(BaseSeeder):
         # Seed Business Units
         business_units_data = [
             {
-                'name': 'Tienda Principal',
-                'description': 'Unidad de negocio principal para ventas al público'
+                'name': 'Tienda',
+                'description': 'Unidad de negocio para ventas al público'
             },
             {
-                'name': 'Tienda Norte',
-                'description': 'Sucursal ubicada en la zona norte de la ciudad'
-            },
-            {
-                'name': 'Tienda Sur',
-                'description': 'Sucursal ubicada en la zona sur de la ciudad'
-            },
-            {
-                'name': 'Almacén Central',
-                'description': 'Centro de distribución y almacenamiento principal'
-            },
-            {
-                'name': 'Tienda Online',
-                'description': 'Unidad de negocio para ventas en línea'
-            },
-            {
-                'name': 'Outlet',
-                'description': 'Tienda de productos en oferta y descuento'
+                'name': 'Comercializadora',
+                'description': 'Unidad de negocio para distribución y comercialización mayorista'
             },
         ]
 

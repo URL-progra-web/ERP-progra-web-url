@@ -66,11 +66,13 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear emprendedor'}
         >
             <div className="mb-3">
-                <label className="form-label">Nombre de la empresa *</label>
+                <label className="form-label" htmlFor="entrepreneurCompanyNameInput">Nombre de la empresa *</label>
                 <input
+                    id="entrepreneurCompanyNameInput"
                     type="text"
                     className={`form-control ${errors.company_name ? 'is-invalid' : ''}`}
                     name="company_name"
+                    autoComplete="organization"
                     value={form.company_name}
                     onChange={handleChange}
                     placeholder="Ej: Tech Solutions S.A."
@@ -78,11 +80,13 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
                 {errors.company_name && <div className="invalid-feedback">{errors.company_name}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Nombre del contacto *</label>
+                <label className="form-label" htmlFor="entrepreneurContactNameInput">Nombre del contacto *</label>
                 <input
+                    id="entrepreneurContactNameInput"
                     type="text"
                     className={`form-control ${errors.contact_name ? 'is-invalid' : ''}`}
                     name="contact_name"
+                    autoComplete="name"
                     value={form.contact_name}
                     onChange={handleChange}
                     placeholder="Ej: Juan Pérez"
@@ -90,22 +94,26 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
                 {errors.contact_name && <div className="invalid-feedback">{errors.contact_name}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Teléfono</label>
+                <label className="form-label" htmlFor="entrepreneurPhoneInput">Teléfono</label>
                 <input
+                    id="entrepreneurPhoneInput"
                     type="text"
                     className="form-control"
                     name="phone"
+                    autoComplete="tel"
                     value={form.phone}
                     onChange={handleChange}
                     placeholder="Ej: +593 99 123 4567"
                 />
             </div>
             <div className="mb-3">
-                <label className="form-label">Correo electrónico</label>
+                <label className="form-label" htmlFor="entrepreneurEmailInput">Correo electrónico</label>
                 <input
+                    id="entrepreneurEmailInput"
                     type="email"
                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                     name="email"
+                    autoComplete="email"
                     value={form.email}
                     onChange={handleChange}
                     placeholder="Ej: contacto@empresa.com"
@@ -113,12 +121,15 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Usuario asignado</label>
+                <label className="form-label" htmlFor="entrepreneurUserSelect">Usuario asignado</label>
                 <select
+                    id="entrepreneurUserSelect"
                     className="form-select"
                     name="user_id"
+                    autoComplete="off"
                     value={form.user_id}
                     onChange={handleChange}
+                    disabled
                 >
                     <option value="">Sin asignar</option>
                     {users.map((user) => (
@@ -127,9 +138,9 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
                         </option>
                     ))}
                 </select>
-                <small className="form-text text-muted">
-                    Opcional: Asigna un usuario responsable de este emprendedor
-                </small>
+                <div className="alert alert-warning py-2 px-3 mt-2 mb-0 small" role="alert">
+                    La asignación de usuarios no se ha implementado aún.
+                </div>
             </div>
         </AppModal>
     );

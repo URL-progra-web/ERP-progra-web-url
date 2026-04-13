@@ -6,11 +6,16 @@ import VariantsTable from '../components/VariantsTable';
 import VariantModal from '../components/VariantModal';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
+import AppPagination from '~/core/components/AppPagination';
 import PageHeader from '~/core/components/PageHeader';
 
 const VariantsPage = () => {
     const {
         variants,
+        count,
+        numPages,
+        page,
+        setPage,
         products,
         entrepreneurs,
         businessUnits,
@@ -70,7 +75,7 @@ const VariantsPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Variantes de Productos"
-                subtitle={`${variants.length} variante(s) registrada(s)`}
+                subtitle={`${count} variante(s) registrada(s)`}
                 icon={FiLayers}
                 actionLabel="Nueva Variante"
                 actionIcon={FiPlus}
@@ -145,6 +150,13 @@ const VariantsPage = () => {
                             />
                         </table>
                     </div>
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
                 </AppCard.Section>
             </AppCard>
 

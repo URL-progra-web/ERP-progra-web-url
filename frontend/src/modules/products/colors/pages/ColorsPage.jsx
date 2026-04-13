@@ -6,11 +6,12 @@ import ColorsTable from '../components/ColorsTable';
 import ColorModal from '../components/ColorModal';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
+import AppPagination from '~/core/components/AppPagination';
 import PageHeader from '~/core/components/PageHeader';
 
 const ColorsPage = () => {
     const {
-        colors, isLoading, error,
+        colors, count, numPages, page, setPage, isLoading, error,
         searchInput, setSearchInput,
         handleSearch,
         saveColor, deleteColor,
@@ -52,7 +53,7 @@ const ColorsPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Colores de Productos"
-                subtitle={`${colors.length} color(es) registrado(s)`}
+                subtitle={`${count} color(es) registrado(s)`}
                 icon={FiDroplet}
                 actionLabel="Nuevo Color"
                 actionIcon={FiPlus}
@@ -94,6 +95,13 @@ const ColorsPage = () => {
                             />
                         </table>
                     </div>
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
                 </AppCard.Section>
             </AppCard>
 

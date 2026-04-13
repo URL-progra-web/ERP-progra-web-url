@@ -30,13 +30,15 @@ const buildProductPayload = (data) => {
 };
 
 export const productService = {
-    getProducts: async ({ search, category, entrepreneur, business_unit, base_uom } = {}) => {
+    getProducts: async ({ search, category, entrepreneur, business_unit, base_uom, page, page_size } = {}) => {
         const params = {};
         if (search) params.search = search;
         if (category) params.category = category;
         if (entrepreneur) params.entrepreneur = entrepreneur;
         if (business_unit) params.business_unit = business_unit;
         if (base_uom) params.base_uom = base_uom;
+        if (page) params.page = page;
+        if (page_size) params.page_size = page_size;
         const response = await api.get('/products/products/', { params });
         return response.data;
     },

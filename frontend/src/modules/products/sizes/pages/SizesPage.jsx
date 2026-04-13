@@ -6,11 +6,12 @@ import SizesTable from '../components/SizesTable';
 import SizeModal from '../components/SizeModal';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
+import AppPagination from '~/core/components/AppPagination';
 import PageHeader from '~/core/components/PageHeader';
 
 const SizesPage = () => {
     const {
-        sizes, isLoading, error,
+        sizes, count, numPages, page, setPage, isLoading, error,
         searchInput, setSearchInput,
         handleSearch,
         saveSize, deleteSize,
@@ -52,7 +53,7 @@ const SizesPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Tallas de Productos"
-                subtitle={`${sizes.length} talla(s) registrada(s)`}
+                subtitle={`${count} talla(s) registrada(s)`}
                 icon={FiTag}
                 actionLabel="Nueva Talla"
                 actionIcon={FiPlus}
@@ -92,6 +93,13 @@ const SizesPage = () => {
                             />
                         </table>
                     </div>
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
                 </AppCard.Section>
             </AppCard>
 

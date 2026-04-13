@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FiArrowLeft, FiShoppingCart } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
+import AppPagination from '~/core/components/AppPagination';
 import { useAuth } from '~/core/auth/AuthContext';
 import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import { CustomerSearch } from './components/CustomerSearch';
@@ -18,11 +19,16 @@ import { useOrders } from './hooks/useOrders';
 
 const OrderCreatePage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const ordersListPath = `${getDashboardPath(user?.role?.name)}/orders/list`;
 
     const {
         variants,
+        count,
+        numPages,
+        page,
+        setPage,
         products,
         entrepreneurs,
         businessUnits,
@@ -92,6 +98,18 @@ const OrderCreatePage = () => {
 
         loadCatalogs();
     }, [setOrderError]);
+
+    useEffect(() => {
+        const preselectedCustomer = location.state?.initialCustomer;
+        if (!preselectedCustomer?.id) return;
+
+        setSelectedCustomer(preselectedCustomer);
+        setFormData((prev) => ({
+            ...prev,
+            customer_id: String(preselectedCustomer.id),
+            shipping_address: preselectedCustomer.address || prev.shipping_address || '',
+        }));
+    }, [location.state]);
 
     const handleSelectCustomer = (customer) => {
         setSelectedCustomer(customer);
@@ -225,6 +243,13 @@ const OrderCreatePage = () => {
                                 uoms={uoms}
                                 conversionsByBaseUom={conversionsByBaseUom}
                             />
+
+                            <AppPagination
+                                page={page}
+                                numPages={numPages}
+                                count={count}
+                                onPageChange={setPage}
+                            />
                         </AppCard.Section>
                     </AppCard>
                 </div>
@@ -235,21 +260,24 @@ const OrderCreatePage = () => {
                             <AppCard.Section label="Datos del Pedido">
                                 <div className="p-3 p-md-4 d-flex flex-column gap-3">
                                     <div>
-                                        <label className="form-label">Cliente *</label>
+                                        <label className="form-label" htmlFor="orderCreateCustomerSearch">Cliente *</label>
                                         <CustomerSearch
                                             selectedCustomer={selectedCustomer}
                                             onSelect={handleSelectCustomer}
                                             onClear={handleClearCustomer}
                                             disabled={isSubmitting}
                                             initialQuery={selectedCustomer?.name || ''}
+                                            inputId="orderCreateCustomerSearch"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="form-label">Metodo de Pago</label>
+                                        <label className="form-label" htmlFor="orderCreatePaymentMethod">Metodo de Pago</label>
                                         <select
+                                            id="orderCreatePaymentMethod"
                                             className="form-select"
                                             name="payment_method_id"
+                                            autoComplete="off"
                                             value={formData.payment_method_id}
                                             onChange={handleChange}
                                             disabled={isLoadingCatalogs}
@@ -262,11 +290,13 @@ const OrderCreatePage = () => {
                                     </div>
 
                                     <div>
-                                        <label className="form-label">Direccion de Envio</label>
+                                        <label className="form-label" htmlFor="orderCreateShippingAddress">Direccion de Envio</label>
                                         <textarea
+                                            id="orderCreateShippingAddress"
                                             className="form-control"
                                             rows="2"
                                             name="shipping_address"
+                                            autoComplete="street-address"
                                             value={formData.shipping_address}
                                             onChange={handleChange}
                                             placeholder="Se autocompleta desde el cliente, pero puedes editarla"
@@ -274,11 +304,13 @@ const OrderCreatePage = () => {
                                     </div>
 
                                     <div>
-                                        <label className="form-label">Notas</label>
+                                        <label className="form-label" htmlFor="orderCreateNotes">Notas</label>
                                         <textarea
+                                            id="orderCreateNotes"
                                             className="form-control"
                                             rows="3"
                                             name="notes"
+                                            autoComplete="off"
                                             value={formData.notes}
                                             onChange={handleChange}
                                         />

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { normalizePaginated } from '../helpers/normalizeList';
 import { orderService } from '../services/orderService';
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 function useDebounce(value, delay = 400) {
     const [debounced, setDebounced] = useState(value);
@@ -10,8 +11,6 @@ function useDebounce(value, delay = 400) {
     }, [value, delay]);
     return debounced;
 }
-
-const PAGE_SIZE = 15;
 
 export const useOrders = ({ autoFetch = true } = {}) => {
     const [data, setData] = useState({ results: [], count: 0, num_pages: 1, page: 1 });
@@ -35,7 +34,7 @@ export const useOrders = ({ autoFetch = true } = {}) => {
             const response = await orderService.list({
                 search: debouncedSearch || undefined,
                 page,
-                page_size: PAGE_SIZE,
+                page_size: DEFAULT_PAGE_SIZE,
             });
             setData(normalizePaginated(response, page));
         } catch (err) {

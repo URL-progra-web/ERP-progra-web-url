@@ -194,8 +194,10 @@ const BillingReportsPage = () => {
                         <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
                         <div className="row g-2">
                             <div className="col-12">
-                                <label className="form-label small text-muted">Rango rápido</label>
-                                <div className="btn-group btn-group-sm d-flex flex-wrap gap-1" role="group">
+                                <div id="billing-report-range-label" className="form-label small text-muted">
+                                    Rango rápido
+                                </div>
+                                <div className="btn-group btn-group-sm d-flex flex-wrap gap-1" role="group" aria-labelledby="billing-report-range-label">
                                     {TIME_RANGES.map(({ value, label }) => (
                                         <button
                                             key={value}
@@ -209,8 +211,9 @@ const BillingReportsPage = () => {
                                 </div>
                             </div>
                             <div className="col-md-2">
-                                <label className="form-label small text-muted">Desde</label>
+                                <label htmlFor="billing-report-from-date" className="form-label small text-muted">Desde</label>
                                 <input
+                                    id="billing-report-from-date"
                                     type="date"
                                     className="form-control form-control-sm"
                                     value={dateAfter}
@@ -218,8 +221,9 @@ const BillingReportsPage = () => {
                                 />
                             </div>
                             <div className="col-md-2">
-                                <label className="form-label small text-muted">Hasta</label>
+                                <label htmlFor="billing-report-to-date" className="form-label small text-muted">Hasta</label>
                                 <input
+                                    id="billing-report-to-date"
                                     type="date"
                                     className="form-control form-control-sm"
                                     value={dateBefore}
@@ -227,8 +231,9 @@ const BillingReportsPage = () => {
                                 />
                             </div>
                             <div className="col-md-3">
-                                <label className="form-label small text-muted">Emprendedor</label>
+                                <label htmlFor="billing-report-entrepreneur" className="form-label small text-muted">Emprendedor</label>
                                 <select
+                                    id="billing-report-entrepreneur"
                                     className="form-select form-select-sm"
                                     value={entrepreneurId}
                                     onChange={(e) => setEntrepreneurId(e.target.value)}
@@ -240,8 +245,9 @@ const BillingReportsPage = () => {
                                 </select>
                             </div>
                             <div className="col-md-3">
-                                <label className="form-label small text-muted">Usuario</label>
+                                <label htmlFor="billing-report-user" className="form-label small text-muted">Usuario</label>
                                 <select
+                                    id="billing-report-user"
                                     className="form-select form-select-sm"
                                     value={userId}
                                     onChange={(e) => setUserId(e.target.value)}
