@@ -236,7 +236,7 @@ const OrderDetailPage = () => {
 
             {!canMutateOrder && (
                 <div className="alert alert-info" role="alert">
-                    Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados fuera de SOLICITADO o BORRADOR.
+                    Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados.
                 </div>
             )}
 
