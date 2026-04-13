@@ -2,6 +2,7 @@ import React from 'react';
 import { FiBox, FiGrid, FiPackage, FiDroplet } from 'react-icons/fi';
 import { FiTag } from 'react-icons/fi';
 import { FiLayers } from 'react-icons/fi';
+import { FiSliders } from 'react-icons/fi';
 
 const UomsPage = React.lazy(() => import('./uoms/UomsPage'));
 const CategoriesPage = React.lazy(() => import('./categories/pages/CategoriesPage'));
@@ -9,6 +10,7 @@ const ProductsPage = React.lazy(() => import('./products/pages/ProductsPage'));
 const ColorsPage = React.lazy(() => import('./colors/pages/ColorsPage'));
 const SizesPage = React.lazy(() => import('./sizes/pages/SizesPage'));
 const VariantsPage = React.lazy(() => import('./variants/pages/VariantsPage'));
+const InventoryAdjustmentsPage = React.lazy(() => import('./inventory/pages/InventoryAdjustmentsPage'));
 
 export const productsFeature = {
     id: 'products',
@@ -55,6 +57,13 @@ export const productsFeature = {
             icon: FiLayers,
             roles: ['ADMIN'],
             element: <VariantsPage />,
+        },
+        {
+            text: 'Ajuste de Inventario',
+            path: 'inventory-adjustments',
+            icon: FiSliders,
+            roles: ['ADMIN'],
+            element: <InventoryAdjustmentsPage />,
         },
     ]
 };
