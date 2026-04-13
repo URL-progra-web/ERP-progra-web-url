@@ -19,8 +19,12 @@ export function ConversionsTab({
             {/* Filters */}
             <div className="px-4 py-3 border-bottom d-flex gap-3 flex-wrap align-items-end">
                 <div style={{ minWidth: 200 }}>
-                    <label className="form-label small fw-semibold mb-1">UOM Origen</label>
+                    <label className="form-label small fw-semibold mb-1" htmlFor="conversionsFromUomFilter">UOM Origen</label>
                     <select
+                        id="conversionsFromUomFilter"
+                        name="conversions_from_uom_filter"
+                        autoComplete="off"
+                        aria-label="Filtrar conversiones por UOM origen"
                         className="form-select form-select-sm"
                         value={fromUomFilter}
                         onChange={e => setFromUomFilter(e.target.value)}
@@ -32,8 +36,12 @@ export function ConversionsTab({
                     </select>
                 </div>
                 <div style={{ minWidth: 200 }}>
-                    <label className="form-label small fw-semibold mb-1">UOM Destino</label>
+                    <label className="form-label small fw-semibold mb-1" htmlFor="conversionsToUomFilter">UOM Destino</label>
                     <select
+                        id="conversionsToUomFilter"
+                        name="conversions_to_uom_filter"
+                        autoComplete="off"
+                        aria-label="Filtrar conversiones por UOM destino"
                         className="form-select form-select-sm"
                         value={toUomFilter}
                         onChange={e => setToUomFilter(e.target.value)}

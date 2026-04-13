@@ -7,6 +7,7 @@ export const CustomerSearch = ({
     onClear,
     disabled,
     initialQuery = '',
+    inputId = 'customerSearchInput',
 }) => {
     const {
         query,
@@ -40,7 +41,11 @@ export const CustomerSearch = ({
         <div>
             <div className="d-flex gap-2">
                 <input
+                    id={inputId}
                     type="text"
+                    name="customer_search"
+                    autoComplete="off"
+                    aria-label="Buscar cliente por nombre, correo o teléfono"
                     className="form-control"
                     placeholder="Buscar cliente por nombre, correo o teléfono..."
                     value={query}

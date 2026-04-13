@@ -6,11 +6,12 @@ import ProductsTable from '../components/ProductsTable';
 import ProductModal from '../components/ProductModal';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
+import AppPagination from '~/core/components/AppPagination';
 import PageHeader from '~/core/components/PageHeader';
 
 const ProductsPage = () => {
     const {
-        products, categories, entrepreneurs, businessUnits, uoms,
+        products, count, numPages, page, setPage, categories, entrepreneurs, businessUnits, uoms,
         isLoading, error,
         searchInput, setSearchInput,
         handleSearch,
@@ -50,7 +51,7 @@ const ProductsPage = () => {
         <div className="container-fluid p-0">
             <PageHeader
                 title="Catálogo de Productos"
-                subtitle={`${products.length} producto(s) registrado(s)`}
+                subtitle={`${count} producto(s) registrado(s)`}
                 icon={FiPackage}
                 actionLabel="Nuevo Producto"
                 actionIcon={FiPlus}
@@ -110,6 +111,13 @@ const ProductsPage = () => {
                             />
                         </table>
                     </div>
+
+                    <AppPagination
+                        page={page}
+                        numPages={numPages}
+                        count={count}
+                        onPageChange={setPage}
+                    />
                 </AppCard.Section>
             </AppCard>
 

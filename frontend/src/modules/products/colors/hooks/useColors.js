@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { colorService } from '../services/colorService';
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 export function useColors() {
     const [colors, setColors] = useState([]);
+    const [count, setCount] = useState(0);
+    const [numPages, setNumPages] = useState(1);
+    const [page, setPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -15,23 +19,28 @@ export function useColors() {
 
             const result = await colorService.getColors({
                 search: searchTerm || undefined,
+                page,
+                page_size: DEFAULT_PAGE_SIZE,
             });
 
             const data = Array.isArray(result) ? result : result.results || [];
             setColors(data);
+            setCount(result?.count ?? data.length);
+            setNumPages(result?.num_pages ?? 1);
             setError(null);
         } catch {
             setError('Error al cargar colores.');
         } finally {
             setIsLoading(false);
         }
-    }, [searchTerm]);
+    }, [searchTerm, page]);
 
     useEffect(() => {
         fetchColors();
     }, [fetchColors]);
 
     const handleSearch = () => {
+        setPage(1);
         setSearchTerm(searchInput);
     };
 
@@ -51,6 +60,10 @@ export function useColors() {
 
     return {
         colors,
+        count,
+        numPages,
+        page,
+        setPage,
         isLoading,
         error,
         searchInput, setSearchInput,

@@ -78,6 +78,8 @@ GLOBAL_SEEDERS = [
     'crm.customer.seeds.CustomerSeeder',
     'products.product.seeds.ProductSeeder',
     'products.variant.seeds.ProductVariantSeeder',
+    'orders.order.seeds.OrderSeeder',
+    'receipts.receipt.seeds.ReceiptSeeder',
 ]
 
 REST_FRAMEWORK = {

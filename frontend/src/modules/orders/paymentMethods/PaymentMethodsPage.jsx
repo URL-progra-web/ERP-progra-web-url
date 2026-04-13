@@ -110,9 +110,12 @@ const PaymentMethodsPage = () => {
                     <div className="p-3 p-md-4 border-bottom">
                         <div className="row g-3 align-items-end">
                             <div className="col-md-5">
-                                <label className="form-label text-muted small mb-1">Buscar</label>
+                                <label className="form-label text-muted small mb-1" htmlFor="paymentMethodsSearchInput">Buscar</label>
                                 <input
+                                    id="paymentMethodsSearchInput"
                                     type="search"
+                                    name="payment_methods_search"
+                                    autoComplete="off"
                                     className="form-control"
                                     placeholder="Nombre del método"
                                     value={search}
@@ -123,7 +126,7 @@ const PaymentMethodsPage = () => {
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label text-muted small mb-1">Estado</label>
+                                <div className="form-label text-muted small mb-1">Estado</div>
                                 <div>
                                     <FilterTabs
                                         options={STATUS_FILTERS}

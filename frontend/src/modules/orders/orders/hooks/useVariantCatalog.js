@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { variantService } from '~/modules/products/variants/services/variantService';
 import { uomService } from '~/modules/products/uoms/services/uomService';
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 const normalize = (result) => Array.isArray(result) ? result : result?.results || [];
 
 export const useVariantCatalog = () => {
     const [variants, setVariants] = useState([]);
+    const [count, setCount] = useState(0);
+    const [numPages, setNumPages] = useState(1);
+    const [page, setPage] = useState(1);
     const [products, setProducts] = useState([]);
     const [entrepreneurs, setEntrepreneurs] = useState([]);
     const [businessUnits, setBusinessUnits] = useState([]);
@@ -19,12 +23,12 @@ export const useVariantCatalog = () => {
 
     const [searchInput, setSearchInput] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [productFilter, setProductFilter] = useState('');
-    const [entrepreneurFilter, setEntrepreneurFilter] = useState('');
-    const [businessUnitFilter, setBusinessUnitFilter] = useState('');
-    const [colorFilter, setColorFilter] = useState('');
-    const [sizeFilter, setSizeFilter] = useState('');
-    const [uomFilter, setUomFilter] = useState('');
+    const [productFilter, setProductFilterState] = useState('');
+    const [entrepreneurFilter, setEntrepreneurFilterState] = useState('');
+    const [businessUnitFilter, setBusinessUnitFilterState] = useState('');
+    const [colorFilter, setColorFilterState] = useState('');
+    const [sizeFilter, setSizeFilterState] = useState('');
+    const [uomFilter, setUomFilterState] = useState('');
 
     const fetchVariants = useCallback(async () => {
         try {
@@ -39,15 +43,20 @@ export const useVariantCatalog = () => {
                 color: colorFilter || undefined,
                 size: sizeFilter || undefined,
                 uom: uomFilter || undefined,
+                page,
+                page_size: DEFAULT_PAGE_SIZE,
             });
-            setVariants(normalize(result));
+            const data = normalize(result);
+            setVariants(data);
+            setCount(result?.count ?? data.length);
+            setNumPages(result?.num_pages ?? 1);
             setError(null);
         } catch {
             setError('No se pudo cargar el catalogo de variantes.');
         } finally {
             setIsLoading(false);
         }
-    }, [searchTerm, productFilter, entrepreneurFilter, businessUnitFilter, colorFilter, sizeFilter, uomFilter]);
+    }, [searchTerm, productFilter, entrepreneurFilter, businessUnitFilter, colorFilter, sizeFilter, uomFilter, page]);
 
     const fetchRelations = useCallback(async () => {
         try {
@@ -104,22 +113,58 @@ export const useVariantCatalog = () => {
     }, [fetchRelations]);
 
     const handleSearch = useCallback(() => {
+        setPage(1);
         setSearchTerm(searchInput);
     }, [searchInput]);
+
+    const setProductFilter = useCallback((value) => {
+        setPage(1);
+        setProductFilterState(value);
+    }, []);
+
+    const setEntrepreneurFilter = useCallback((value) => {
+        setPage(1);
+        setEntrepreneurFilterState(value);
+    }, []);
+
+    const setBusinessUnitFilter = useCallback((value) => {
+        setPage(1);
+        setBusinessUnitFilterState(value);
+    }, []);
+
+    const setColorFilter = useCallback((value) => {
+        setPage(1);
+        setColorFilterState(value);
+    }, []);
+
+    const setSizeFilter = useCallback((value) => {
+        setPage(1);
+        setSizeFilterState(value);
+    }, []);
+
+    const setUomFilter = useCallback((value) => {
+        setPage(1);
+        setUomFilterState(value);
+    }, []);
 
     const resetFilters = useCallback(() => {
         setSearchInput('');
         setSearchTerm('');
-        setProductFilter('');
-        setEntrepreneurFilter('');
-        setBusinessUnitFilter('');
-        setColorFilter('');
-        setSizeFilter('');
-        setUomFilter('');
+        setProductFilterState('');
+        setEntrepreneurFilterState('');
+        setBusinessUnitFilterState('');
+        setColorFilterState('');
+        setSizeFilterState('');
+        setUomFilterState('');
+        setPage(1);
     }, []);
 
     return {
         variants,
+        count,
+        numPages,
+        page,
+        setPage,
         products,
         entrepreneurs,
         businessUnits,

@@ -12,6 +12,7 @@ export const OrderItemModal = ({
     item,
     statusOptions,
     orderId,
+    submitDisabled: forceSubmitDisabled = false,
 }) => {
     const isEdit = Boolean(item);
 
@@ -124,6 +125,7 @@ export const OrderItemModal = ({
         : null;
 
     const submitDisabled =
+        forceSubmitDisabled ||
         isSubmitting ||
         !formData.quantity ||
         Number(formData.quantity) <= 0 ||
@@ -143,9 +145,12 @@ export const OrderItemModal = ({
             {!isEdit && (
                 <>
                     <div className="mb-2">
-                        <label className="form-label">Buscar Variante</label>
+                        <label className="form-label" htmlFor="orderItemVariantSearch">Buscar Variante</label>
                         <input
+                            id="orderItemVariantSearch"
                             type="text"
+                            name="order_item_variant_search"
+                            autoComplete="off"
                             className="form-control"
                             value={variantSearch}
                             onChange={(e) => setVariantSearch(e.target.value)}
@@ -154,10 +159,12 @@ export const OrderItemModal = ({
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Variante *</label>
+                        <label className="form-label" htmlFor="orderItemVariantSelect">Variante *</label>
                         <select
+                            id="orderItemVariantSelect"
                             className="form-select"
                             name="variant_id"
+                            autoComplete="off"
                             value={formData.variant_id}
                             onChange={handleVariantChange}
                             disabled={isLoadingVariants}
@@ -191,10 +198,12 @@ export const OrderItemModal = ({
 
                     {selectedVariant && (
                         <div className="mb-3">
-                            <label className="form-label">UOM de operacion *</label>
+                            <label className="form-label" htmlFor="orderItemSelectedUom">UOM de operacion *</label>
                             <select
+                                id="orderItemSelectedUom"
                                 className="form-select"
                                 name="selected_uom_id"
+                                autoComplete="off"
                                 value={formData.selected_uom_id || selectedVariant.base_uom || ''}
                                 onChange={handleChange}
                             >
@@ -209,22 +218,26 @@ export const OrderItemModal = ({
             )}
 
             <div className="mb-3">
-                <label className="form-label">Cantidad *</label>
+                <label className="form-label" htmlFor="orderItemQuantity">Cantidad *</label>
                 <input
+                    id="orderItemQuantity"
                     type="number"
                     min="1"
                     className="form-control"
                     name="quantity"
+                    autoComplete="off"
                     value={formData.quantity}
                     onChange={handleChange}
                 />
             </div>
 
             <div className="mb-0">
-                <label className="form-label">Estado del Item</label>
+                <label className="form-label" htmlFor="orderItemStatus">Estado del Item</label>
                 <select
+                    id="orderItemStatus"
                     className="form-select"
                     name="status_id"
+                    autoComplete="off"
                     value={formData.status_id}
                     onChange={handleChange}
                 >

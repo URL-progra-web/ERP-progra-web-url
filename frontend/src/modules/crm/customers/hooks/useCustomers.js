@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { customerService } from '../services/customerService';
-
-const PAGE_SIZE = 12;
+import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 
 export const useCustomers = () => {
     const [customers, setCustomers] = useState([]);
@@ -22,7 +21,7 @@ export const useCustomers = () => {
                 created_from: createdFrom || undefined,
                 created_to: createdTo || undefined,
                 page,
-                page_size: PAGE_SIZE,
+                page_size: DEFAULT_PAGE_SIZE,
             });
             setCustomers(data.results);
             setCount(data.count);

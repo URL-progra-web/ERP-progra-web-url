@@ -68,12 +68,14 @@ const SizeModal = ({ size, onClose, onSave }) => {
         >
             {error && <div className="alert alert-danger small py-2">{error}</div>}
 
-            <form onSubmit={handleSubmit} id="sizeForm">
+            <div>
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Nombre de la talla *</label>
+                    <label className="form-label fw-semibold" htmlFor="sizeNameInput">Nombre de la talla *</label>
                     <input
+                        id="sizeNameInput"
                         type="text"
                         name="name"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.name}
                         onChange={handleChange}
@@ -83,7 +85,7 @@ const SizeModal = ({ size, onClose, onSave }) => {
                         Usa un nombre claro para identificar esta talla.
                     </div>
                 </div>
-            </form>
+            </div>
         </AppModal>
     );
 };

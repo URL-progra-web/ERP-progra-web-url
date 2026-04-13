@@ -17,6 +17,10 @@ const ColorsFilters = ({ searchInput, onSearchChange, onSearch }) => {
                         </span>
                         <input
                             type="text"
+                            id="colorsSearchInput"
+                            name="colors_search"
+                            autoComplete="off"
+                            aria-label="Buscar color por nombre"
                             className="form-control bg-body border-start-0 ps-0 shadow-none text-body"
                             placeholder="Buscar color por nombre..."
                             value={searchInput}

@@ -17,9 +17,12 @@ export const CustomersFilters = ({
     return (
         <form className="row g-3" onSubmit={handleSubmit}>
             <div className="col-md-4">
-                <label className="form-label small text-muted">Buscar</label>
+                <label className="form-label small text-muted" htmlFor="customersSearchInput">Buscar</label>
                 <input
+                    id="customersSearchInput"
                     type="search"
+                    name="customers_search"
+                    autoComplete="off"
                     className="form-control"
                     placeholder="Nombre, correo o teléfono"
                     value={search}
@@ -27,18 +30,24 @@ export const CustomersFilters = ({
                 />
             </div>
             <div className="col-md-3">
-                <label className="form-label small text-muted">Desde</label>
+                <label className="form-label small text-muted" htmlFor="customersCreatedFrom">Desde</label>
                 <input
+                    id="customersCreatedFrom"
                     type="date"
+                    name="customers_created_from"
+                    autoComplete="off"
                     className="form-control"
                     value={createdFrom}
                     onChange={(e) => onCreatedFromChange(e.target.value)}
                 />
             </div>
             <div className="col-md-3">
-                <label className="form-label small text-muted">Hasta</label>
+                <label className="form-label small text-muted" htmlFor="customersCreatedTo">Hasta</label>
                 <input
+                    id="customersCreatedTo"
                     type="date"
+                    name="customers_created_to"
+                    autoComplete="off"
                     className="form-control"
                     value={createdTo}
                     onChange={(e) => onCreatedToChange(e.target.value)}

@@ -3,7 +3,7 @@ import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { formatCurrency } from '../helpers/formatCurrency';
 import TableActions from '~/core/components/TableActions';
 
-export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete }) => {
+export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete, canEdit = true }) => {
     if (isLoading) {
         return <div className="text-center p-3">Cargando items...</div>;
     }
@@ -37,8 +37,20 @@ export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete }) => {
                             <td>{item.status_name || `#${item.status}`}</td>
                             <td className="text-end pe-3">
                                 <TableActions actions={[
-                                    { icon: FiEdit2,  onClick: () => onEdit?.(item),   title: 'Editar',   variant: 'primary' },
-                                    { icon: FiTrash2, onClick: () => onDelete?.(item), title: 'Eliminar', variant: 'danger'  },
+                                    {
+                                        icon: FiEdit2,
+                                        onClick: () => onEdit?.(item),
+                                        title: canEdit ? 'Editar' : 'Solo editable en estado SOLICITADO',
+                                        variant: 'primary',
+                                        disabled: !canEdit,
+                                    },
+                                    {
+                                        icon: FiTrash2,
+                                        onClick: () => onDelete?.(item),
+                                        title: canEdit ? 'Eliminar' : 'Solo editable en estado SOLICITADO',
+                                        variant: 'danger',
+                                        disabled: !canEdit,
+                                    },
                                 ]} />
                             </td>
                         </tr>
