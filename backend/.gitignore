@@ -12,3 +12,4 @@ build/
 *.pyd
 .env
 *.sqlite3
+media/

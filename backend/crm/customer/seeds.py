@@ -85,6 +85,20 @@ class CustomerSeeder(BaseSeeder):
                 'address': 'Av. Petit Thouars 456, Lince, Lima',
                 'customer_type': 'RETAIL',
             },
+            {
+                'name': 'Diego Navarro Paredes',
+                'phone': '+51 987654341',
+                'email': 'diego.navarro@gmail.com',
+                'address': 'Av. Brasil 789, Pueblo Libre, Lima',
+                'customer_type': 'RETAIL',
+            },
+            {
+                'name': 'Lucia Campos Herrera',
+                'phone': '+51 987654342',
+                'email': 'lucia.campos@outlook.com',
+                'address': 'Jr. Junin 234, Magdalena del Mar, Lima',
+                'customer_type': 'RETAIL',
+            },
         ]
 
         # Seed Customers - Clientes Mayoristas
@@ -115,48 +129,6 @@ class CustomerSeeder(BaseSeeder):
                 'phone': '+51 987654334',
                 'email': 'ventas@mercadonorte.pe',
                 'address': 'Av. Túpac Amaru 2345, Independencia, Lima',
-                'customer_type': 'WHOLESALE',
-            },
-            {
-                'name': 'Grupo Comercial Pacífico',
-                'phone': '+51 987654335',
-                'email': 'compras@grupopacifico.com.pe',
-                'address': 'Av. La Marina 678, San Miguel, Lima',
-                'customer_type': 'WHOLESALE',
-            },
-            {
-                'name': 'Almacenes Lima SAC',
-                'phone': '+51 987654336',
-                'email': 'ventas@almaceneslima.pe',
-                'address': 'Av. Universitaria 1111, Los Olivos, Lima',
-                'customer_type': 'WHOLESALE',
-            },
-            {
-                'name': 'Distribuciones El Sol EIRL',
-                'phone': '+51 987654337',
-                'email': 'info@distribucioneselsol.com',
-                'address': 'Jr. Paruro 444, Cercado de Lima',
-                'customer_type': 'WHOLESALE',
-            },
-            {
-                'name': 'Corporación Textil Perú',
-                'phone': '+51 987654338',
-                'email': 'contacto@textilperu.com.pe',
-                'address': 'Av. Grau 777, Barranco, Lima',
-                'customer_type': 'WHOLESALE',
-            },
-            {
-                'name': 'Importaciones y Exportaciones Global',
-                'phone': '+51 987654339',
-                'email': 'ventas@impexglobal.pe',
-                'address': 'Av. Venezuela 999, Cercado de Lima',
-                'customer_type': 'WHOLESALE',
-            },
-            {
-                'name': 'Comercializadora Mega SAC',
-                'phone': '+51 987654340',
-                'email': 'info@mega.com.pe',
-                'address': 'Av. Universitaria 3333, Comas, Lima',
                 'customer_type': 'WHOLESALE',
             },
         ]
