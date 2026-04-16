@@ -15,6 +15,7 @@ export const getNavigationConfig = () => {
         }
 
         feature.items.forEach(item => {
+            if (item.hidden) return;
             // Se calcula la ruta base dependiendo del rol principal que la vea (o la que se prefiera)
             // Tip: podemos añadir logic para que si el item es para admin se ponga /dashboard/admin/item.path
             const primaryRole = item.roles[0].toLowerCase(); // e.g., 'admin'

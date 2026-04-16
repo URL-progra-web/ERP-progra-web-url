@@ -12,8 +12,6 @@ class UserSeeder(BaseSeeder):
         # Create Roles
         roles = [
             ('ADMIN', 'Administrator with full access'),
-            ('MANAGER', 'Manager with limited access'),
-            ('VISITOR', 'Read-only visitor'),
         ]
 
         role_objs = {}

@@ -31,6 +31,13 @@ export const uomService = {
         return response.data;
     },
 
+    getApplicableConversions: async (baseUomId) => {
+        const response = await api.get('/inventory/uom-conversions/', {
+            params: { to_uom_id: baseUomId, page_size: 200 },
+        });
+        return response.data;
+    },
+
     createConversion: async (data) => {
         const response = await api.post('/inventory/uom-conversions/', data);
         return response.data;

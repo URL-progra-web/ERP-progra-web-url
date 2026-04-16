@@ -1,6 +1,15 @@
 from django.test import TestCase
 from inventory.uom.models.models import UoM
 from inventory.uom_conversion.models.models import UoMConversion
+from inventory.transaction_type.models.models import TransactionType
+from inventory.transaction.models.models import InventoryTransaction
+from inventory.transaction_type.services.services import TransactionTypeService
+from inventory.transaction.services.services import InventoryTransactionService
+from products.variant.models.models import ProductVariant
+from products.product.models.models import Product
+from products.size.models.models import Size
+from products.color.models.models import Color
+from decimal import Decimal
 
 
 class UoMServiceTests(TestCase):
@@ -34,3 +43,18 @@ class UoMConversionServiceTests(TestCase):
     def test_invalid_multiplier_fails(self):
         with self.assertRaises(ValueError):
             self.conv_service.create_conversion(from_uom_id=self.kg.id, to_uom_id=self.g.id, multiplier=0)
+
+
+class TransactionTypeServiceTests(TestCase):
+    def setUp(self):
+        self.service = TransactionTypeService()
+
+    def test_create_transaction_type(self):
+        tt = self.service.create_transaction_type(name='COMPRA', factor=1, description='Entrada de inventario')
+        self.assertEqual(tt.name, 'COMPRA')
+        self.assertEqual(tt.factor, 1)
+        self.assertEqual(TransactionType.objects.count(), 1)
+
+    def test_create_transaction_type_invalid_factor(self):
+        with self.assertRaises(ValueError):
+            self.service.create_transaction_type(name='TEST', factor=0, description='Test')

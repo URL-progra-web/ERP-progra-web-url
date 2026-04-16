@@ -38,7 +38,7 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
     return (
         <AppModal
             title={conversion ? 'Editar Conversión' : 'Nueva Conversión'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={saving ? 'Guardando...' : (conversion ? 'Guardar cambios' : 'Crear conversión')}
@@ -46,8 +46,11 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
         >
             {error && <div className="alert alert-danger py-2 small">{error}</div>}
             <div className="mb-3">
-                <label className="form-label fw-semibold small">UOM Origen <span className="text-danger">*</span></label>
+                <label className="form-label fw-semibold small" htmlFor="conversionFromUomSelect">UOM Origen <span className="text-danger">*</span></label>
                 <select
+                    id="conversionFromUomSelect"
+                    name="conversion_from_uom"
+                    autoComplete="off"
                     className="form-select"
                     value={fromUomId}
                     onChange={e => setFromUomId(e.target.value)}
@@ -60,8 +63,11 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
                 </select>
             </div>
             <div className="mb-3">
-                <label className="form-label fw-semibold small">UOM Destino <span className="text-danger">*</span></label>
+                <label className="form-label fw-semibold small" htmlFor="conversionToUomSelect">UOM Destino <span className="text-danger">*</span></label>
                 <select
+                    id="conversionToUomSelect"
+                    name="conversion_to_uom"
+                    autoComplete="off"
                     className="form-select"
                     value={toUomId}
                     onChange={e => setToUomId(e.target.value)}
@@ -74,9 +80,12 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
                 </select>
             </div>
             <div className="mb-3">
-                <label className="form-label fw-semibold small">Multiplicador <span className="text-danger">*</span></label>
+                <label className="form-label fw-semibold small" htmlFor="conversionMultiplierInput">Multiplicador <span className="text-danger">*</span></label>
                 <input
+                    id="conversionMultiplierInput"
                     type="number"
+                    name="conversion_multiplier"
+                    autoComplete="off"
                     step="0.0001"
                     min="0.0001"
                     className="form-control"

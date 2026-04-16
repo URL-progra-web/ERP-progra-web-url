@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Third party
+    'drf_spectacular',
     'rest_framework',
     'corsheaders',
     # Local
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
     'products',
     'inventory',
     'orders',
+    'receipts',
+    'public',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +70,16 @@ ROOT_URLCONF = 'backend.urls'
 GLOBAL_SEEDERS = [
     'users.seeds.UserSeeder',
     'inventory.uom.seeds.UomSeeder',
+    'products.color.seeds.ColorSeeder',
+    'products.size.seeds.SizeSeeder',
+    'products.category.seeds.CategorySeeder',
+    'inventory.business_unit.seeds.BusinessUnitSeeder',
+    'crm.entrepreneur.seeds.EntrepreneurSeeder',
+    'crm.customer.seeds.CustomerSeeder',
+    'products.product.seeds.ProductSeeder',
+    'products.variant.seeds.ProductVariantSeeder',
+    'orders.order.seeds.OrderSeeder',
+    'receipts.receipt.seeds.ReceiptSeeder',
 ]
 
 REST_FRAMEWORK = {
@@ -75,7 +88,33 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'backend.schema.CustomAutoSchema',
+    'DEFAULT_THROTTLE_RATES': {
+        'public_order': '5/hour',
+        'public_catalog': '100/minute',
+    },
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'ERP API',
+    'DESCRIPTION': 'API endpoints for the ERP system',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'bearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
+    'SECURITY': [{'bearerAuth': []}],
 }
 
 SIMPLE_JWT = {
@@ -150,4 +189,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 CORS_ALLOW_ALL_ORIGINS = True
+
+# ============================================================
+# Email Configuration
+# ============================================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@erp.com')
+
+# ============================================================
+# Cloudflare Turnstile Configuration
+# ============================================================
+TURNSTILE_SECRET_KEY = os.environ.get('TURNSTILE_SECRET_KEY', '')

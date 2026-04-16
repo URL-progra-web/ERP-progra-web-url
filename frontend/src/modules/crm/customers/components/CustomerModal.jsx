@@ -60,59 +60,69 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
     return (
         <AppModal
             title={isEditing ? 'Editar cliente' : 'Nuevo cliente'}
-            tone="dark"
+            tone="dark" accent="var(--bs-success)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={isEditing ? 'Guardar cambios' : 'Crear cliente'}
         >
             <div className="mb-3">
-                <label className="form-label">Nombre *</label>
+                <label className="form-label" htmlFor="customerNameInput">Nombre *</label>
                 <input
+                    id="customerNameInput"
                     type="text"
                     className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                     name="name"
+                    autoComplete="name"
                     value={form.name}
                     onChange={handleChange}
                 />
                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Teléfono *</label>
+                <label className="form-label" htmlFor="customerPhoneInput">Teléfono *</label>
                 <input
+                    id="customerPhoneInput"
                     type="text"
                     className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
                     name="phone"
+                    autoComplete="tel"
                     value={form.phone}
                     onChange={handleChange}
                 />
                 {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Correo</label>
+                <label className="form-label" htmlFor="customerEmailInput">Correo</label>
                 <input
+                    id="customerEmailInput"
                     type="email"
                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                     name="email"
+                    autoComplete="email"
                     value={form.email}
                     onChange={handleChange}
                 />
                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
             <div>
-                <label className="form-label">Dirección</label>
+                <label className="form-label" htmlFor="customerAddressInput">Dirección</label>
                 <textarea
+                    id="customerAddressInput"
                     className="form-control"
                     rows={3}
                     name="address"
+                    autoComplete="street-address"
                     value={form.address}
                     onChange={handleChange}
                 />
             </div>
             <div className="mb-3 mt-3">
-                <label className="form-label">Tipo de cliente *</label>
+                <label className="form-label" htmlFor="customerTypeSelect">Tipo de cliente *</label>
                 <select
+                    id="customerTypeSelect"
                     className="form-select"
                     name="customer_type"
+                    autoComplete="off"
                     value={form.customer_type}
                     onChange={handleChange}
                 >

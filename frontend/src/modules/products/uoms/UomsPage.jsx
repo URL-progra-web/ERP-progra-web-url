@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiPlus, FiBox } from 'react-icons/fi';
+import FilterTabs from '~/core/components/FilterTabs';
 import { useUoms } from './hooks/useUoms';
 import { useUomPageState } from './hooks/useUomPageState';
 import { UomModal } from './components/UomModal';
@@ -7,6 +8,7 @@ import { ConversionModal } from './components/ConversionModal';
 import { UomsTable } from './components/UomsTable';
 import { ConversionsTab } from './components/ConversionsTab';
 import AppAlert from '~/core/components/AppAlert';
+import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
 
@@ -45,6 +47,7 @@ const UomsPage = () => {
                 actionLabel={activeTab === 'uoms' ? 'Nueva UOM' : 'Nueva Conversión'}
                 actionIcon={FiPlus}
                 onAction={() => (activeTab === 'uoms' ? setUomModal('new') : setConvModal('new'))}
+                isDark
             />
 
             {/* Global error */}
@@ -57,63 +60,54 @@ const UomsPage = () => {
                 />
             )}
 
-            <div className="rounded-4 border shadow-sm overflow-hidden bg-body">
-                {/* Tabs */}
-                <div className="bg-dark text-white px-4 py-3 d-flex flex-wrap gap-3 align-items-center">
-                    <div className="d-flex gap-2 flex-wrap">
-                        <button
-                            className={`btn btn-sm px-4 py-2 rounded-3 border-0 ${activeTab === 'uoms' ? 'bg-white text-dark fw-semibold shadow-sm' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
-                            style={activeTab === 'uoms' ? { color: '#1f1f1f' } : {}}
-                            onClick={() => setActiveTab('uoms')}
-                        >
-                            Unidades de Medida
-                            <span className="badge bg-dark-subtle text-dark ms-2">{uoms.length}</span>
-                        </button>
-                        <button
-                            className={`btn btn-sm px-4 py-2 rounded-3 ${activeTab === 'conversions' ? 'bg-white text-dark fw-semibold shadow-sm border-0' : 'bg-transparent text-white-50 fw-semibold border border-light-subtle'}`}
-                            style={activeTab === 'conversions' ? { color: '#1f1f1f' } : {}}
-                            onClick={() => setActiveTab('conversions')}
-                        >
-                            Conversiones
-                            <span className="badge bg-dark-subtle text-dark ms-2">{conversions.length}</span>
-                        </button>
+            <AppCard accent="var(--bs-primary)">
+                <AppCard.Section label="Tipo">
+                    <div className="p-3 p-md-4 border-bottom">
+                        <FilterTabs
+                            options={[
+                                { value: 'uoms',        label: 'Unidades de Medida', badge: uoms.length },
+                                { value: 'conversions', label: 'Conversiones',       badge: conversions.length },
+                            ]}
+                            value={activeTab}
+                            onChange={setActiveTab}
+                        />
                     </div>
-                </div>
+                </AppCard.Section>
 
-                <div className="bg-body p-3 p-md-4">
-                    {/* Tab: UOMs */}
-                    {activeTab === 'uoms' && (
-                        <UomsTable
-                            uoms={uoms}
-                            isLoading={isLoadingUoms}
-                            onEdit={setUomModal}
-                            onDelete={handleDeleteUom}
-                        />
-                    )}
+                <AppCard.Section label={activeTab === 'uoms' ? 'Unidades de Medida' : 'Conversiones'}>
+                    <div className="p-3 p-md-4">
+                        {activeTab === 'uoms' && (
+                            <UomsTable
+                                uoms={uoms}
+                                isLoading={isLoadingUoms}
+                                onEdit={setUomModal}
+                                onDelete={handleDeleteUom}
+                            />
+                        )}
 
-                    {/* Tab: Conversions */}
-                    {activeTab === 'conversions' && (
-                        <ConversionsTab
-                            conversions={conversions}
-                            isLoading={isLoadingConversions}
-                            uoms={uoms}
-                            fromUomFilter={fromUomFilter}
-                            setFromUomFilter={setFromUomFilter}
-                            toUomFilter={toUomFilter}
-                            setToUomFilter={setToUomFilter}
-                            onEdit={setConvModal}
-                            onDelete={handleDeleteConversion}
-                        />
-                    )}
-                </div>
+                        {activeTab === 'conversions' && (
+                            <ConversionsTab
+                                conversions={conversions}
+                                isLoading={isLoadingConversions}
+                                uoms={uoms}
+                                fromUomFilter={fromUomFilter}
+                                setFromUomFilter={setFromUomFilter}
+                                toUomFilter={toUomFilter}
+                                setToUomFilter={setToUomFilter}
+                                onEdit={setConvModal}
+                                onDelete={handleDeleteConversion}
+                            />
+                        )}
+                    </div>
 
-                <AppPagination
-                    page={activeTab === 'uoms' ? uomPage : convPage}
-                    numPages={activeTab === 'uoms' ? uomNumPages : convNumPages}
-                    count={activeTab === 'uoms' ? uomCount : convCount}
-                    onPageChange={activeTab === 'uoms' ? setUomPage : setConvPage}
-                />
-            </div>
+                    <AppPagination
+                        page={activeTab === 'uoms' ? uomPage : convPage}
+                        numPages={activeTab === 'uoms' ? uomNumPages : convNumPages}
+                        count={activeTab === 'uoms' ? uomCount : convCount}
+                        onPageChange={activeTab === 'uoms' ? setUomPage : setConvPage}
+                    />
+                </AppCard.Section>
+            </AppCard>
 
             {/* Modals */}
             {uomModal && (

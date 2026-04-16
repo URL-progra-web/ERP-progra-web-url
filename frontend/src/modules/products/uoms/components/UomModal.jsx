@@ -24,7 +24,7 @@ export function UomModal({ uom, onClose, onSave }) {
     return (
         <AppModal
             title={uom ? 'Editar Unidad de Medida' : 'Nueva Unidad de Medida'}
-            tone="dark"
+            tone="dark" accent="var(--bs-primary)"
             onClose={onClose}
             onSubmit={handleSubmit}
             submitLabel={saving ? 'Guardando...' : (uom ? 'Guardar cambios' : 'Crear UOM')}
@@ -32,8 +32,12 @@ export function UomModal({ uom, onClose, onSave }) {
         >
             {error && <div className="alert alert-danger py-2 small">{error}</div>}
             <div className="mb-3">
-                <label className="form-label fw-semibold small">Código <span className="text-danger">*</span></label>
+                <label className="form-label fw-semibold small" htmlFor="uomCodeInput">Código <span className="text-danger">*</span></label>
                 <input
+                    id="uomCodeInput"
+                    name="uom_code"
+                    type="text"
+                    autoComplete="off"
                     className="form-control"
                     placeholder="ej: kg, lb, un"
                     value={code}
@@ -44,8 +48,12 @@ export function UomModal({ uom, onClose, onSave }) {
                 <div className="form-text">Máximo 10 caracteres. Se guardará en minúsculas.</div>
             </div>
             <div className="mb-3">
-                <label className="form-label fw-semibold small">Nombre <span className="text-danger">*</span></label>
+                <label className="form-label fw-semibold small" htmlFor="uomNameInput">Nombre <span className="text-danger">*</span></label>
                 <input
+                    id="uomNameInput"
+                    name="uom_name"
+                    type="text"
+                    autoComplete="off"
                     className="form-control"
                     placeholder="ej: Kilogramo, Libra, Unidad"
                     value={name}

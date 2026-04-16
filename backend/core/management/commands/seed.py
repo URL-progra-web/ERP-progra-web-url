@@ -27,6 +27,17 @@ class Command(BaseCommand):
                 uom_service=inventory_container.uom_service,
                 conv_service=inventory_container.uom_conversion_service
             ),
+            # Nuevos seeders sin dependencias DI
+            'products.color.seeds.ColorSeeder': lambda: import_string('products.color.seeds.ColorSeeder')(),
+            'products.size.seeds.SizeSeeder': lambda: import_string('products.size.seeds.SizeSeeder')(),
+            'products.category.seeds.CategorySeeder': lambda: import_string('products.category.seeds.CategorySeeder')(),
+            'inventory.business_unit.seeds.BusinessUnitSeeder': lambda: import_string('inventory.business_unit.seeds.BusinessUnitSeeder')(),
+            'crm.entrepreneur.seeds.EntrepreneurSeeder': lambda: import_string('crm.entrepreneur.seeds.EntrepreneurSeeder')(),
+            'crm.customer.seeds.CustomerSeeder': lambda: import_string('crm.customer.seeds.CustomerSeeder')(),
+            'products.product.seeds.ProductSeeder': lambda: import_string('products.product.seeds.ProductSeeder')(),
+            'products.variant.seeds.ProductVariantSeeder': lambda: import_string('products.variant.seeds.ProductVariantSeeder')(),
+            'orders.order.seeds.OrderSeeder': lambda: import_string('orders.order.seeds.OrderSeeder')(),
+            'receipts.receipt.seeds.ReceiptSeeder': lambda: import_string('receipts.receipt.seeds.ReceiptSeeder')(),
         }
 
     def handle(self, *args, **options):
@@ -39,6 +50,15 @@ class Command(BaseCommand):
             global_seeders = getattr(settings, 'GLOBAL_SEEDERS', [
                 'users.seeds.UserSeeder',
                 'inventory.uom.seeds.UomSeeder',
+                'products.color.seeds.ColorSeeder',
+                'products.size.seeds.SizeSeeder',
+                'products.category.seeds.CategorySeeder',
+                'inventory.business_unit.seeds.BusinessUnitSeeder',
+                'crm.entrepreneur.seeds.EntrepreneurSeeder',
+                'products.product.seeds.ProductSeeder',
+                'products.variant.seeds.ProductVariantSeeder',
+                'orders.order.seeds.OrderSeeder',
+                'receipts.receipt.seeds.ReceiptSeeder',
             ])
             for path in global_seeders:
                 self.run_seeder(path, factories)

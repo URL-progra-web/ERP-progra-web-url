@@ -1,6 +1,8 @@
 import React from 'react';
-import { FiUsers } from 'react-icons/fi';
-import CustomersPage from './customers/CustomersPage';
+import { FiUsers, FiBriefcase } from 'react-icons/fi';
+
+const CustomersPage = React.lazy(() => import('./customers/CustomersPage'));
+const EntrepreneursPage = React.lazy(() => import('./entrepreneurs/EntrepreneursPage'));
 
 export const crmFeature = {
     id: 'crm',
@@ -12,6 +14,13 @@ export const crmFeature = {
             icon: FiUsers,
             roles: ['MANAGER', 'ADMIN'],
             element: <CustomersPage />,
+        },
+        {
+            text: 'Emprendedores',
+            path: 'crm/entrepreneurs',
+            icon: FiBriefcase,
+            roles: ['MANAGER', 'ADMIN'],
+            element: <EntrepreneursPage />,
         },
     ],
 };

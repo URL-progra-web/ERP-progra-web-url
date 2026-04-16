@@ -1,37 +1,49 @@
 import React from 'react';
-import { useTheme } from '../theme/ThemeContext';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const AppPagination = ({ page, numPages, count, onPageChange }) => {
-    const { theme } = useTheme();
-    const isDark = theme === 'dark';
-
-    if (numPages <= 1) return null;
-
-    const bgClass = isDark ? 'bg-dark text-white border-top' : 'bg-body border-top';
-    const btnClass = isDark ? 'btn-outline-light' : 'btn-outline-secondary';
+    const currentPage = Number.isFinite(page) && page > 0 ? page : 1;
+    const totalPages = Number.isFinite(numPages) && numPages > 0 ? numPages : 1;
+    const totalCount = Number.isFinite(count) && count >= 0 ? count : 0;
 
     return (
-        <div className={`px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-3 ${bgClass}`}>
-            <small className={isDark ? 'text-white-50' : 'text-muted'}>
-                Página {page} de {numPages} ({count} registros)
-            </small>
-            <div className="btn-group">
+        <div
+            style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '12px',
+                padding: '12px 20px',
+                borderTop: '1px solid var(--bs-border-color)',
+            }}
+        >
+            <span
+                style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '12px',
+                    color: 'var(--bs-secondary-color)',
+                }}
+            >
+                Pág. {currentPage} / {totalPages} · {totalCount} registros
+            </span>
+
+            <div style={{ display: 'flex', gap: '4px' }}>
                 <button
-                    className={`btn btn-sm ${btnClass}`}
-                    disabled={page <= 1}
-                    onClick={() => onPageChange(page - 1)}
+                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                    disabled={currentPage <= 1}
+                    onClick={() => onPageChange(currentPage - 1)}
                 >
+                    <FiChevronLeft size={14} />
                     Anterior
                 </button>
-                <div className={`btn btn-sm ${btnClass} disabled`}>
-                    {page} / {numPages}
-                </div>
                 <button
-                    className={`btn btn-sm ${btnClass}`}
-                    disabled={page >= numPages}
-                    onClick={() => onPageChange(page + 1)}
+                    className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                    disabled={currentPage >= totalPages}
+                    onClick={() => onPageChange(currentPage + 1)}
                 >
                     Siguiente
+                    <FiChevronRight size={14} />
                 </button>
             </div>
         </div>

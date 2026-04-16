@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2, FiRefreshCw, FiArrowRight } from 'react-icons/fi';
+import TableActions from '~/core/components/TableActions';
 
 /**
  * Tab completa de Conversiones: filtros + tabla.
@@ -18,8 +19,12 @@ export function ConversionsTab({
             {/* Filters */}
             <div className="px-4 py-3 border-bottom d-flex gap-3 flex-wrap align-items-end">
                 <div style={{ minWidth: 200 }}>
-                    <label className="form-label small fw-semibold mb-1">UOM Origen</label>
+                    <label className="form-label small fw-semibold mb-1" htmlFor="conversionsFromUomFilter">UOM Origen</label>
                     <select
+                        id="conversionsFromUomFilter"
+                        name="conversions_from_uom_filter"
+                        autoComplete="off"
+                        aria-label="Filtrar conversiones por UOM origen"
                         className="form-select form-select-sm"
                         value={fromUomFilter}
                         onChange={e => setFromUomFilter(e.target.value)}
@@ -31,8 +36,12 @@ export function ConversionsTab({
                     </select>
                 </div>
                 <div style={{ minWidth: 200 }}>
-                    <label className="form-label small fw-semibold mb-1">UOM Destino</label>
+                    <label className="form-label small fw-semibold mb-1" htmlFor="conversionsToUomFilter">UOM Destino</label>
                     <select
+                        id="conversionsToUomFilter"
+                        name="conversions_to_uom_filter"
+                        autoComplete="off"
+                        aria-label="Filtrar conversiones por UOM destino"
                         className="form-select form-select-sm"
                         value={toUomFilter}
                         onChange={e => setToUomFilter(e.target.value)}
@@ -98,20 +107,10 @@ export function ConversionsTab({
                                         </code>
                                     </td>
                                     <td className="px-4 text-end">
-                                        <button
-                                            className="btn btn-sm btn-outline-secondary me-2"
-                                            title="Editar"
-                                            onClick={() => onEdit(conv)}
-                                        >
-                                            <FiEdit2 />
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-outline-danger"
-                                            title="Eliminar"
-                                            onClick={() => onDelete(conv)}
-                                        >
-                                            <FiTrash2 />
-                                        </button>
+                                        <TableActions actions={[
+                                            { icon: FiEdit2,  onClick: () => onEdit(conv),   title: 'Editar',   variant: 'primary' },
+                                            { icon: FiTrash2, onClick: () => onDelete(conv), title: 'Eliminar', variant: 'danger'  },
+                                        ]} />
                                     </td>
                                 </tr>
                             ))
