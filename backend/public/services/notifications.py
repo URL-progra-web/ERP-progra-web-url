@@ -74,8 +74,9 @@ class NotificationService:
                 fail_silently=False,
             )
             return True
-        except Exception:
-            logger.exception('Error enviando email de notificación')
+        except Exception as e:
+            # Log del error (en producción usar logging)
+            print(f'Error enviando email de notificación: {e}')
             return False
     
     @staticmethod

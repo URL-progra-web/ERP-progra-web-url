@@ -17,7 +17,6 @@ const OrderStatusesPage = () => {
         isLoadingWorkflow,
         error,
         setError,
-        runTransition,
     } = useOrderStatuses();
 
     return (
@@ -33,8 +32,6 @@ const OrderStatusesPage = () => {
             <div className="d-flex flex-column gap-4">
                 <TransitionPanel
                     workflow={workflow}
-                    statuses={statuses}
-                    onSubmit={runTransition}
                     isLoadingWorkflow={isLoadingWorkflow}
                 />
 
