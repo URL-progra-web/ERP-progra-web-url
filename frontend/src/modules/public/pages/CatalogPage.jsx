@@ -160,12 +160,14 @@ export const CatalogPage = () => {
           label="Cargando interfaz de tienda"
         />
 
+        {/* CONTENIDO PRINCIPAL - Filtros (2/8) + (Buscador + Grid) (6/8) */}
       <main style={{ 
         flex: 1,
         display: 'flex',
         width: '100%',
         minHeight: 'calc(100vh - 60px)'
       }}>
+        {/* SIDEBAR IZQUIERDA - Navegación y Filtros */}
         <aside className="d-none d-lg-flex" style={{
           width: '280px',
           minWidth: '280px',
@@ -180,6 +182,7 @@ export const CatalogPage = () => {
           top: 0,
           height: '100vh'
         }}>
+          {/* Navegación por categorías */}
           <div>
             <h3 className="store-kicker mb-3" style={{ 
               fontSize: '0.7rem', 
@@ -195,12 +198,14 @@ export const CatalogPage = () => {
             />
           </div>
 
+          {/* Divisor */}
           <div style={{
             height: '1px',
             backgroundColor: 'var(--bs-border-color, #dee2e6)',
             margin: '0'
           }} />
 
+          {/* Filtros */}
           <div>
             <div className="d-flex align-items-center justify-content-between mb-3">
               <h3 className="store-kicker mb-0" style={{ 
@@ -239,6 +244,7 @@ export const CatalogPage = () => {
           </div>
         </aside>
 
+        {/* CONTENIDO PRINCIPAL - Búsqueda + Grid de productos */}
         <section style={{ 
           flex: 1,
           display: 'flex',
@@ -246,6 +252,7 @@ export const CatalogPage = () => {
           width: '100%',
           minWidth: 0
         }}>
+          {/* Cabecera con búsqueda - sin fondo, flotante */}
           <div style={{ 
             padding: '1rem 1.5rem 0.75rem',
             position: 'sticky',
@@ -310,11 +317,13 @@ export const CatalogPage = () => {
             </form>
           </div>
 
+          {/* Área de productos con scroll */}
           <div style={{ 
             flex: 1,
             overflowY: 'auto',
             padding: '1.5rem 1.5rem 2rem'
           }}>
+            {/* Cabecera de resultados */}
             <div className="store-section__header mb-3">
               <div>
                 <span className="store-kicker">
@@ -330,10 +339,11 @@ export const CatalogPage = () => {
               </div>
             </div>
 
+            {/* Chips de filtros activos */}
             {activeChips.length > 0 && (
               <div className="store-chip-row mb-3">
                 {activeChips.map((chip) => (
-                  <div key={chip.key} className="store-chip store-chip--filter">
+                  <div key={chip.key} className="store-chip">
                     <span>{chip.label}</span>
                     <button type="button" onClick={chip.onRemove} aria-label={`Quitar ${chip.label}`}>
                       <FiX size={12} />
@@ -343,6 +353,7 @@ export const CatalogPage = () => {
               </div>
             )}
 
+            {/* Grid de productos o estados vacíos */}
             <div className="mt-4">
               {loading && <CatalogSkeletonGrid />}
 
@@ -398,6 +409,7 @@ export const CatalogPage = () => {
         </section>
     </main>
 
+    {/* Panel móvil de filtros */}
     {showMobileFilters && (
         <div className="store-cart-sheet d-lg-none">
           <div className="store-cart-sheet__backdrop" onClick={() => setShowMobileFilters(false)} />

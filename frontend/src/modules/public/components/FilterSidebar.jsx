@@ -13,9 +13,11 @@ export const FilterSidebar = ({
 }) => {
   const { sizes, colors, price_range } = filters;
   
+  // Estado local para el slider de precio
   const [localMinPrice, setLocalMinPrice] = useState(price_range.min);
   const [localMaxPrice, setLocalMaxPrice] = useState(price_range.max);
 
+  // Sincronizar con price_range cuando cambie
   useEffect(() => {
     if (selectedFilters.minPrice === null) {
       setLocalMinPrice(price_range.min);
@@ -85,7 +87,7 @@ export const FilterSidebar = ({
                 title={color.name}
               >
                 {color.hex_code && (
-                  <span className="store-filter-pill__swatch" style={{ backgroundColor: color.hex_code }} />
+                  <span className="store-filter-pill__swatch" style={{ backgroundColor: color.hex_code, width: '12px', height: '12px' }} />
                 )}
                 <span>{color.name}</span>
               </button>
@@ -132,7 +134,7 @@ export const FilterSidebar = ({
           </div>
 
           <div className="store-pill mt-2" style={{ fontSize: '0.75rem', padding: '4px 8px' }}>
-            <FiTag size={11} /> {formatPrice(localMinPrice)} — {formatPrice(localMaxPrice)}
+            {formatPrice(localMinPrice)} - {formatPrice(localMaxPrice)}
           </div>
 
           <div className="store-btn-group mt-2">
@@ -156,4 +158,3 @@ export const FilterSidebar = ({
     </div>
   );
 };
-

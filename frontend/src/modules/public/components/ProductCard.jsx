@@ -33,8 +33,9 @@ export const ProductCard = ({ product }) => {
               {product.name}
             </h3>
             {product.description && (
-              <p className="store-card__copy mb-0">
-                {product.description}
+              <p className="store-card__copy mb-0" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                {product.description.substring(0, 95)}
+                {product.description.length > 95 && '...'}
               </p>
             )}
           </div>
@@ -43,8 +44,8 @@ export const ProductCard = ({ product }) => {
 
         {product.entrepreneur_name && (
           <div className="store-card__meta mb-3">
-            <span className="store-pill store-pill--sm d-inline-flex align-items-center">
-              <FiUser size={10} /> {product.entrepreneur_name}
+            <span className="d-inline-flex align-items-center gap-2" style={{ fontSize: '0.8rem' }}>
+              <FiUser size={12} /> {product.entrepreneur_name}
             </span>
           </div>
         )}
@@ -55,8 +56,8 @@ export const ProductCard = ({ product }) => {
               Desde <strong>{formatPrice(product.min_price)}</strong>
             </div>
             <div className="store-card__meta">
-              <span className="store-pill store-pill--sm d-inline-flex align-items-center">
-                <FiLayers size={10} /> {product.variant_count} var.
+              <span className="d-inline-flex align-items-center gap-2" style={{ fontSize: '0.8rem' }}>
+                <FiLayers size={12} /> {product.variant_count}
               </span>
             </div>
           </div>
