@@ -35,4 +35,9 @@ export const orderService = {
     async remove(id) {
         await api.delete(`${BASE_URL}${id}/`);
     },
+
+    async getHistory(id) {
+        const response = await api.get(`${BASE_URL}${id}/history/`);
+        return response.data;
+    },
 };

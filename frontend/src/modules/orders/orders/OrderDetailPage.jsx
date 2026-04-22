@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiPlus, FiSave, FiTrash2, FiClock } from 'react-icons/fi';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import { useAuth } from '~/core/auth/AuthContext';
@@ -49,6 +49,8 @@ const OrderDetailPage = () => {
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [isSubmittingItem, setIsSubmittingItem] = useState(false);
     const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || '');
+    const [history, setHistory] = useState([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [formData, setFormData] = useState({
         payment_method_id: '',
         shipping_address: '',
@@ -83,7 +85,20 @@ const OrderDetailPage = () => {
         };
 
         load();
+        loadHistory();
     }, [fetchOrderDetail, orderId, setError]);
+
+    const loadHistory = async () => {
+        setIsLoadingHistory(true);
+        try {
+            const historyData = await orderService.getHistory(orderId);
+            setHistory(historyData || []);
+        } catch {
+            setHistory([]);
+        } finally {
+            setIsLoadingHistory(false);
+        }
+    };
 
     useEffect(() => {
         if (!location.state?.successMessage) return;
@@ -360,6 +375,54 @@ const OrderDetailPage = () => {
                     onDelete={(item) => setItemToDelete(item)}
                     canEdit={canMutateOrder}
                 />
+            </div>
+
+            <div className="card border-0 shadow-sm mt-4">
+                <div className="card-header bg-body py-3 d-flex align-items-center">
+                    <FiClock className="me-2" />
+                    <h6 className="mb-0 text-uppercase text-muted small">Historial de Estados</h6>
+                </div>
+                <div className="card-body p-0">
+                    {isLoadingHistory ? (
+                        <div className="p-3 text-muted">Cargando historial...</div>
+                    ) : history.length === 0 ? (
+                        <div className="p-3 text-muted">No hay historial de cambios.</div>
+                    ) : (
+                        <div className="table-responsive">
+                            <table className="table table-hover mb-0">
+                                <thead className="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Usuario</th>
+                                        <th>Estado Anterior</th>
+                                        <th>Estado Nuevo</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {history.map((entry) => (
+                                        <tr key={entry.id}>
+                                            <td>
+                                                <div>{new Date(entry.created_at).toLocaleDateString()}</div>
+                                                <div className="small text-muted">
+                                                    {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </td>
+                                            <td>{entry.user_name || 'Sistema'}</td>
+                                            <td>
+                                                <span className="badge bg-secondary">{entry.previous_status_name || '-'}</span>
+                                            </td>
+                                            <td>
+                                                <span className="badge bg-primary">{entry.status_name}</span>
+                                            </td>
+                                            <td>{entry.notes || '-'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {error && (
