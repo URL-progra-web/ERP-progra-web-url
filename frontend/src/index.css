@@ -366,6 +366,26 @@ code, pre, .font-mono, kbd {
   background: var(--bs-tertiary-bg);
 }
 
+/* ── Range selector active button ───────────────────────────── */
+[data-bs-theme='light'] .btn-range-active {
+  background-color: #1a2540;
+  border-color: #1a2540;
+  color: #ffffff;
+}
+[data-bs-theme='dark'] .btn-range-active {
+  background-color: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.35);
+  color: #ffffff;
+}
+[data-bs-theme='light'] .btn-range-active:hover {
+  background-color: #162240;
+  border-color: #162240;
+}
+[data-bs-theme='dark'] .btn-range-active:hover {
+  background-color: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.45);
+}
+
 /* ── Mobile bottom nav spacing ───────────────────────────────── */
 @media (max-width: 767.98px) {
   .has-bottom-nav {

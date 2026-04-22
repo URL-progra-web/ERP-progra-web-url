@@ -2,6 +2,7 @@ import { usersFeature } from '../../modules/users/users.config';
 import { productsFeature } from '../../modules/products/products.config';
 import { ordersFeature } from '../../modules/orders/orders.config';
 import { crmFeature } from '../../modules/crm/crm.config';
+import { receiptsFeature } from "../../modules/receipts/receipts.config";
 
 /**
  * Los 28 programadores solo tocarán este archivo una vez:
@@ -13,6 +14,8 @@ export const REGISTERED_FEATURES = [
     productsFeature,
     ordersFeature,
     crmFeature,
+    receiptsFeature,
     // Inventario: inventoryFeature,
     // Ventas: salesFeature,
 ];
+

@@ -11,6 +11,7 @@ class Product(models.Model):
     base_uom = models.ForeignKey(UoM, on_delete=models.RESTRICT)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

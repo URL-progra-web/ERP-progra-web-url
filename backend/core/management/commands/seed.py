@@ -36,6 +36,8 @@ class Command(BaseCommand):
             'crm.customer.seeds.CustomerSeeder': lambda: import_string('crm.customer.seeds.CustomerSeeder')(),
             'products.product.seeds.ProductSeeder': lambda: import_string('products.product.seeds.ProductSeeder')(),
             'products.variant.seeds.ProductVariantSeeder': lambda: import_string('products.variant.seeds.ProductVariantSeeder')(),
+            'orders.order.seeds.OrderSeeder': lambda: import_string('orders.order.seeds.OrderSeeder')(),
+            'receipts.receipt.seeds.ReceiptSeeder': lambda: import_string('receipts.receipt.seeds.ReceiptSeeder')(),
         }
 
     def handle(self, *args, **options):
@@ -55,6 +57,8 @@ class Command(BaseCommand):
                 'crm.entrepreneur.seeds.EntrepreneurSeeder',
                 'products.product.seeds.ProductSeeder',
                 'products.variant.seeds.ProductVariantSeeder',
+                'orders.order.seeds.OrderSeeder',
+                'receipts.receipt.seeds.ReceiptSeeder',
             ])
             for path in global_seeders:
                 self.run_seeder(path, factories)

@@ -244,10 +244,12 @@ export const CheckoutPage = () => {
             <form onSubmit={handleSubmit} className="store-form-grid">
               <div className="store-form-grid store-form-grid--two">
                 <div>
-                  <label className="store-form-label">Nombre completo *</label>
+                  <label className="store-form-label" htmlFor="checkoutCustomerName">Nombre completo *</label>
                   <input
+                    id="checkoutCustomerName"
                     type="text"
                     name="customer_name"
+                    autoComplete="name"
                     className="form-control store-form-control"
                     value={formData.customer_name}
                     onChange={handleChange}
@@ -256,10 +258,12 @@ export const CheckoutPage = () => {
                 </div>
 
                 <div>
-                  <label className="store-form-label">Telefono / WhatsApp *</label>
+                  <label className="store-form-label" htmlFor="checkoutCustomerPhone">Telefono / WhatsApp *</label>
                   <input
+                    id="checkoutCustomerPhone"
                     type="tel"
                     name="customer_phone"
+                    autoComplete="tel"
                     className="form-control store-form-control"
                     placeholder="+502 5555-1234"
                     value={formData.customer_phone}
@@ -271,10 +275,12 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="store-form-label">Email</label>
+                <label className="store-form-label" htmlFor="checkoutCustomerEmail">Email</label>
                 <input
+                  id="checkoutCustomerEmail"
                   type="email"
                   name="customer_email"
+                  autoComplete="email"
                   className="form-control store-form-control"
                   value={formData.customer_email}
                   onChange={handleChange}
@@ -282,9 +288,11 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="store-form-label">Direccion de envio</label>
+                <label className="store-form-label" htmlFor="checkoutShippingAddress">Direccion de envio</label>
                 <textarea
+                  id="checkoutShippingAddress"
                   name="shipping_address"
+                  autoComplete="street-address"
                   className="form-control store-form-textarea"
                   value={formData.shipping_address}
                   onChange={handleChange}
@@ -293,9 +301,11 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="store-form-label">Notas adicionales</label>
+                <label className="store-form-label" htmlFor="checkoutNotes">Notas adicionales</label>
                 <textarea
+                  id="checkoutNotes"
                   name="notes"
+                  autoComplete="off"
                   className="form-control store-form-textarea"
                   placeholder="Horario ideal, referencias, instrucciones especiales..."
                   value={formData.notes}

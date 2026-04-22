@@ -13,13 +13,11 @@ const getLineTitle = (item) => {
 
 export const OrderCartSummary = ({
     items,
-    availableUomsByItem = {},
     shippingCost,
     onShippingCostChange,
     onIncrement,
     onDecrement,
     onQuantityChange,
-    onSelectedUomChange,
     onRemove,
     onClear,
 }) => {
@@ -48,7 +46,7 @@ export const OrderCartSummary = ({
             ) : (
                 <div className="d-flex flex-column gap-3">
                     {items.map((item) => {
-                        const lineTotal = Number(item.unit_price ?? 0) * Number(item.quantity ?? 0);
+                        const lineTotal = Number(item.unit_price ?? 0) * Number(item.base_quantity ?? 0);
                         return (
                             <div key={`${item.variant_id}-${item.selected_uom_id}`} className="border rounded-4 p-3 bg-body-tertiary">
                                 <div className="d-flex justify-content-between gap-3 align-items-start">
@@ -64,16 +62,10 @@ export const OrderCartSummary = ({
 
                                 <div className="d-flex justify-content-between align-items-center gap-3 mt-3 flex-wrap">
                                     <div style={{ minWidth: 180 }}>
-                                        <label className="form-label small text-muted mb-1">UOM de operacion</label>
-                                        <select
-                                            className="form-select form-select-sm"
-                                            value={item.selected_uom_id || ''}
-                                            onChange={(e) => onSelectedUomChange?.(item.variant_id, item.selected_uom_id, e.target.value)}
-                                        >
-                                            {(availableUomsByItem[`${item.variant_id}`] || []).map((uom) => (
-                                                <option key={uom.id} value={uom.id}>{uom.name}</option>
-                                            ))}
-                                        </select>
+                                        <div className="form-label small text-muted mb-1">UOM de operacion</div>
+                                        <div className="small fw-semibold">
+                                            {item.selected_uom_name || item.base_uom_name || 'UOM base'}
+                                        </div>
                                     </div>
                                     <div className="small text-muted">
                                         Precio: <span className="fw-semibold text-body">{formatMoney(item.unit_price)}</span>
@@ -92,7 +84,10 @@ export const OrderCartSummary = ({
                                             <FiMinus />
                                         </button>
                                         <input
+                                            id={`orderCartQty-${item.variant_id}-${item.selected_uom_id}`}
                                             type="number"
+                                            name={`order_cart_qty_${item.variant_id}_${item.selected_uom_id}`}
+                                            autoComplete="off"
                                             min="1"
                                             className="form-control text-center"
                                             value={item.quantity}
@@ -112,9 +107,12 @@ export const OrderCartSummary = ({
 
             <div className="border rounded-4 p-3 bg-dark text-white">
                 <div className="mb-3">
-                    <label className="form-label small text-white-50">Costo de envio</label>
+                    <label className="form-label small text-white-50" htmlFor="orderCartShippingCost">Costo de envio</label>
                     <input
+                        id="orderCartShippingCost"
                         type="number"
+                        name="order_cart_shipping_cost"
+                        autoComplete="off"
                         step="0.01"
                         min="0"
                         className="form-control"

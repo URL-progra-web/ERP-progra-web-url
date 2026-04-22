@@ -41,8 +41,14 @@ const OrderStatusesPage = () => {
                 <AppCard accent="var(--bs-orange)">
                     <AppCard.Section label="Filtros">
                         <div className="p-3 p-md-4 border-bottom">
+                            <label className="visually-hidden" htmlFor="orderStatusesSearchInput">
+                                Buscar estados por nombre
+                            </label>
                             <input
+                                id="orderStatusesSearchInput"
                                 type="search"
+                                name="order_statuses_search"
+                                autoComplete="off"
                                 className="form-control"
                                 placeholder="Buscar por nombre..."
                                 value={search}

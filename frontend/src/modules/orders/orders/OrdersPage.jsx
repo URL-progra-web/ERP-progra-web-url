@@ -120,8 +120,14 @@ const OrdersPage = () => {
             <AppCard accent="var(--bs-orange)">
                 <AppCard.Section label="Filtros">
                     <div className="p-3 p-md-4 border-bottom">
+                        <label className="visually-hidden" htmlFor="ordersSearchInput">
+                            Buscar pedidos por ID, cliente o estado
+                        </label>
                         <input
+                            id="ordersSearchInput"
                             type="search"
+                            name="orders_search"
+                            autoComplete="off"
                             className="form-control"
                             placeholder="Buscar por ID, cliente, estado..."
                             value={search}

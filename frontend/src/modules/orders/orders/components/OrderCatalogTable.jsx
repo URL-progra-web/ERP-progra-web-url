@@ -76,7 +76,13 @@ export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = [], 
                                 <td className="py-3 text-end fw-semibold">{formatMoney(variant.price)}</td>
                                 <td className="py-3 text-end">{stock} {variant.base_uom_name || ''}</td>
                                 <td className="px-4 py-3 text-end">
+                                    <label className="visually-hidden" htmlFor={`orderCreateVariantUom-${variant.id}`}>
+                                        Seleccionar UOM para {variant.product_name || `variante ${variant.id}`}
+                                    </label>
                                     <select
+                                        id={`orderCreateVariantUom-${variant.id}`}
+                                        name={`order_create_variant_uom_${variant.id}`}
+                                        autoComplete="off"
                                         className="form-select form-select-sm mb-2"
                                         value={selectedUomId || ''}
                                         onChange={(e) => setSelectedUoms((prev) => ({ ...prev, [variant.id]: e.target.value }))}

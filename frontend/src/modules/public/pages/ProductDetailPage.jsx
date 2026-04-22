@@ -328,7 +328,11 @@ export const ProductDetailPage = () => {
                 <FiMinus size={14} />
               </button>
               <input
+                id="productDetailQuantityInput"
                 type="number"
+                name="product_detail_quantity"
+                autoComplete="off"
+                aria-label="Cantidad a agregar al carrito"
                 className="store-quantity-input text-center"
                 value={quantity}
                 onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}

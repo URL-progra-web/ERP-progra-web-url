@@ -13,33 +13,12 @@ class SizeSeeder(BaseSeeder):
             return
 
         # Seed Sizes (Tallas)
+        # Solo dejamos tallas básicas y unitalla
         sizes_data = [
-            # Tallas de ropa estándar
-            {'name': 'XXS'},
-            {'name': 'XS'},
             {'name': 'S'},
             {'name': 'M'},
             {'name': 'L'},
-            {'name': 'XL'},
-            {'name': 'XXL'},
-            {'name': '3XL'},
-            {'name': '4XL'},
-            # Tallas numéricas para calzado
-            {'name': '35'},
-            {'name': '36'},
-            {'name': '37'},
-            {'name': '38'},
-            {'name': '39'},
-            {'name': '40'},
-            {'name': '41'},
-            {'name': '42'},
-            {'name': '43'},
-            {'name': '44'},
-            # Tallas genéricas
             {'name': 'Unitalla'},
-            {'name': 'Chico'},
-            {'name': 'Mediano'},
-            {'name': 'Grande'},
         ]
 
         for data in sizes_data:

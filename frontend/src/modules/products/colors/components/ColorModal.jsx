@@ -75,12 +75,14 @@ const ColorModal = ({ color, onClose, onSave }) => {
         >
             {error && <div className="alert alert-danger small py-2">{error}</div>}
 
-            <form onSubmit={handleSubmit} id="colorForm">
+            <div>
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Nombre del color *</label>
+                    <label className="form-label fw-semibold" htmlFor="colorNameInput">Nombre del color *</label>
                     <input
+                        id="colorNameInput"
                         type="text"
                         name="name"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.name}
                         onChange={handleChange}
@@ -92,10 +94,12 @@ const ColorModal = ({ color, onClose, onSave }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Código del color</label>
+                    <label className="form-label fw-semibold" htmlFor="colorCodeInput">Código del color</label>
                     <input
+                        id="colorCodeInput"
                         type="text"
                         name="code"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.code}
                         onChange={handleChange}
@@ -108,7 +112,7 @@ const ColorModal = ({ color, onClose, onSave }) => {
 
                 {formData.code && (
                     <div className="mb-3">
-                        <label className="form-label fw-semibold">Vista previa</label>
+                        <div className="form-label fw-semibold">Vista previa</div>
                         <div>
                             <span
                                 className="d-inline-block rounded border"
@@ -122,7 +126,7 @@ const ColorModal = ({ color, onClose, onSave }) => {
                         </div>
                     </div>
                 )}
-            </form>
+            </div>
         </AppModal>
     );
 };

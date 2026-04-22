@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
 
+const emptyForm = {
+    product: '',
+    sku: '',
+    size: '',
+    color: '',
+    cost: '',
+    price: '',
+    image: null,
+    remove_image: false,
+    is_active: true,
+};
+
 const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => {
     const isEditing = !!variant;
 
-    const [formData, setFormData] = useState({
-        product: '',
-        sku: '',
-        size: '',
-        color: '',
-        cost: '',
-        price: '',
-        is_active: true,
-    });
+    const [formData, setFormData] = useState(emptyForm);
 
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState('');
 
     useEffect(() => {
         if (variant) {
@@ -26,17 +31,65 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                 color: variant.color || '',
                 cost: variant.cost || '',
                 price: variant.price || '',
+                image: null,
+                remove_image: false,
                 is_active: variant.is_active ?? true,
             });
+            setPreviewUrl(variant.image_url || '');
+            return;
         }
+
+        setFormData(emptyForm);
+        setPreviewUrl('');
     }, [variant]);
 
+    useEffect(() => () => {
+        if (previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+        }
+    }, [previewUrl]);
+
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type, checked, files } = e.target;
+
+        if (type === 'file') {
+            const file = files?.[0] || null;
+            setFormData(prev => ({
+                ...prev,
+                image: file,
+                remove_image: false,
+            }));
+
+            setPreviewUrl((currentUrl) => {
+                if (currentUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(currentUrl);
+                }
+                return file ? URL.createObjectURL(file) : (variant?.image_url || '');
+            });
+            return;
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value,
         }));
+    };
+
+    const handleRemoveImageChange = (e) => {
+        const shouldRemove = e.target.checked;
+
+        setFormData(prev => ({
+            ...prev,
+            image: null,
+            remove_image: shouldRemove,
+        }));
+
+        setPreviewUrl((currentUrl) => {
+            if (currentUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(currentUrl);
+            }
+            return shouldRemove ? '' : (variant?.image_url || '');
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -58,6 +111,8 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                 color: formData.color || null,
                 cost: formData.cost,
                 price: formData.price,
+                image: formData.image,
+                remove_image: formData.remove_image,
                 is_active: formData.is_active,
             };
 
@@ -86,11 +141,13 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
         >
             {error && <div className="alert alert-danger small py-2">{error}</div>}
 
-            <form onSubmit={handleSubmit} id="variantForm">
+            <div>
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Producto *</label>
+                    <label className="form-label fw-semibold" htmlFor="variantProductSelect">Producto *</label>
                     <select
+                        id="variantProductSelect"
                         name="product"
+                        autoComplete="off"
                         className="form-select"
                         value={formData.product}
                         onChange={handleChange}
@@ -106,10 +163,12 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">SKU *</label>
+                    <label className="form-label fw-semibold" htmlFor="variantSkuInput">SKU *</label>
                     <input
+                        id="variantSkuInput"
                         type="text"
                         name="sku"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.sku}
                         onChange={handleChange}
@@ -117,11 +176,56 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                     />
                 </div>
 
+                <div className="mb-3">
+                    <label className="form-label fw-semibold" htmlFor="variantImageInput">Imagen de la variante</label>
+                    <input
+                        id="variantImageInput"
+                        type="file"
+                        name="image"
+                        autoComplete="off"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={handleChange}
+                    />
+                    <div className="form-text">
+                        Sube una foto específica para esta talla o color.
+                    </div>
+                </div>
+
+                {previewUrl && (
+                    <div className="mb-3">
+                        <div className="small text-muted mb-2">Vista previa</div>
+                        <img
+                            src={previewUrl}
+                            alt="Vista previa de la variante"
+                            className="rounded-3 border"
+                            style={{ width: '96px', height: '96px', objectFit: 'cover' }}
+                        />
+                    </div>
+                )}
+
+                {isEditing && variant?.image_url && (
+                    <div className="form-check mb-3">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="removeVariantImage"
+                            checked={formData.remove_image}
+                            onChange={handleRemoveImageChange}
+                        />
+                        <label className="form-check-label" htmlFor="removeVariantImage">
+                            Quitar imagen actual
+                        </label>
+                    </div>
+                )}
+
                 <div className="row g-3">
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Color</label>
+                        <label className="form-label fw-semibold" htmlFor="variantColorSelect">Color</label>
                         <select
+                            id="variantColorSelect"
                             name="color"
+                            autoComplete="off"
                             className="form-select"
                             value={formData.color}
                             onChange={handleChange}
@@ -134,9 +238,11 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                     </div>
 
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Talla</label>
+                        <label className="form-label fw-semibold" htmlFor="variantSizeSelect">Talla</label>
                         <select
+                            id="variantSizeSelect"
                             name="size"
+                            autoComplete="off"
                             className="form-select"
                             value={formData.size}
                             onChange={handleChange}
@@ -151,12 +257,14 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
 
                 <div className="row g-3">
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Costo *</label>
+                        <label className="form-label fw-semibold" htmlFor="variantCostInput">Costo *</label>
                         <input
+                            id="variantCostInput"
                             type="number"
                             step="0.01"
                             min="0"
                             name="cost"
+                            autoComplete="off"
                             className="form-control"
                             value={formData.cost}
                             onChange={handleChange}
@@ -164,12 +272,14 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                     </div>
 
                     <div className="col-md-6">
-                        <label className="form-label fw-semibold">Precio *</label>
+                        <label className="form-label fw-semibold" htmlFor="variantPriceInput">Precio *</label>
                         <input
+                            id="variantPriceInput"
                             type="number"
                             step="0.01"
                             min="0"
                             name="price"
+                            autoComplete="off"
                             className="form-control"
                             value={formData.price}
                             onChange={handleChange}
@@ -190,7 +300,7 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                         Variante activa
                     </label>
                 </div>
-            </form>
+            </div>
         </AppModal>
     );
 };

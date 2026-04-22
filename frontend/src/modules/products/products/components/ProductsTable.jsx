@@ -27,12 +27,32 @@ const ProductsTable = ({ products, isLoading, onEdit, onDelete }) => {
             ) : products.map(product => (
                 <tr key={product.id} className="border-bottom border-light-subtle">
                     <td className="px-4 py-3">
-                        <div className="fw-bold text-body">{product.name}</div>
-                        {product.description && (
-                            <small className="text-muted d-block text-truncate" style={{ maxWidth: 300 }}>
-                                {product.description}
-                            </small>
-                        )}
+                        <div className="d-flex align-items-center gap-3">
+                            {product.image_url ? (
+                                <img
+                                    src={product.image_url}
+                                    alt={product.name}
+                                    className="rounded-3 border flex-shrink-0"
+                                    style={{ width: '52px', height: '52px', objectFit: 'cover' }}
+                                />
+                            ) : (
+                                <div
+                                    className="rounded-3 border d-flex align-items-center justify-content-center text-muted flex-shrink-0"
+                                    style={{ width: '52px', height: '52px', fontSize: '0.75rem' }}
+                                >
+                                    Sin foto
+                                </div>
+                            )}
+
+                            <div>
+                                <div className="fw-bold text-body">{product.name}</div>
+                                {product.description && (
+                                    <small className="text-muted d-block text-truncate" style={{ maxWidth: 300 }}>
+                                        {product.description}
+                                    </small>
+                                )}
+                            </div>
+                        </div>
                     </td>
                     <td className="py-3">
                         {product.category_name

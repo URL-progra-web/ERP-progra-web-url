@@ -12,6 +12,7 @@ class UomSeeder(BaseSeeder):
         # Seed UOMs
         uoms_data = [
             {'code': 'und', 'name': 'Unidad'},
+            {'code': 'doc', 'name': 'Docena'},
             {'code': 'kg', 'name': 'Kilogramo'},
             {'code': 'g', 'name': 'Gramo'},
             {'code': 'lt', 'name': 'Litro'},
@@ -33,6 +34,8 @@ class UomSeeder(BaseSeeder):
         conversions_data = [
             {'from_code': 'kg', 'to_code': 'g', 'multiplier': 1000},
             {'from_code': 'lt', 'to_code': 'ml', 'multiplier': 1000},
+            # 1 docena -> 12 unidades
+            {'from_code': 'doc', 'to_code': 'und', 'multiplier': 12},
         ]
 
         for data in conversions_data:

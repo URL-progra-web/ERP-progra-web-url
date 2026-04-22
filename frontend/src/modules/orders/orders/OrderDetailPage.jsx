@@ -95,6 +95,10 @@ const OrderDetailPage = () => {
         return `${order.customer_name || `Cliente #${order.customer}`} • ${order.status_name || 'Sin estado'}`;
     }, [order]);
 
+    const canMutateOrder = useMemo(() => (
+        String(order?.status_name || '').toUpperCase() === 'SOLICITADO'
+    ), [order?.status_name]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -102,7 +106,7 @@ const OrderDetailPage = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        if (!order) return;
+        if (!order || !canMutateOrder) return;
 
         const payload = {
             shipping_address: formData.shipping_address || null,
@@ -128,7 +132,7 @@ const OrderDetailPage = () => {
     };
 
     const confirmDelete = async () => {
-        if (!order) return;
+        if (!order || !canMutateOrder) return;
         const ok = await deleteOrder(order.id);
         if (ok) {
             navigate(ordersListPath);
@@ -137,16 +141,19 @@ const OrderDetailPage = () => {
     };
 
     const handleOpenCreateItem = () => {
+        if (!canMutateOrder) return;
         setItemToEdit(null);
         setIsItemModalOpen(true);
     };
 
     const handleOpenEditItem = (item) => {
+        if (!canMutateOrder) return;
         setItemToEdit(item);
         setIsItemModalOpen(true);
     };
 
     const handleSubmitItem = async (payload, itemId) => {
+        if (!canMutateOrder) return false;
         setIsSubmittingItem(true);
         const ok = itemId
             ? await updateItem(itemId, payload)
@@ -161,7 +168,7 @@ const OrderDetailPage = () => {
     };
 
     const handleConfirmDeleteItem = async () => {
-        if (!itemToDelete) return;
+        if (!itemToDelete || !canMutateOrder) return;
         const ok = await deleteItem(itemToDelete.id);
         if (ok) {
             const refreshed = await fetchOrderDetail(orderId);
@@ -212,6 +219,12 @@ const OrderDetailPage = () => {
                 </div>
             )}
 
+            {!canMutateOrder && (
+                <div className="alert alert-info" role="alert">
+                    Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados.
+                </div>
+            )}
+
             <div className="card border-0 shadow-sm">
                 <div className="card-header bg-body py-3 d-flex justify-content-between align-items-center">
                     <h6 className="mb-0 text-uppercase text-muted small">Detalle</h6>
@@ -219,6 +232,8 @@ const OrderDetailPage = () => {
                         type="button"
                         className="btn btn-sm btn-outline-danger"
                         onClick={() => setShowDeleteAlert(true)}
+                        disabled={!canMutateOrder}
+                        title={canMutateOrder ? 'Eliminar pedido' : 'Solo editable en estado SOLICITADO'}
                     >
                         <FiTrash2 className="me-2" />
                         Eliminar
@@ -228,21 +243,38 @@ const OrderDetailPage = () => {
                 <form className="card-body" onSubmit={handleSave}>
                     <div className="row g-3">
                         <div className="col-md-6">
-                            <label className="form-label">Cliente</label>
-                            <input className="form-control" value={order.customer_name || `#${order.customer}`} disabled />
+                            <label className="form-label" htmlFor="orderDetailCustomer">Cliente</label>
+                            <input
+                                id="orderDetailCustomer"
+                                name="order_detail_customer"
+                                autoComplete="off"
+                                className="form-control"
+                                value={order.customer_name || `#${order.customer}`}
+                                disabled
+                            />
                         </div>
                         <div className="col-md-6">
-                            <label className="form-label">Estado</label>
-                            <input className="form-control" value={order.status_name || `#${order.status}`} disabled />
+                            <label className="form-label" htmlFor="orderDetailStatus">Estado</label>
+                            <input
+                                id="orderDetailStatus"
+                                name="order_detail_status"
+                                autoComplete="off"
+                                className="form-control"
+                                value={order.status_name || `#${order.status}`}
+                                disabled
+                            />
                         </div>
 
                         <div className="col-md-6">
-                            <label className="form-label">Método de Pago</label>
+                            <label className="form-label" htmlFor="orderDetailPaymentMethod">Método de Pago</label>
                             <select
+                                id="orderDetailPaymentMethod"
                                 className="form-select"
                                 name="payment_method_id"
+                                autoComplete="off"
                                 value={formData.payment_method_id}
                                 onChange={handleChange}
+                                disabled={!canMutateOrder}
                             >
                                 <option value="">(Ninguno / Por definir)</option>
                                 {catalogs.payment_methods.map((pm) => (
@@ -252,41 +284,50 @@ const OrderDetailPage = () => {
                         </div>
 
                         <div className="col-md-6">
-                            <label className="form-label">Costo de Envío</label>
+                            <label className="form-label" htmlFor="orderDetailShippingCost">Costo de Envío</label>
                             <input
+                                id="orderDetailShippingCost"
                                 type="number"
                                 step="0.01"
                                 className="form-control"
                                 name="shipping_cost"
+                                autoComplete="off"
                                 value={formData.shipping_cost}
                                 onChange={handleChange}
+                                disabled={!canMutateOrder}
                             />
                         </div>
 
                         <div className="col-12">
-                            <label className="form-label">Dirección de Envío</label>
+                            <label className="form-label" htmlFor="orderDetailShippingAddress">Dirección de Envío</label>
                             <textarea
+                                id="orderDetailShippingAddress"
                                 className="form-control"
                                 rows="2"
                                 name="shipping_address"
+                                autoComplete="street-address"
                                 value={formData.shipping_address}
                                 onChange={handleChange}
+                                disabled={!canMutateOrder}
                             />
                         </div>
 
                         <div className="col-12">
-                            <label className="form-label">Notas</label>
+                            <label className="form-label" htmlFor="orderDetailNotes">Notas</label>
                             <textarea
+                                id="orderDetailNotes"
                                 className="form-control"
                                 rows="3"
                                 name="notes"
+                                autoComplete="off"
                                 value={formData.notes}
                                 onChange={handleChange}
+                                disabled={!canMutateOrder}
                             />
                         </div>
 
                         <div className="col-12 d-flex justify-content-end">
-                            <button type="submit" className="btn btn-dark" disabled={isSaving}>
+                            <button type="submit" className="btn btn-dark" disabled={isSaving || !canMutateOrder}>
                                 {isSaving ? 'Guardando...' : 'Guardar cambios'}
                             </button>
                         </div>
@@ -302,7 +343,13 @@ const OrderDetailPage = () => {
                             {items.length} item(s) • Total: {formatCurrency(order.total_amount)}
                         </small>
                     </div>
-                    <button type="button" className="btn btn-sm btn-dark" onClick={handleOpenCreateItem}>
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-dark"
+                        onClick={handleOpenCreateItem}
+                        disabled={!canMutateOrder}
+                        title={canMutateOrder ? 'Agregar item' : 'Solo editable en estado SOLICITADO'}
+                    >
                         <FiPlus className="me-2" />Agregar Item
                     </button>
                 </div>
@@ -311,6 +358,7 @@ const OrderDetailPage = () => {
                     isLoading={isLoadingItems}
                     onEdit={handleOpenEditItem}
                     onDelete={(item) => setItemToDelete(item)}
+                    canEdit={canMutateOrder}
                 />
             </div>
 
@@ -351,6 +399,7 @@ const OrderDetailPage = () => {
                 item={itemToEdit}
                 statusOptions={statusOptions}
                 orderId={order?.id}
+                submitDisabled={!canMutateOrder}
             />
 
             {itemToDelete && (

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'products',
     'inventory',
     'orders',
+    'receipts',
     'public',
 ]
 
@@ -77,6 +78,8 @@ GLOBAL_SEEDERS = [
     'crm.customer.seeds.CustomerSeeder',
     'products.product.seeds.ProductSeeder',
     'products.variant.seeds.ProductVariantSeeder',
+    'orders.order.seeds.OrderSeeder',
+    'receipts.receipt.seeds.ReceiptSeeder',
 ]
 
 REST_FRAMEWORK = {
@@ -186,6 +189,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 CORS_ALLOW_ALL_ORIGINS = True
 
 # ============================================================

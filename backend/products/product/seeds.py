@@ -1,3 +1,4 @@
+import subprocess
 from core.seeds import BaseSeeder
 from products.product.models.models import Product
 from products.category.models.models import Category
@@ -10,15 +11,30 @@ class ProductSeeder(BaseSeeder):
     def __init__(self):
         super().__init__()
 
+    def _download_photos(self):
+        print("Downloading photos...")
+        try:
+            result = subprocess.run(
+                ['python', '/app/products/download_photos.py'],
+                capture_output=True,
+                text=True,
+                timeout=300
+            )
+            if result.returncode == 0:
+                print("Photos downloaded successfully")
+            else:
+                print(f"Warning downloading photos: {result.stderr}")
+        except Exception as e:
+            print(f"Error downloading photos: {e}")
+
     def run(self):
-        # Verificar si ya hay productos del seeder
-        if Product.objects.filter(name='Camiseta Básica Algodón').exists():
+        self._download_photos()
+
+        if Product.objects.exists():
             print("Products already seeded. Skipping...")
             return
 
-        # Obtener referencias necesarias
         try:
-            # Obtener entrepreneurs por nombre para distribución realista
             entrepreneurs = {
                 'fashion': Entrepreneur.objects.get(company_name='Fashion House S.A.'),
                 'tech': Entrepreneur.objects.get(company_name='Tech Solutions Peru'),
@@ -40,112 +56,58 @@ class ProductSeeder(BaseSeeder):
             print(f"Error getting dependencies: {e}")
             return
 
-        # Obtener categorías leaf (para asignar productos)
         categories = {}
         try:
-            categories['camisetas'] = Category.objects.get(name='Camisetas', is_leaf=True)
-            categories['pantalones'] = Category.objects.get(name='Pantalones', is_leaf=True)
-            categories['zapatillas'] = Category.objects.get(name='Zapatillas', is_leaf=True)
-            categories['smartphones'] = Category.objects.get(name='Smartphones', is_leaf=True)
-            categories['laptops'] = Category.objects.get(name='Laptops', is_leaf=True)
-            categories['bolsos'] = Category.objects.get(name='Bolsos', is_leaf=True)
+            categories = {
+                'camisetas': Category.objects.get(name='Camisetas', is_leaf=True),
+                'pantalones': Category.objects.get(name='Pantalones', is_leaf=True),
+                'shorts': Category.objects.get(name='Shorts', is_leaf=True),
+                'zapatillas': Category.objects.get(name='Zapatillas', is_leaf=True),
+                'sandalias': Category.objects.get(name='Sandalias', is_leaf=True),
+                'smartphones': Category.objects.get(name='Smartphones', is_leaf=True),
+                'laptops': Category.objects.get(name='Laptops', is_leaf=True),
+                'tablets': Category.objects.get(name='Tablets', is_leaf=True),
+                'audifonos': Category.objects.get(name='Audífonos', is_leaf=True),
+                'bolsos': Category.objects.get(name='Bolsos', is_leaf=True),
+                'gafas': Category.objects.get(name='Gafas', is_leaf=True),
+                'textiles': Category.objects.get(name='Textiles', is_leaf=True),
+            }
         except Category.DoesNotExist as e:
-            print(f"Some categories not found. Please run CategorySeeder first: {e}")
+            print(f"Some categories not found: {e}")
             return
 
-        # Seed Products - Distribuidos por empresa según especialidad
         products_data = [
-            # Ropa - Fashion House S.A.
-            {
-                'name': 'Camiseta Básica Algodón',
-                'description': 'Camiseta 100% algodón, ideal para uso diario',
-                'category': categories.get('camisetas'),
-                'entrepreneur': entrepreneurs['fashion'],
-            },
-            {
-                'name': 'Pantalón Jean Clásico',
-                'description': 'Pantalón jean de corte clásico, disponible en varios colores',
-                'category': categories.get('pantalones'),
-                'entrepreneur': entrepreneurs['fashion'],
-            },
-            # Ropa Deportiva - Sport Center
-            {
-                'name': 'Camiseta Deportiva Dry-Fit',
-                'description': 'Camiseta deportiva con tecnología que absorbe la humedad',
-                'category': categories.get('camisetas'),
-                'entrepreneur': entrepreneurs['sport'],
-            },
-            {
-                'name': 'Pantalón Deportivo',
-                'description': 'Pantalón deportivo cómodo para entrenar',
-                'category': categories.get('pantalones'),
-                'entrepreneur': entrepreneurs['sport'],
-            },
-            # Calzado Deportivo - Sport Center
-            {
-                'name': 'Zapatillas Running Pro',
-                'description': 'Zapatillas profesionales para correr con amortiguación avanzada',
-                'category': categories.get('zapatillas'),
-                'entrepreneur': entrepreneurs['sport'],
-            },
-            # Calzado Casual - Calzado Premium
-            {
-                'name': 'Zapatillas Casual Urban',
-                'description': 'Zapatillas casuales para uso diario',
-                'category': categories.get('zapatillas'),
-                'entrepreneur': entrepreneurs['shoes'],
-            },
-            # Electrónica - Tech Solutions Peru
-            {
-                'name': 'Smartphone Galaxy X10',
-                'description': 'Smartphone con pantalla AMOLED 6.5", 128GB almacenamiento',
-                'category': categories.get('smartphones'),
-                'entrepreneur': entrepreneurs['tech'],
-            },
-            {
-                'name': 'Smartphone iPhone Pro',
-                'description': 'iPhone última generación, 256GB, cámara triple',
-                'category': categories.get('smartphones'),
-                'entrepreneur': entrepreneurs['tech'],
-            },
-            {
-                'name': 'Laptop Business Elite',
-                'description': 'Laptop profesional Intel i7, 16GB RAM, 512GB SSD',
-                'category': categories.get('laptops'),
-                'entrepreneur': entrepreneurs['tech'],
-            },
-            {
-                'name': 'Laptop Gaming Master',
-                'description': 'Laptop para gaming con RTX 4060, 32GB RAM, 1TB SSD',
-                'category': categories.get('laptops'),
-                'entrepreneur': entrepreneurs['tech'],
-            },
-            # Accesorios - Home & Deco
-            {
-                'name': 'Bolso Tote Cuero',
-                'description': 'Bolso tipo tote de cuero genuino',
-                'category': categories.get('bolsos'),
-                'entrepreneur': entrepreneurs['home'],
-            },
-            {
-                'name': 'Mochila Urban Style',
-                'description': 'Mochila moderna con compartimento para laptop',
-                'category': categories.get('bolsos'),
-                'entrepreneur': entrepreneurs['home'],
-            },
+            {'name': 'Camiseta Básica Algodón', 'description': 'Camiseta 100% algodón, ideal para uso diario', 'category': categories['camisetas'], 'entrepreneur': entrepreneurs['fashion'], 'image': 'products/01_camiseta.jpg'},
+            {'name': 'Camiseta Dry-Fit Sport', 'description': 'Camiseta deportiva que absorbe la humedad', 'category': categories['camisetas'], 'entrepreneur': entrepreneurs['sport'], 'image': 'products/02_camiseta_dryfit.jpg'},
+            {'name': 'Camiseta Oversized', 'description': 'Camiseta oversize estilo urbano', 'category': categories['camisetas'], 'entrepreneur': entrepreneurs['fashion'], 'image': 'products/03_camiseta_oversized.jpg'},
+            {'name': 'Jeans Classic Fit', 'description': 'Jean corte clásico recto', 'category': categories['pantalones'], 'entrepreneur': entrepreneurs['fashion'], 'image': 'products/04_jeans.jpg'},
+            {'name': 'Pantalón Deportivo', 'description': 'Pantalón deportivo cómodo para entrenar', 'category': categories['pantalones'], 'entrepreneur': entrepreneurs['sport'], 'image': 'products/05_pantalon_deportivo.jpg'},
+            {'name': 'Shorts Casual Playa', 'description': 'Shorts casuales para playa y piscina', 'category': categories['shorts'], 'entrepreneur': entrepreneurs['fashion'], 'image': 'products/06_shorts.jpg'},
+            {'name': 'Zapatillas Running Pro', 'description': 'Zapatillas profesionales para correr', 'category': categories['zapatillas'], 'entrepreneur': entrepreneurs['sport'], 'image': 'products/07_zapatillas_running.jpg'},
+            {'name': 'Zapatillas Urban Casual', 'description': 'Zapatillas casuales estilo urbano', 'category': categories['zapatillas'], 'entrepreneur': entrepreneurs['shoes'], 'image': 'products/08_zapatillas_urban.jpg'},
+            {'name': 'Sandalias Premium Leather', 'description': 'Sandalias de cuero premium', 'category': categories['sandalias'], 'entrepreneur': entrepreneurs['shoes'], 'image': 'products/09_sandalias.jpg'},
+            {'name': 'Smartphone Galaxy X10', 'description': 'Smartphone 128GB AMOLED', 'category': categories['smartphones'], 'entrepreneur': entrepreneurs['tech'], 'image': 'products/10_smartphone.jpg'},
+            {'name': 'iPhone 15 Pro Max', 'description': 'iPhone 256GB última generación', 'category': categories['smartphones'], 'entrepreneur': entrepreneurs['tech'], 'image': 'products/11_iphone.jpg'},
+            {'name': 'Laptop Business Elite', 'description': 'Laptop Intel i7, 16GB RAM', 'category': categories['laptops'], 'entrepreneur': entrepreneurs['tech'], 'image': 'products/12_laptop.jpg'},
+            {'name': 'Tablet Pro 11"', 'description': 'Tablet 11" WiFi 128GB', 'category': categories['tablets'], 'entrepreneur': entrepreneurs['tech'], 'image': 'products/13_tablet.jpg'},
+            {'name': 'Audífonos Wireless Pro', 'description': 'Audífonos bluetooth cancelación ruido', 'category': categories['audifonos'], 'entrepreneur': entrepreneurs['tech'], 'image': 'products/14_audifonos.jpg'},
+            {'name': 'Bolso Tote Cuero', 'description': 'Bolso tote de cuero genuino', 'category': categories['bolsos'], 'entrepreneur': entrepreneurs['home'], 'image': 'products/15_bolso_tote.jpg'},
+            {'name': 'Mochila Urbana AntiRobo', 'description': 'Mochila con sistema antirrobo', 'category': categories['bolsos'], 'entrepreneur': entrepreneurs['home'], 'image': 'products/16_mochila.jpg'},
+            {'name': 'Reloj Smart Serie 9', 'description': 'Smartwatch con monitor de salud', 'category': categories['gafas'], 'entrepreneur': entrepreneurs['tech'], 'image': 'products/17_reloj.jpg'},
+            {'name': 'Gafas Sol Vintage', 'description': 'Gafas de sol estilo vintage', 'category': categories['gafas'], 'entrepreneur': entrepreneurs['home'], 'image': 'products/18_gafas.jpg'},
+            {'name': 'Billetera Cuero Premium', 'description': 'Billetera de cuero genuino', 'category': categories['bolsos'], 'entrepreneur': entrepreneurs['home'], 'image': 'products/19_billetera.jpg'},
+            {'name': 'Sábanas 200 Hilos', 'description': 'Juego de sábanas 200 hilos algodon', 'category': categories['textiles'], 'entrepreneur': entrepreneurs['home'], 'image': 'products/20_sabanas.jpg'},
         ]
 
         for data in products_data:
             try:
                 entrepreneur = data.pop('entrepreneur')
                 product = Product.objects.create(
-                    name=data['name'],
-                    description=data['description'],
-                    category=data['category'],
+                    **data,
                     entrepreneur=entrepreneur,
                     business_unit=business_unit,
                     base_uom=base_uom,
                 )
-                print(f"Created product: {data['name']} (Entrepreneur: {entrepreneur.company_name})")
+                print(f"Created product: {data['name']}")
             except Exception as e:
-                print(f"Product {data['name']} already exists or error: {e}")
+                print(f"Product {data['name']} error: {e}")

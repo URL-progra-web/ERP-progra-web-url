@@ -4,5 +4,5 @@ from .order.models.models import Order
 from .order_item.models.models import OrderItem
 from .order_history.models.models import OrderStatusHistory
 from .order_item_history.models.models import OrderItemStatusHistory
-from .receipt.models.models import Receipt
-from .receipt_adjustment.models.models import ReceiptAdjustment
+from receipts.receipt.models.models import Receipt
+from receipts.receipt_adjustment.models.models import ReceiptAdjustment

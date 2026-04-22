@@ -17,6 +17,10 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
                         </span>
                         <input
                             type="text"
+                            id="categoriesSearchInput"
+                            name="categories_search"
+                            autoComplete="off"
+                            aria-label="Buscar categoría por nombre"
                             className="form-control bg-body border-start-0 ps-0 shadow-none text-body"
                             placeholder="Buscar categoría por nombre..."
                             value={searchInput}
@@ -32,6 +36,9 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
                 </div>
                 <div className="col-md-auto">
                     <select
+                        id="categoriesLeafFilter"
+                        name="categories_leaf_filter"
+                        aria-label="Filtrar categorías por tipo"
                         className="form-select bg-body shadow-none text-body"
                         value={leafFilter}
                         onChange={(e) => onLeafChange(e.target.value)}

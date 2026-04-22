@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { RecursiveHierarchySelector } from '~/core/components';
+
+const emptyForm = {
+    name: '',
+    description: '',
+    category: '',
+    entrepreneur: '',
+    business_unit: '',
+    base_uom: '',
+    image: null,
+    remove_image: false,
+};
 
 const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms, onClose, onSave }) => {
     const isEditing = !!product;
 
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        category: '',
-        entrepreneur: '',
-        business_unit: '',
-        base_uom: '',
-    });
+    const [formData, setFormData] = useState(emptyForm);
 
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState('');
 
     useEffect(() => {
         if (product) {
@@ -25,13 +31,61 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 entrepreneur: product.entrepreneur || '',
                 business_unit: product.business_unit || '',
                 base_uom: product.base_uom || '',
+                image: null,
+                remove_image: false,
             });
+            setPreviewUrl(product.image_url || '');
+            return;
         }
+
+        setFormData(emptyForm);
+        setPreviewUrl('');
     }, [product]);
 
+    useEffect(() => () => {
+        if (previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+        }
+    }, [previewUrl]);
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, files, type } = e.target;
+
+        if (type === 'file') {
+            const file = files?.[0] || null;
+            setFormData(prev => ({
+                ...prev,
+                image: file,
+                remove_image: false,
+            }));
+
+            setPreviewUrl((currentUrl) => {
+                if (currentUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(currentUrl);
+                }
+                return file ? URL.createObjectURL(file) : (product?.image_url || '');
+            });
+            return;
+        }
+
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleRemoveImageChange = (e) => {
+        const shouldRemove = e.target.checked;
+
+        setFormData(prev => ({
+            ...prev,
+            image: null,
+            remove_image: shouldRemove,
+        }));
+
+        setPreviewUrl((currentUrl) => {
+            if (currentUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(currentUrl);
+            }
+            return shouldRemove ? '' : (product?.image_url || '');
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -67,6 +121,8 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 entrepreneur: formData.entrepreneur,
                 business_unit: formData.business_unit,
                 base_uom: formData.base_uom,
+                image: formData.image,
+                remove_image: formData.remove_image,
             };
             await onSave(dataToSubmit);
         } catch (err) {
@@ -93,12 +149,14 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
         >
             {error && <div className="alert alert-danger small py-2">{error}</div>}
 
-            <form onSubmit={handleSubmit} id="productForm">
+            <div>
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Nombre del producto *</label>
+                    <label className="form-label fw-semibold" htmlFor="productNameInput">Nombre del producto *</label>
                     <input
+                        id="productNameInput"
                         type="text"
                         name="name"
+                        autoComplete="off"
                         className="form-control"
                         value={formData.name}
                         onChange={handleChange}
@@ -110,8 +168,9 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Descripción</label>
+                    <label className="form-label fw-semibold" htmlFor="productDescriptionInput">Descripción</label>
                     <textarea
+                        id="productDescriptionInput"
                         name="description"
                         className="form-control"
                         rows="2"
@@ -122,18 +181,63 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Categoría</label>
-                    <select
-                        name="category"
-                        className="form-select"
-                        value={formData.category}
+                    <label className="form-label fw-semibold" htmlFor="productImageInput">Imagen del producto</label>
+                    <input
+                        id="productImageInput"
+                        type="file"
+                        name="image"
+                        autoComplete="off"
+                        className="form-control"
+                        accept="image/*"
                         onChange={handleChange}
-                    >
-                        <option value="">Sin categoría</option>
-                        {categories.map(c => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                    </select>
+                    />
+                    <div className="form-text">
+                        Foto principal del producto. Las variantes pueden tener su propia imagen aparte.
+                    </div>
+                </div>
+
+                {previewUrl && (
+                    <div className="mb-3">
+                        <div className="small text-muted mb-2">Vista previa</div>
+                        <img
+                            src={previewUrl}
+                            alt="Vista previa del producto"
+                            className="rounded-3 border"
+                            style={{ width: '96px', height: '96px', objectFit: 'cover' }}
+                        />
+                    </div>
+                )}
+
+                {isEditing && product?.image_url && (
+                    <div className="form-check mb-3">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="removeProductImage"
+                            checked={formData.remove_image}
+                            onChange={handleRemoveImageChange}
+                        />
+                        <label className="form-check-label" htmlFor="removeProductImage">
+                            Quitar imagen actual
+                        </label>
+                    </div>
+                )}
+
+                <div className="mb-3">
+                    <div className="form-label fw-semibold" id="productCategoryLabel">Categoría</div>
+                    <RecursiveHierarchySelector
+                        items={categories}
+                        value={formData.category}
+                        onChange={(categoryId) => setFormData((prev) => ({ ...prev, category: categoryId }))}
+                        disabled={isSubmitting}
+                        getId={(item) => item?.id}
+                        getParentId={(item) => item?.parent}
+                        getLabel={(item) => item?.name}
+                        rootOptionLabel="Sin categoría"
+                        levelRootLabel="Selecciona la categoría"
+                        levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
+                        selectionMode="any"
+                    />
                     <div className="form-text">
                         Grupo al que pertenece este producto (ej. Frutas, Ropa, Bebidas).
                     </div>
@@ -142,9 +246,11 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 <hr className="my-3" />
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Emprendedor / Proveedor *</label>
+                    <label className="form-label fw-semibold" htmlFor="productEntrepreneurSelect">Emprendedor / Proveedor *</label>
                     <select
+                        id="productEntrepreneurSelect"
                         name="entrepreneur"
+                        autoComplete="off"
                         className="form-select"
                         value={formData.entrepreneur}
                         onChange={handleChange}
@@ -160,9 +266,11 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Unidad base *</label>
+                    <label className="form-label fw-semibold" htmlFor="productBaseUomSelect">Unidad base *</label>
                     <select
+                        id="productBaseUomSelect"
                         name="base_uom"
+                        autoComplete="off"
                         className="form-select"
                         value={formData.base_uom}
                         onChange={handleChange}
@@ -178,9 +286,11 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label fw-semibold">Sede / Punto de venta *</label>
+                    <label className="form-label fw-semibold" htmlFor="productBusinessUnitSelect">Sede / Punto de venta *</label>
                     <select
+                        id="productBusinessUnitSelect"
                         name="business_unit"
+                        autoComplete="off"
                         className="form-select"
                         value={formData.business_unit}
                         onChange={handleChange}
@@ -194,7 +304,7 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
                         Lugar donde se vende o almacena este producto.
                     </div>
                 </div>
-            </form>
+            </div>
         </AppModal>
     );
 };

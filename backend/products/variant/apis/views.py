@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db.models import DecimalField, ExpressionWrapper, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.viewsets import ModelViewSet
 from orders.order.models.models import Order
 from products.variant.models.models import ProductVariant
@@ -10,6 +11,7 @@ from products.variant.serializers.serializers import ProductVariantSerializer
 
 class ProductVariantViewSet(ModelViewSet):
     serializer_class = ProductVariantSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     @staticmethod
     def _parse_bool(value):

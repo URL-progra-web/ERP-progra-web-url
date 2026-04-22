@@ -1,0 +1,1 @@
+from receipts.receipt_adjustment.models.models import ReceiptAdjustment

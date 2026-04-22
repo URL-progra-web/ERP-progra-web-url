@@ -27,8 +27,28 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
             ) : variants.map(variant => (
                 <tr key={variant.id} className="border-bottom border-light-subtle">
                     <td className="px-4 py-3">
-                        <div className="fw-bold text-body">{variant.product_name}</div>
-                        <small className="text-muted">SKU: {variant.sku}</small>
+                        <div className="d-flex align-items-center gap-3">
+                            {variant.image_url ? (
+                                <img
+                                    src={variant.image_url}
+                                    alt={variant.product_name}
+                                    className="rounded-3 border flex-shrink-0"
+                                    style={{ width: '52px', height: '52px', objectFit: 'cover' }}
+                                />
+                            ) : (
+                                <div
+                                    className="rounded-3 border d-flex align-items-center justify-content-center text-muted flex-shrink-0"
+                                    style={{ width: '52px', height: '52px', fontSize: '0.75rem' }}
+                                >
+                                    Sin foto
+                                </div>
+                            )}
+
+                            <div>
+                                <div className="fw-bold text-body">{variant.product_name}</div>
+                                <small className="text-muted">SKU: {variant.sku}</small>
+                            </div>
+                        </div>
                     </td>
 
                     <td className="py-3">{variant.color_name || '—'}</td>
