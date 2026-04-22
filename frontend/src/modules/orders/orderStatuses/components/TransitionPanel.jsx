@@ -15,7 +15,7 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
 
     useEffect(() => {
         const fetchOrderPreview = async () => {
-            if (!form.order_id || form.order_id < 1) {
+            if (!form.order_id || Number(form.order_id) < 1) {
                 setOrderPreview(null);
                 return;
             }
