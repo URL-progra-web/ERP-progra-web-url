@@ -1,7 +1,10 @@
+import io
 from decimal import Decimal
 from typing import Optional
 
+import openpyxl
 from django.db import IntegrityError, transaction
+from django.db.models import DecimalField, F, Sum
 from django.utils.timezone import localdate
 
 from orders.order.exceptions import (
@@ -62,6 +65,48 @@ class OrderService:
 
     def list_orders(self):
         return self.repository.list()
+
+    def export_orders_excel(self, date_from=None, date_to=None) -> bytes:
+        orders = self.repository.list_for_export(date_from=date_from, date_to=date_to)
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Pedidos'
+
+        headers = [
+            'ID Pedido', 'Cliente', 'Estado', 'Método de pago',
+            'Dirección de envío', 'Costo de envío', 'Total Cantidad',
+            'Total Monto', 'Notas', 'Fecha creación', 'Fecha actualización',
+        ]
+        ws.append(headers)
+
+        for order in orders:
+            total_qty = order.items.aggregate(total=Sum('base_quantity')).get('total') or 0
+            total_amt = order.items.aggregate(
+                total=Sum(
+                    F('quantity') * F('unit_price'),
+                    output_field=DecimalField(max_digits=12, decimal_places=2),
+                )
+            ).get('total') or 0
+
+            ws.append([
+                order.short_id,
+                order.customer.name,
+                order.status.name,
+                order.payment_method.name if order.payment_method else '',
+                order.shipping_address or '',
+                float(order.shipping_cost),
+                float(total_qty),
+                float(total_amt),
+                order.notes or '',
+                order.created_at.strftime('%Y-%m-%d %H:%M'),
+                order.updated_at.strftime('%Y-%m-%d %H:%M'),
+            ])
+
+        buf = io.BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        return buf.read()
 
     def get_order(self, order_id: int):
         order = self.repository.get_by_id(order_id)

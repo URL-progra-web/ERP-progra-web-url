@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -226,3 +227,34 @@ class OrderCatalogAPIView(APIView):
             'customers': CustomerLookupSerializer(customers, many=True).data,
             'payment_methods': PaymentMethodLookupSerializer(payment_methods, many=True).data,
         }, status=status.HTTP_200_OK)
+
+
+class OrderExportExcelAPIView(APIView):
+    permission_classes = [IsAuthenticated, HasRole]
+    allowed_roles = ['ADMIN', 'MANAGER']
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = orders_container.order_service
+
+    @staticmethod
+    def _error_response(message: str, code: str, http_status: int):
+        return Response({'error': message, 'code': code}, status=http_status)
+
+    def get(self, request):
+        date_from = request.query_params.get('date_from')  # YYYY-MM-DD
+        date_to = request.query_params.get('date_to')      # YYYY-MM-DD
+        try:
+            content = self.service.export_orders_excel(date_from=date_from, date_to=date_to)
+        except Exception:
+            return self._error_response(
+                message='No se pudo generar el archivo Excel',
+                code='order_excel_failed',
+                http_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        response = HttpResponse(
+            content,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        response['Content-Disposition'] = 'attachment; filename="pedidos.xlsx"'
+        return response
