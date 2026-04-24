@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core.mixins import PaginationMixin
+from orders.order.exceptions import OrderNotFound
 from orders.order_item.exceptions import OrderItemStockUnavailable
 from orders.order_status.exceptions import (
     InvalidOrderStatusTransition,
@@ -15,7 +16,6 @@ from orders.order_status.serializers.serializers import (
     OrderStatusTransitionSerializer,
 )
 from orders.order_status.services.services import OrderStatusService
-from orders.order.exceptions import OrderNotFound
 from users.permissions import HasRole
 
 

@@ -1,11 +1,12 @@
 import React from 'react';
-import { FiCreditCard, FiLayers, FiShoppingCart } from 'react-icons/fi';
+import { FiBarChart2, FiCreditCard, FiLayers, FiShoppingCart } from 'react-icons/fi';
 
 const PaymentMethodsPage = React.lazy(() => import('./paymentMethods/PaymentMethodsPage'));
 const OrderStatusesPage = React.lazy(() => import('./orderStatuses/OrderStatusesPage'));
 const OrdersPage = React.lazy(() => import('./orders/OrdersPage'));
 const OrderDetailPage = React.lazy(() => import('./orders/OrderDetailPage'));
 const OrderCreatePage = React.lazy(() => import('./orders/OrderCreatePage'));
+const OrdersChartPage = React.lazy(() => import('./orders/OrdersChartPage'));
 
 export const ordersFeature = {
     id: 'orders',
@@ -47,6 +48,13 @@ export const ordersFeature = {
             icon: FiLayers,
             roles: ['MANAGER', 'ADMIN'],
             element: <OrderStatusesPage />,
+        },
+        {
+            text: 'Estadísticas',
+            path: 'orders/chart',
+            icon: FiBarChart2,
+            roles: ['MANAGER', 'ADMIN'],
+            element: <OrdersChartPage />,
         },
     ],
 };
