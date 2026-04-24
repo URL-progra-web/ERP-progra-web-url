@@ -290,15 +290,25 @@ class PublicOrderCreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Buscar o crear Customer
-        customer, created = Customer.objects.get_or_create(
-            phone=data['customer_phone'],
-            defaults={
-                'name': data['customer_name'],
-                'email': data.get('customer_email', '') or '',
-                'customer_type': 'RETAIL',
-            }
-        )
+        customer_email = (data.get('customer_email') or '').strip().lower()
+        customer = None
+        created = False
+
+        # Buscar primero por email para no duplicar clientes con teléfono nuevo.
+        if customer_email:
+            customer = Customer.objects.filter(email__iexact=customer_email).first()
+
+        if customer is None:
+            customer = Customer.objects.filter(phone=data['customer_phone']).first()
+
+        if customer is None:
+            customer = Customer.objects.create(
+                name=data['customer_name'],
+                phone=data['customer_phone'],
+                email=customer_email or None,
+                customer_type='RETAIL',
+            )
+            created = True
         
         # Si el cliente existe, actualizar nombre y email si corresponde
         if not created:
@@ -306,8 +316,8 @@ class PublicOrderCreateView(APIView):
             if data['customer_name'] and customer.name != data['customer_name']:
                 customer.name = data['customer_name']
                 updated = True
-            if data.get('customer_email') and not customer.email:
-                customer.email = data['customer_email']
+            if customer_email and not customer.email:
+                customer.email = customer_email
                 updated = True
             if updated:
                 customer.save()

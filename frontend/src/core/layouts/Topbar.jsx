@@ -6,6 +6,8 @@ import { FiMenu, FiBell, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
 import { orderService } from '~/modules/orders/orders/services/orderService';
 import { getDashboardPath } from '~/core/registry/dashboardPaths';
 
+const NOTIFICATIONS_REFRESH_INTERVAL_MS = 20 * 60 * 1000;
+
 /* ── TopbarActions ───────────────────────────────────────── */
 
 const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
@@ -51,6 +53,15 @@ const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
             setIsLoadingNotifications(false);
         }
     }, [canViewNotifications]);
+
+    React.useEffect(() => {
+        if (!canViewNotifications) return undefined;
+
+        loadNotifications();
+        const intervalId = window.setInterval(loadNotifications, NOTIFICATIONS_REFRESH_INTERVAL_MS);
+
+        return () => window.clearInterval(intervalId);
+    }, [canViewNotifications, loadNotifications]);
 
     const handleToggleNotifications = async () => {
         const nextOpen = !isNotificationsOpen;
