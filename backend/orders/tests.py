@@ -1,7 +1,8 @@
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.utils import timezone
 
 from crm.customer.models.models import Customer
 from crm.entrepreneur.models.models import Entrepreneur
@@ -10,6 +11,8 @@ from inventory.transaction.models.models import InventoryTransaction
 from inventory.transaction_type.models.models import TransactionType
 from inventory.uom.models.models import UoM
 from orders.order.models.models import Order
+from orders.order_notification.models.models import OrderNotification
+from orders.order_notification.services.services import OrderNotificationService
 from orders.order.services.services import OrderService
 from orders.order.exceptions import OrderDeleteNotAllowed
 from orders.order_item.models.models import OrderItem
@@ -64,6 +67,10 @@ class PaymentMethodServiceTests(TestCase):
 class OrderStatusServiceTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.draft, _ = OrderStatus.objects.get_or_create(
+            name='BORRADOR',
+            defaults={'description': 'Pedido creado, pendiente de revision'},
+        )
         cls.requested = OrderStatus.objects.get(name='SOLICITADO')
         cls.confirmed = OrderStatus.objects.get(name='CONFIRMADO')
         cls.shipped = OrderStatus.objects.get(name='ENVIADO')
@@ -111,6 +118,17 @@ class OrderStatusServiceTests(TestCase):
         self.assertEqual(updated.status.name, 'CONFIRMADO')
         self.assertEqual(OrderStatusHistory.objects.filter(order=order).count(), 1)
 
+    def test_draft_transition_to_requested_is_allowed(self):
+        order = Order.objects.create(
+            short_id='WF-DRAFT-1',
+            customer=self.customer,
+            payment_method=self.payment_method,
+            status=self.draft,
+        )
+        updated = self.service.transition_order(order.id, 'SOLICITADO', actor=None, notes='Promote draft')
+        self.assertEqual(updated.status.name, 'SOLICITADO')
+        self.assertEqual(OrderStatusHistory.objects.filter(order=order).count(), 1)
+
     def test_invalid_transition_is_rejected(self):
         order = self._create_order(short_id='WF-2')
         with self.assertRaises(InvalidOrderStatusTransition):
@@ -135,6 +153,15 @@ class OrderStatusServiceTests(TestCase):
         order = self._create_order(short_id='WF-DEL-1')
         self.order_service.delete_order(order.id)
         self.assertFalse(Order.objects.filter(id=order.id).exists())
+
+        draft_order = Order.objects.create(
+            short_id='WF-DEL-0',
+            customer=self.customer,
+            payment_method=self.payment_method,
+            status=self.draft,
+        )
+        self.order_service.delete_order(draft_order.id)
+        self.assertFalse(Order.objects.filter(id=draft_order.id).exists())
 
         locked_order = Order.objects.create(
             short_id='WF-DEL-2',
@@ -269,3 +296,84 @@ class OrderServiceShortIdTests(TestCase):
         order = self.service.create_order(customer=self.customer, status=self.requested)
 
         self.assertEqual(order.short_id, 'ORD-260326-00008')
+
+
+class OrderNotificationServiceTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.customer = Customer.objects.create(name='Notification Guest', phone='555-0400')
+        cls.draft_status, _ = OrderStatus.objects.get_or_create(
+            name='BORRADOR',
+            defaults={'description': 'Pedido creado por cliente, pendiente de revisión'},
+        )
+        cls.requested_status, _ = OrderStatus.objects.get_or_create(
+            name='SOLICITADO',
+            defaults={'description': 'La orden fue creada y espera confirmación.'},
+        )
+
+    def test_create_new_public_order_notification_generates_message(self):
+        order = Order.objects.create(short_id='ORD-NOTIF-1', customer=self.customer, status=self.draft_status)
+
+        notification = OrderNotificationService.create_new_public_order_notification(order)
+
+        self.assertEqual(notification.order_id, order.id)
+        self.assertEqual(notification.title, 'Nuevo pedido en tienda online')
+        self.assertIn(order.short_id, notification.message)
+
+    def test_purge_expired_notifications_deletes_records_older_than_retention(self):
+        order = Order.objects.create(short_id='ORD-NOTIF-2', customer=self.customer, status=self.draft_status)
+        expired = OrderNotification.objects.create(
+            order=order,
+            title='Vencida',
+            message='Notificación fuera de ventana',
+        )
+        recent = OrderNotification.objects.create(
+            order=order,
+            title='Reciente',
+            message='Notificación vigente',
+        )
+
+        threshold = timezone.now() - timedelta(days=61)
+        OrderNotification.objects.filter(id=expired.id).update(created_at=threshold)
+
+        deleted_count = OrderNotificationService.purge_expired_notifications()
+
+        self.assertEqual(deleted_count, 1)
+        self.assertFalse(OrderNotification.objects.filter(id=expired.id).exists())
+        self.assertTrue(OrderNotification.objects.filter(id=recent.id).exists())
+
+    def test_list_notifications_only_returns_draft_orders(self):
+        draft_order = Order.objects.create(short_id='ORD-NOTIF-3', customer=self.customer, status=self.draft_status)
+        requested_order = Order.objects.create(short_id='ORD-NOTIF-4', customer=self.customer, status=self.requested_status)
+
+        draft_notification = OrderNotification.objects.create(
+            order=draft_order,
+            title='Borrador',
+            message='Debe mostrarse en campana',
+        )
+        OrderNotification.objects.create(
+            order=requested_order,
+            title='Solicitado',
+            message='No debe mostrarse en campana',
+        )
+
+        visible_notifications = list(OrderNotificationService.list_notifications())
+
+        self.assertEqual(len(visible_notifications), 1)
+        self.assertEqual(visible_notifications[0].id, draft_notification.id)
+
+    def test_notification_stops_showing_after_order_leaves_draft(self):
+        order = Order.objects.create(short_id='ORD-NOTIF-5', customer=self.customer, status=self.draft_status)
+        notification = OrderNotification.objects.create(
+            order=order,
+            title='Nuevo pedido en tienda online',
+            message='Pedido pendiente de revisión',
+        )
+
+        self.assertTrue(OrderNotificationService.list_notifications().filter(id=notification.id).exists())
+
+        order.status = self.requested_status
+        order.save(update_fields=['status'])
+
+        self.assertFalse(OrderNotificationService.list_notifications().filter(id=notification.id).exists())
+        self.assertTrue(OrderNotification.objects.filter(id=notification.id).exists())

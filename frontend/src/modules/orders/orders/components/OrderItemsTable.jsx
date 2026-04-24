@@ -40,14 +40,14 @@ export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete, canEdit = 
                                     {
                                         icon: FiEdit2,
                                         onClick: () => onEdit?.(item),
-                                        title: canEdit ? 'Editar' : 'Solo editable en estado SOLICITADO',
+                                        title: canEdit ? 'Editar' : 'Solo editable en estado SOLICITADO o BORRADOR',
                                         variant: 'primary',
                                         disabled: !canEdit,
                                     },
                                     {
                                         icon: FiTrash2,
                                         onClick: () => onDelete?.(item),
-                                        title: canEdit ? 'Eliminar' : 'Solo editable en estado SOLICITADO',
+                                        title: canEdit ? 'Eliminar' : 'Solo editable en estado SOLICITADO o BORRADOR',
                                         variant: 'danger',
                                         disabled: !canEdit,
                                     },

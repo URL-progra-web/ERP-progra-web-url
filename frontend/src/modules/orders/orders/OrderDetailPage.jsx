@@ -96,7 +96,7 @@ const OrderDetailPage = () => {
     }, [order]);
 
     const canMutateOrder = useMemo(() => (
-        String(order?.status_name || '').toUpperCase() === 'SOLICITADO'
+        ['SOLICITADO', 'BORRADOR'].includes(String(order?.status_name || '').toUpperCase())
     ), [order?.status_name]);
 
     const handleChange = (e) => {
@@ -221,7 +221,7 @@ const OrderDetailPage = () => {
 
             {!canMutateOrder && (
                 <div className="alert alert-info" role="alert">
-                    Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados.
+                    Este pedido está en estado <strong>{order.status_name}</strong>. Solo se permite visualización; edición, agregado y eliminación están bloqueados fuera de SOLICITADO o BORRADOR.
                 </div>
             )}
 
@@ -233,7 +233,7 @@ const OrderDetailPage = () => {
                         className="btn btn-sm btn-outline-danger"
                         onClick={() => setShowDeleteAlert(true)}
                         disabled={!canMutateOrder}
-                        title={canMutateOrder ? 'Eliminar pedido' : 'Solo editable en estado SOLICITADO'}
+                        title={canMutateOrder ? 'Eliminar pedido' : 'Solo editable en estado SOLICITADO o BORRADOR'}
                     >
                         <FiTrash2 className="me-2" />
                         Eliminar
@@ -250,6 +250,51 @@ const OrderDetailPage = () => {
                                 autoComplete="off"
                                 className="form-control"
                                 value={order.customer_name || `#${order.customer}`}
+                                disabled
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label" htmlFor="orderDetailCustomerType">Tipo de Cliente</label>
+                            <input
+                                id="orderDetailCustomerType"
+                                name="order_detail_customer_type"
+                                autoComplete="off"
+                                className="form-control"
+                                value={order.customer_type_label || order.customer_type || '-'}
+                                disabled
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label" htmlFor="orderDetailCustomerPhone">Teléfono del Cliente</label>
+                            <input
+                                id="orderDetailCustomerPhone"
+                                name="order_detail_customer_phone"
+                                autoComplete="tel"
+                                className="form-control"
+                                value={order.customer_phone || '-'}
+                                disabled
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <label className="form-label" htmlFor="orderDetailCustomerEmail">Email del Cliente</label>
+                            <input
+                                id="orderDetailCustomerEmail"
+                                name="order_detail_customer_email"
+                                autoComplete="email"
+                                className="form-control"
+                                value={order.customer_email || '-'}
+                                disabled
+                            />
+                        </div>
+                        <div className="col-12">
+                            <label className="form-label" htmlFor="orderDetailCustomerAddress">Dirección del Cliente</label>
+                            <textarea
+                                id="orderDetailCustomerAddress"
+                                className="form-control"
+                                rows="2"
+                                name="order_detail_customer_address"
+                                autoComplete="street-address"
+                                value={order.customer_address || '-'}
                                 disabled
                             />
                         </div>
@@ -348,7 +393,7 @@ const OrderDetailPage = () => {
                         className="btn btn-sm btn-dark"
                         onClick={handleOpenCreateItem}
                         disabled={!canMutateOrder}
-                        title={canMutateOrder ? 'Agregar item' : 'Solo editable en estado SOLICITADO'}
+                        title={canMutateOrder ? 'Agregar item' : 'Solo editable en estado SOLICITADO o BORRADOR'}
                     >
                         <FiPlus className="me-2" />Agregar Item
                     </button>

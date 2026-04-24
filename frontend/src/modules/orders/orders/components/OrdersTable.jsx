@@ -53,7 +53,8 @@ export const OrdersTable = ({
                         const transitions = getTransitions?.(order) || [];
                         const isDeleting = deletingOrderId === order.id;
                         const isTransitioning = transitioningOrderId === order.id;
-                        const canDelete = String(order.status_name || '').toUpperCase() === 'SOLICITADO';
+                        const orderStatus = String(order.status_name || '').toUpperCase();
+                        const canDelete = ['SOLICITADO', 'BORRADOR'].includes(orderStatus);
 
                         return (
                             <tr key={order.id}>
@@ -85,7 +86,7 @@ export const OrdersTable = ({
                                     <TableActions actions={[{
                                         icon: FiTrash2,
                                         onClick: () => onDelete?.(order),
-                                        title: canDelete ? 'Eliminar pedido' : 'Solo se puede eliminar en estado SOLICITADO',
+                                        title: canDelete ? 'Eliminar pedido' : 'Solo se puede eliminar en estado SOLICITADO o BORRADOR',
                                         variant: 'danger',
                                         disabled: isDeleting || isTransitioning || !canDelete,
                                     }]} />

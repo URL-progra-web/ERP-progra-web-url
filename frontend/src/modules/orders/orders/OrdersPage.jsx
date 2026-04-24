@@ -36,6 +36,8 @@ const OrdersPage = () => {
     const [transitionCandidate, setTransitionCandidate] = React.useState(null);
     const [deletingOrderId, setDeletingOrderId] = React.useState(null);
     const [transitioningOrderId, setTransitioningOrderId] = React.useState(null);
+    const [notifications, setNotifications] = React.useState([]);
+    const [isLoadingNotifications, setIsLoadingNotifications] = React.useState(false);
     // --- exportar excel ---
     const [showExportModal, setShowExportModal] = React.useState(false);
     const [exportDateFrom, setExportDateFrom] = React.useState('');
@@ -54,6 +56,22 @@ const OrdersPage = () => {
 
         loadWorkflow();
     }, [setError]);
+
+    React.useEffect(() => {
+        const loadNotifications = async () => {
+            setIsLoadingNotifications(true);
+            try {
+                const response = await orderService.listNotifications({ page: 1, page_size: 5 });
+                setNotifications(Array.isArray(response?.results) ? response.results : []);
+            } catch {
+                setNotifications([]);
+            } finally {
+                setIsLoadingNotifications(false);
+            }
+        };
+
+        loadNotifications();
+    }, []);
 
     const getTransitions = React.useCallback((order) => {
         const currentStatus = String(order?.status_name || '').toUpperCase();
@@ -148,6 +166,19 @@ const OrdersPage = () => {
                             Cerrar
                         </button>
                     </div>
+                </div>
+            )}
+
+            {!isLoadingNotifications && notifications.length > 0 && (
+                <div className="alert alert-info" role="status">
+                    <div className="fw-semibold mb-2">Nuevos pedidos de tienda online</div>
+                    <ul className="mb-0 ps-3">
+                        {notifications.map((notification) => (
+                            <li key={notification.id}>
+                                {notification.message} ({new Date(notification.created_at).toLocaleString()})
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             )}
 

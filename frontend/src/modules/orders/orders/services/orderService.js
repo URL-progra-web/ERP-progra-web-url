@@ -1,6 +1,7 @@
 import api from '~/core/api/api';
 
 const BASE_URL = '/orders/';
+const NOTIFICATIONS_URL = '/orders/notifications/';
 
 export const orderService = {
     async list({ search, page, page_size } = {}) {
@@ -52,5 +53,13 @@ export const orderService = {
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
+    },
+
+    async listNotifications({ page, page_size } = {}) {
+        const params = {};
+        if (page) params.page = page;
+        if (page_size) params.page_size = page_size;
+        const response = await api.get(NOTIFICATIONS_URL, { params });
+        return response.data;
     },
 };

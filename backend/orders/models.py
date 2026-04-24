@@ -2,6 +2,7 @@ from .payment_method.models.models import PaymentMethod
 from .order_status.models.models import OrderStatus
 from .order.models.models import Order
 from .order_item.models.models import OrderItem
+from .order_notification.models.models import OrderNotification
 from .order_history.models.models import OrderStatusHistory
 from .order_item_history.models.models import OrderItemStatusHistory
 from receipts.receipt.models.models import Receipt

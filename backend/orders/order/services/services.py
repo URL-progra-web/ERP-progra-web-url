@@ -207,8 +207,8 @@ class OrderService:
     @transaction.atomic
     def delete_order(self, order_id: int) -> None:
         order = self.get_order(order_id)
-        if order.status.name.upper() != 'SOLICITADO':
-            raise OrderDeleteNotAllowed('Solo se pueden eliminar pedidos en estado SOLICITADO')
+        if order.status.name.upper() not in {'SOLICITADO', 'BORRADOR'}:
+            raise OrderDeleteNotAllowed('Solo se pueden eliminar pedidos en estado SOLICITADO o BORRADOR')
         self.repository.delete(order)
 
 
