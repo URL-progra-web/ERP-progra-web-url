@@ -1,13 +1,80 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useTheme } from '../theme/ThemeContext';
 import { FiMenu, FiBell, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
+import { orderService } from '~/modules/orders/orders/services/orderService';
+import { getDashboardPath } from '~/core/registry/dashboardPaths';
+
+const NOTIFICATIONS_REFRESH_INTERVAL_MS = 20 * 60 * 1000;
 
 /* ── TopbarActions ───────────────────────────────────────── */
 
 const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
     const initials  = user?.name?.charAt(0)?.toUpperCase() || 'U';
     const firstName = user?.name?.split(' ')[0] || 'Usuario';
+    const navigate = useNavigate();
+    const canViewNotifications = ['ADMIN', 'MANAGER'].includes(user?.role?.name);
+    const basePath = getDashboardPath(user?.role?.name);
+    const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
+    const [notifications, setNotifications] = React.useState([]);
+    const [notificationCount, setNotificationCount] = React.useState(0);
+    const [isLoadingNotifications, setIsLoadingNotifications] = React.useState(false);
+    const [notificationsError, setNotificationsError] = React.useState('');
+    const notificationsRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (!isNotificationsOpen) return undefined;
+
+        const handlePointerDown = (event) => {
+            if (!notificationsRef.current?.contains(event.target)) {
+                setIsNotificationsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handlePointerDown);
+        return () => document.removeEventListener('mousedown', handlePointerDown);
+    }, [isNotificationsOpen]);
+
+    const loadNotifications = React.useCallback(async () => {
+        if (!canViewNotifications) return;
+
+        setIsLoadingNotifications(true);
+        setNotificationsError('');
+        try {
+            const response = await orderService.listNotifications({ page: 1, page_size: 6 });
+            setNotifications(Array.isArray(response?.results) ? response.results : []);
+            setNotificationCount(Number(response?.count) || 0);
+        } catch {
+            setNotifications([]);
+            setNotificationCount(0);
+            setNotificationsError('No se pudieron cargar las notificaciones.');
+        } finally {
+            setIsLoadingNotifications(false);
+        }
+    }, [canViewNotifications]);
+
+    React.useEffect(() => {
+        if (!canViewNotifications) return undefined;
+
+        loadNotifications();
+        const intervalId = window.setInterval(loadNotifications, NOTIFICATIONS_REFRESH_INTERVAL_MS);
+
+        return () => window.clearInterval(intervalId);
+    }, [canViewNotifications, loadNotifications]);
+
+    const handleToggleNotifications = async () => {
+        const nextOpen = !isNotificationsOpen;
+        setIsNotificationsOpen(nextOpen);
+        if (nextOpen) {
+            await loadNotifications();
+        }
+    };
+
+    const handleOpenOrder = (orderId) => {
+        setIsNotificationsOpen(false);
+        navigate(`${basePath}/orders/detail/${orderId}`);
+    };
 
     return (
         <div className="d-flex align-items-center gap-2">
@@ -19,9 +86,65 @@ const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
                 {theme === 'light' ? <FiMoon size={17} /> : <FiSun size={17} />}
             </button>
 
-            <button className="topbar-icon-btn d-none d-sm-flex" aria-label="Notificaciones">
-                <FiBell size={17} />
-            </button>
+            {canViewNotifications && (
+                <div className="topbar-notifications" ref={notificationsRef}>
+                    <button
+                        type="button"
+                        className="topbar-icon-btn d-none d-sm-flex position-relative"
+                        aria-label="Notificaciones"
+                        aria-expanded={isNotificationsOpen}
+                        onClick={handleToggleNotifications}
+                    >
+                        <FiBell size={17} />
+                        {notificationCount > 0 && (
+                            <span className="topbar-notification-badge">
+                                {notificationCount > 99 ? '99+' : notificationCount}
+                            </span>
+                        )}
+                    </button>
+
+                    {isNotificationsOpen && (
+                        <div className="topbar-notification-panel">
+                            <div className="topbar-notification-header">
+                                <strong>Notificaciones</strong>
+                                <span>{notificationCount} total</span>
+                            </div>
+
+                            {isLoadingNotifications && (
+                                <div className="topbar-notification-state">Cargando notificaciones...</div>
+                            )}
+
+                            {!isLoadingNotifications && notificationsError && (
+                                <div className="topbar-notification-state text-danger">{notificationsError}</div>
+                            )}
+
+                            {!isLoadingNotifications && !notificationsError && notifications.length === 0 && (
+                                <div className="topbar-notification-state">No hay notificaciones recientes.</div>
+                            )}
+
+                            {!isLoadingNotifications && !notificationsError && notifications.length > 0 && (
+                                <div className="topbar-notification-list">
+                                    {notifications.map((notification) => (
+                                        <button
+                                            key={notification.id}
+                                            type="button"
+                                            className="topbar-notification-item"
+                                            onClick={() => handleOpenOrder(notification.order_id)}
+                                        >
+                                            <div className="topbar-notification-item-title">{notification.title}</div>
+                                            <div className="topbar-notification-item-message">{notification.message}</div>
+                                            <div className="topbar-notification-item-meta">
+                                                <span>{notification.order_short_id}</span>
+                                                <span>{new Date(notification.created_at).toLocaleString()}</span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
 
             <button className="topbar-user-btn" onClick={logout} title="Cerrar sesión">
                 <div className="topbar-avatar">{initials}</div>

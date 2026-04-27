@@ -1,8 +1,14 @@
+import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 
+from orders.order_notification.services.services import OrderNotificationService
 from users.user.models.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationService:
@@ -30,10 +36,11 @@ class NotificationService:
         Returns:
             True si se envió correctamente, False en caso contrario
         """
+        OrderNotificationService.create_new_public_order_notification(order)
+
         admin_emails = cls.get_admin_emails()
-        
         if not admin_emails:
-            return False
+            return True
         
         subject = f'Nuevo pedido: {order.short_id}'
         
@@ -67,9 +74,8 @@ class NotificationService:
                 fail_silently=False,
             )
             return True
-        except Exception as e:
-            # Log del error (en producción usar logging)
-            print(f'Error enviando email de notificación: {e}')
+        except Exception:
+            logger.exception('Error enviando email de notificación')
             return False
     
     @staticmethod

@@ -26,6 +26,7 @@ class OrderStatusService:
     CANCELLATION_RESTORE_TRANSACTION_TYPE = 'Entrada'
 
     allowed_transitions: Dict[str, Sequence[str]] = {
+        'BORRADOR': ('SOLICITADO',),
         'SOLICITADO': ('CONFIRMADO',),
         'CONFIRMADO': ('ENVIADO', 'CANCELADO'),
         'ENVIADO': ('ENTREGADO',),

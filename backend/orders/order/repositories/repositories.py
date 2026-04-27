@@ -10,6 +10,19 @@ class OrderRepository:
     def list(self) -> QuerySet:
         return Order.objects.select_related('customer', 'payment_method', 'status').order_by('-created_at')
 
+    def list_for_export(self, date_from=None, date_to=None) -> QuerySet:
+        qs = (
+            Order.objects
+            .select_related('customer', 'payment_method', 'status')
+            .prefetch_related('items')
+            .order_by('created_at')
+        )
+        if date_from:
+            qs = qs.filter(created_at__date__gte=date_from)
+        if date_to:
+            qs = qs.filter(created_at__date__lte=date_to)
+        return qs
+
     def get_by_id(self, order_id: int) -> Optional[Order]:
         return (
             Order.objects.select_related('customer', 'payment_method', 'status')

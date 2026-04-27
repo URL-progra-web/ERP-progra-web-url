@@ -392,3 +392,9 @@ code, pre, .font-mono, kbd {
     padding-bottom: var(--mobile-nav-height) !important;
   }
 }
+
+/* ── Utility: spinning icon ──────────────────────────────────── */
+.spin {
+  animation: spinnerRotate 0.8s linear infinite;
+  display: inline-block;
+}

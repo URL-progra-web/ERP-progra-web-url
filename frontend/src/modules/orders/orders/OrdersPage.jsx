@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiShoppingCart } from 'react-icons/fi';
+import { FiDownload, FiShoppingCart } from 'react-icons/fi';
 import { useOrders } from './hooks/useOrders';
 import { OrdersTable } from './components/OrdersTable';
+import { orderService } from './services/orderService';
 import { orderStatusesService } from '../orderStatuses/services/orderStatusesService';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
@@ -35,6 +36,13 @@ const OrdersPage = () => {
     const [transitionCandidate, setTransitionCandidate] = React.useState(null);
     const [deletingOrderId, setDeletingOrderId] = React.useState(null);
     const [transitioningOrderId, setTransitioningOrderId] = React.useState(null);
+    const [notifications, setNotifications] = React.useState([]);
+    const [isLoadingNotifications, setIsLoadingNotifications] = React.useState(false);
+    // --- exportar excel ---
+    const [showExportModal, setShowExportModal] = React.useState(false);
+    const [exportDateFrom, setExportDateFrom] = React.useState('');
+    const [exportDateTo, setExportDateTo] = React.useState('');
+    const [isExporting, setIsExporting] = React.useState(false);
 
     React.useEffect(() => {
         const loadWorkflow = async () => {
@@ -49,10 +57,41 @@ const OrdersPage = () => {
         loadWorkflow();
     }, [setError]);
 
+    React.useEffect(() => {
+        const loadNotifications = async () => {
+            setIsLoadingNotifications(true);
+            try {
+                const response = await orderService.listNotifications({ page: 1, page_size: 5 });
+                setNotifications(Array.isArray(response?.results) ? response.results : []);
+            } catch {
+                setNotifications([]);
+            } finally {
+                setIsLoadingNotifications(false);
+            }
+        };
+
+        loadNotifications();
+    }, []);
+
     const getTransitions = React.useCallback((order) => {
         const currentStatus = String(order?.status_name || '').toUpperCase();
         return workflow[currentStatus] || [];
     }, [workflow]);
+
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            await orderService.exportExcel({
+                date_from: exportDateFrom || undefined,
+                date_to:   exportDateTo   || undefined,
+            });
+        } catch {
+            setError('No se pudo exportar el Excel. Intente nuevamente.');
+        } finally {
+            setIsExporting(false);
+            setShowExportModal(false);
+        }
+    };
 
     const handleConfirmDelete = async () => {
         if (!deleteCandidate) return;
@@ -102,6 +141,19 @@ const OrdersPage = () => {
                 isDark
             />
 
+            {/* Botón exportar Excel */}
+            <div className="d-flex justify-content-end mb-3">
+                <button
+                    id="btnExportarExcel"
+                    type="button"
+                    className="btn btn-outline-success d-flex align-items-center gap-2"
+                    onClick={() => setShowExportModal(true)}
+                >
+                    <FiDownload />
+                    Exportar a Excel
+                </button>
+            </div>
+
             {successMessage && (
                 <div className="alert alert-success" role="alert">
                     <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
@@ -114,6 +166,19 @@ const OrdersPage = () => {
                             Cerrar
                         </button>
                     </div>
+                </div>
+            )}
+
+            {!isLoadingNotifications && notifications.length > 0 && (
+                <div className="alert alert-info" role="status">
+                    <div className="fw-semibold mb-2">Nuevos pedidos de tienda online</div>
+                    <ul className="mb-0 ps-3">
+                        {notifications.map((notification) => (
+                            <li key={notification.id}>
+                                {notification.message} ({new Date(notification.created_at).toLocaleString()})
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             )}
 
@@ -189,7 +254,84 @@ const OrdersPage = () => {
                     onClose={() => setTransitionCandidate(null)}
                 />
             )}
+            {/* Modal exportar Excel */}
+            {showExportModal && (
+                <div
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 1050,
+                        background: 'rgba(0,0,0,0.45)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="exportModalTitle"
+                >
+                    <div className="card shadow" style={{ width: '100%', maxWidth: 420 }}>
+                        <div className="card-header d-flex align-items-center gap-2">
+                            <FiDownload />
+                            <span id="exportModalTitle" className="fw-semibold mb-0">
+                                Exportar pedidos a Excel
+                            </span>
+                        </div>
+                        <div className="card-body">
+                            <p className="text-muted small mb-3">
+                                Selecciona un rango de fechas de creación. Si no seleccionas ninguna, se exportarán <strong>todos</strong> los pedidos.
+                            </p>
+                            <div className="mb-3">
+                                <label htmlFor="exportDateFrom" className="form-label">Fecha desde</label>
+                                <input
+                                    id="exportDateFrom"
+                                    type="date"
+                                    className="form-control"
+                                    value={exportDateFrom}
+                                    onChange={(e) => setExportDateFrom(e.target.value)}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="exportDateTo" className="form-label">Fecha hasta</label>
+                                <input
+                                    id="exportDateTo"
+                                    type="date"
+                                    className="form-control"
+                                    value={exportDateTo}
+                                    onChange={(e) => setExportDateTo(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="card-footer d-flex justify-content-end gap-2">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setShowExportModal(false)}
+                                disabled={isExporting}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                id="btnConfirmarExportarExcel"
+                                type="button"
+                                className="btn btn-success d-flex align-items-center gap-2"
+                                onClick={handleExport}
+                                disabled={isExporting}
+                            >
+                                {isExporting ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                        Generando…
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiDownload />
+                                        Descargar
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
+
     );
 };
 
