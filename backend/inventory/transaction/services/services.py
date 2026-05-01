@@ -21,8 +21,8 @@ class InventoryTransactionService:
     def list_transactions(self) -> QuerySet[InventoryTransaction]:
         return self.repository.get_all()
 
-    def list_transactions_filtered(self, variant_id: int = None, transaction_type_name: str = None):
-        return self.repository.get_filtered(variant_id=variant_id, transaction_type_name=transaction_type_name)
+    def list_transactions_filtered(self, variant_id: int = None, transaction_type_name: str = None, date_from: str = None, date_to: str = None):
+        return self.repository.get_filtered(variant_id=variant_id, transaction_type_name=transaction_type_name, date_from=date_from, date_to=date_to)
 
     @staticmethod
     def _resolve_conversion(selected_uom: UoM, base_uom: UoM) -> Decimal:

@@ -7,10 +7,15 @@ const TransactionHistoryTab = ({
   isLoading,
   variants,
   transactionTypes,
+  userMap,
   variantFilter,
   setVariantFilter,
   typeFilter,
   setTypeFilter,
+  dateFromFilter,
+  setDateFromFilter,
+  dateToFilter,
+  setDateToFilter,
   onViewDetails,
 }) => {
   const formatDate = (dateString) => {
@@ -42,7 +47,29 @@ const TransactionHistoryTab = ({
   return (
     <div>
       <div className="row g-3 mb-3">
-        <div className="col-md-6">
+        <div className="col-md-3">
+          <label className="form-label small text-muted text-uppercase">
+            Fecha Desde
+          </label>
+          <input
+            type="date"
+            className="form-control"
+            value={dateFromFilter}
+            onChange={(e) => setDateFromFilter(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
+          <label className="form-label small text-muted text-uppercase">
+            Fecha Hasta
+          </label>
+          <input
+            type="date"
+            className="form-control"
+            value={dateToFilter}
+            onChange={(e) => setDateToFilter(e.target.value)}
+          />
+        </div>
+        <div className="col-md-3">
           <label className="form-label small text-muted text-uppercase">
             Filtrar por Variante (SKU)
           </label>
@@ -59,7 +86,7 @@ const TransactionHistoryTab = ({
             ))}
           </select>
         </div>
-        <div className="col-md-6">
+        <div className="col-md-3">
           <label className="form-label small text-muted text-uppercase">
             Filtrar por Tipo de Transacción
           </label>
@@ -144,7 +171,7 @@ const TransactionHistoryTab = ({
                     )}
                   </td>
                   <td className="py-3 text-secondary">
-                    {transaction.user || (
+                    {userMap?.[transaction.user] || transaction.user || (
                       <span className="fst-italic text-muted">N/A</span>
                     )}
                   </td>

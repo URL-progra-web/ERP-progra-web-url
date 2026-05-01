@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { inventoryService } from "../services/inventoryService";
 import { categoryService } from "../../categories/services/categoryService";
+import { userService } from "../../../users/services/userService";
 import { DEFAULT_PAGE_SIZE } from "~/core/constants/pagination";
 
 export function useInventoryAdjustments() {
@@ -17,15 +18,19 @@ export function useInventoryAdjustments() {
   const [transactionsCount, setTransactionsCount] = useState(0);
   const [transactionsNumPages, setTransactionsNumPages] = useState(1);
   const [transactionsPage, setTransactionsPage] = useState(1);
+  const [variants, setVariants] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [userMap, setUserMap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilterState] = useState("");
-  const [variants, setVariants] = useState([]);
   const [transactionVariantFilter, setTransactionVariantFilter] = useState("");
   const [transactionTypeFilter, setTransactionTypeFilter] = useState("");
+  const [dateFromFilter, setDateFromFilter] = useState("");
+  const [dateToFilter, setDateToFilter] = useState("");
 
   const normalize = (result) =>
     Array.isArray(result) ? result : result.results || [];
@@ -76,6 +81,8 @@ export function useInventoryAdjustments() {
       const result = await inventoryService.getTransactions({
         variant_id: transactionVariantFilter || undefined,
         transaction_type: transactionTypeFilter || undefined,
+        date_from: dateFromFilter || undefined,
+        date_to: dateToFilter || undefined,
         page: transactionsPage,
         page_size: DEFAULT_PAGE_SIZE,
       });
@@ -89,7 +96,7 @@ export function useInventoryAdjustments() {
     } finally {
       setIsLoading(false);
     }
-  }, [transactionVariantFilter, transactionTypeFilter, transactionsPage]);
+  }, [transactionVariantFilter, transactionTypeFilter, dateFromFilter, dateToFilter, transactionsPage]);
 
   const fetchVariants = useCallback(async () => {
     try {
@@ -98,6 +105,21 @@ export function useInventoryAdjustments() {
       setVariants(data);
     } catch {
       // Silently fail - variants are optional for the filter
+    }
+  }, []);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const result = await userService.getUsers({ page_size: 100 });
+      const data = normalize(result);
+      setUsers(data);
+      const map = {};
+      data.forEach((user) => {
+        map[user.id] = user.name || user.email || `Usuario ${user.id}`;
+      });
+      setUserMap(map);
+    } catch {
+      // Silently fail - users are optional
     }
   }, []);
 
@@ -134,6 +156,10 @@ export function useInventoryAdjustments() {
   useEffect(() => {
     fetchVariants();
   }, [fetchVariants]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const setCategoryFilter = (value) => {
     setProductsPage(1);
@@ -188,10 +214,16 @@ export function useInventoryAdjustments() {
     transactionsPage,
     setTransactionsPage,
     variants,
+    users,
+    userMap,
     transactionVariantFilter,
     setTransactionVariantFilter,
     transactionTypeFilter,
     setTransactionTypeFilter,
+    dateFromFilter,
+    setDateFromFilter,
+    dateToFilter,
+    setDateToFilter,
     isLoading,
     error,
     setError,

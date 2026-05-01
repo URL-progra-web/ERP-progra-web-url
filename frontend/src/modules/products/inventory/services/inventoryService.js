@@ -39,10 +39,12 @@ export const inventoryService = {
         return response.data;
     },
 
-    getTransactions: async ({ variant_id, transaction_type, page, page_size } = {}) => {
+    getTransactions: async ({ variant_id, transaction_type, date_from, date_to, page, page_size } = {}) => {
         const params = {};
         if (variant_id) params.variant_id = variant_id;
         if (transaction_type) params.transaction_type = transaction_type;
+        if (date_from) params.date_from = date_from;
+        if (date_to) params.date_to = date_to;
         if (page) params.page = page;
         if (page_size) params.page_size = page_size;
         const response = await api.get('/inventory/transactions/', { params });
