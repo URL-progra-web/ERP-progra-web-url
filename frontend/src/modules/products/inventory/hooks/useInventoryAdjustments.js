@@ -13,12 +13,19 @@ export function useInventoryAdjustments() {
   const [typesCount, setTypesCount] = useState(0);
   const [typesNumPages, setTypesNumPages] = useState(1);
   const [typesPage, setTypesPage] = useState(1);
+  const [transactions, setTransactions] = useState([]);
+  const [transactionsCount, setTransactionsCount] = useState(0);
+  const [transactionsNumPages, setTransactionsNumPages] = useState(1);
+  const [transactionsPage, setTransactionsPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilterState] = useState("");
+  const [variants, setVariants] = useState([]);
+  const [transactionVariantFilter, setTransactionVariantFilter] = useState("");
+  const [transactionTypeFilter, setTransactionTypeFilter] = useState("");
 
   const normalize = (result) =>
     Array.isArray(result) ? result : result.results || [];
@@ -63,6 +70,37 @@ export function useInventoryAdjustments() {
     }
   }, [typesPage]);
 
+  const fetchTransactions = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const result = await inventoryService.getTransactions({
+        variant_id: transactionVariantFilter || undefined,
+        transaction_type: transactionTypeFilter || undefined,
+        page: transactionsPage,
+        page_size: DEFAULT_PAGE_SIZE,
+      });
+      const data = normalize(result);
+      setTransactions(data);
+      setTransactionsCount(result?.count ?? data.length);
+      setTransactionsNumPages(result?.num_pages ?? 1);
+      setError(null);
+    } catch {
+      setError("Error al cargar el historial de transacciones.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [transactionVariantFilter, transactionTypeFilter, transactionsPage]);
+
+  const fetchVariants = useCallback(async () => {
+    try {
+      const result = await inventoryService.getVariants();
+      const data = normalize(result);
+      setVariants(data);
+    } catch {
+      // Silently fail - variants are optional for the filter
+    }
+  }, []);
+
   const fetchRelations = useCallback(async () => {
     const [categoriesRes] = await Promise.allSettled([
       categoryService.getCategories(),
@@ -88,6 +126,14 @@ export function useInventoryAdjustments() {
   useEffect(() => {
     fetchTransactionTypes();
   }, [fetchTransactionTypes]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  useEffect(() => {
+    fetchVariants();
+  }, [fetchVariants]);
 
   const setCategoryFilter = (value) => {
     setProductsPage(1);
@@ -136,6 +182,16 @@ export function useInventoryAdjustments() {
     typesNumPages,
     typesPage,
     setTypesPage,
+    transactions,
+    transactionsCount,
+    transactionsNumPages,
+    transactionsPage,
+    setTransactionsPage,
+    variants,
+    transactionVariantFilter,
+    setTransactionVariantFilter,
+    transactionTypeFilter,
+    setTransactionTypeFilter,
     isLoading,
     error,
     setError,
@@ -147,6 +203,7 @@ export function useInventoryAdjustments() {
     createAdjustment,
     getProductVariants,
     fetchTransactionTypes,
+    fetchTransactions,
     createTransactionType,
     updateTransactionType,
     deleteTransactionType,

@@ -8,7 +8,8 @@ import InventoryAdjustmentTable from "../components/InventoryAdjustmentTable";
 import InventoryAdjustmentModal from "../components/InventoryAdjustmentModal";
 import TransactionTypeModal from "../components/TransactionTypeModal";
 import TransactionTypeList from "../components/TransactionTypeList";
-import { TransactionsTab } from "../components/TransactionsTab";
+import TransactionHistoryTab from "../components/TransactionHistoryTab";
+import TransactionDetailModal from "../components/TransactionDetailModal";
 import AppAlert from "~/core/components/AppAlert";
 import AppCard from "~/core/components/AppCard";
 import AppPagination from "~/core/components/AppPagination";
@@ -27,6 +28,16 @@ const InventoryAdjustmentsPage = () => {
     typesNumPages,
     typesPage,
     setTypesPage,
+    transactions,
+    transactionsCount,
+    transactionsNumPages,
+    transactionsPage,
+    setTransactionsPage,
+    variants,
+    transactionVariantFilter,
+    setTransactionVariantFilter,
+    transactionTypeFilter,
+    setTransactionTypeFilter,
     isLoading,
     error,
     setError,
@@ -62,6 +73,8 @@ const InventoryAdjustmentsPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [adjustmentType, setAdjustmentType] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const handleAddStock = (product) => {
     setSelectedProduct(product);
@@ -91,6 +104,11 @@ const InventoryAdjustmentsPage = () => {
       value: "types",
       label: "Tipos de Transacción",
       badge: typesCount,
+    },
+    {
+      value: "history",
+      label: "Historial de Transacciones",
+      badge: transactionsCount,
     },
   ];
 
@@ -128,7 +146,11 @@ const InventoryAdjustmentsPage = () => {
 
         <AppCard.Section
           label={
-            activeTab === "adjustments" ? "Productos" : "Tipos de Transacción"
+            activeTab === "adjustments"
+              ? "Productos"
+              : activeTab === "types"
+              ? "Tipos de Transacción"
+              : "Historial de Transacciones"
           }
         >
           <div className="p-3 p-md-4">
@@ -187,13 +209,54 @@ const InventoryAdjustmentsPage = () => {
                 </table>
               </div>
             )}
+
+            {activeTab === "history" && (
+              <TransactionHistoryTab
+                transactions={transactions}
+                isLoading={isLoading}
+                variants={variants}
+                transactionTypes={transactionTypes}
+                variantFilter={transactionVariantFilter}
+                setVariantFilter={setTransactionVariantFilter}
+                typeFilter={transactionTypeFilter}
+                setTypeFilter={setTransactionTypeFilter}
+                onViewDetails={(transaction) => {
+                  setSelectedTransaction(transaction);
+                  setIsDetailModalOpen(true);
+                }}
+              />
+            )}
           </div>
 
           <AppPagination
-            page={activeTab === "adjustments" ? productsPage : typesPage}
-            numPages={activeTab === "adjustments" ? productsNumPages : typesNumPages}
-            count={activeTab === "adjustments" ? productsCount : typesCount}
-            onPageChange={activeTab === "adjustments" ? setProductsPage : setTypesPage}
+            page={
+              activeTab === "adjustments"
+                ? productsPage
+                : activeTab === "types"
+                ? typesPage
+                : transactionsPage
+            }
+            numPages={
+              activeTab === "adjustments"
+                ? productsNumPages
+                : activeTab === "types"
+                ? typesNumPages
+                : transactionsNumPages
+            }
+            count={
+              activeTab === "adjustments"
+                ? productsCount
+                : activeTab === "types"
+                ? typesCount
+                : transactionsCount
+            }
+            onPageChange={
+              activeTab === "adjustments"
+                ? setProductsPage
+                : activeTab === "types"
+                ? setTypesPage
+                : setTransactionsPage
+            }
           />
         </AppCard.Section>
       </AppCard>
@@ -216,6 +279,17 @@ const InventoryAdjustmentsPage = () => {
         onSave={handleSaveType}
         onDelete={handleDeleteType}
       />
+
+      {isDetailModalOpen && (
+        <TransactionDetailModal
+          isOpen={isDetailModalOpen}
+          transaction={selectedTransaction}
+          onClose={() => {
+            setIsDetailModalOpen(false);
+            setSelectedTransaction(null);
+          }}
+        />
+      )}
 
       {alertConfig && (
         <AppAlert
