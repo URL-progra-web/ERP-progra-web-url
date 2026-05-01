@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiPackage, FiPlus } from "react-icons/fi";
+import { FiPackage, FiPlus, FiDownload } from "react-icons/fi";
 import FilterTabs from "~/core/components/FilterTabs";
 import { useInventoryAdjustments } from "../hooks/useInventoryAdjustments";
 import { useInventoryPageState } from "../hooks/useInventoryPageState";
@@ -56,6 +56,7 @@ const InventoryAdjustmentsPage = () => {
     createTransactionType,
     updateTransactionType,
     deleteTransactionType,
+    exportTransactions,
   } = useInventoryAdjustments();
 
   const {
@@ -81,6 +82,7 @@ const InventoryAdjustmentsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleAddStock = (product) => {
     setSelectedProduct(product);
@@ -98,6 +100,22 @@ const InventoryAdjustmentsPage = () => {
     setSelectedProduct(null);
     setAdjustmentType(null);
     setIsModalOpen(false);
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportTransactions({
+        variant_id: transactionVariantFilter || undefined,
+        transaction_type: transactionTypeFilter || undefined,
+        date_from: dateFromFilter || undefined,
+        date_to: dateToFilter || undefined,
+      });
+    } catch {
+      setError("No se pudo exportar el Excel. Intente nuevamente.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const tabOptions = [
@@ -217,25 +235,51 @@ const InventoryAdjustmentsPage = () => {
             )}
 
             {activeTab === "history" && (
-              <TransactionHistoryTab
-                transactions={transactions}
-                isLoading={isLoading}
-                variants={variants}
-                transactionTypes={transactionTypes}
-                userMap={userMap}
-                variantFilter={transactionVariantFilter}
-                setVariantFilter={setTransactionVariantFilter}
-                typeFilter={transactionTypeFilter}
-                setTypeFilter={setTransactionTypeFilter}
-                dateFromFilter={dateFromFilter}
-                setDateFromFilter={setDateFromFilter}
-                dateToFilter={dateToFilter}
-                setDateToFilter={setDateToFilter}
-                onViewDetails={(transaction) => {
-                  setSelectedTransaction(transaction);
-                  setIsDetailModalOpen(true);
-                }}
-              />
+              <>
+                <TransactionHistoryTab
+                  transactions={transactions}
+                  isLoading={isLoading}
+                  variants={variants}
+                  transactionTypes={transactionTypes}
+                  userMap={userMap}
+                  variantFilter={transactionVariantFilter}
+                  setVariantFilter={setTransactionVariantFilter}
+                  typeFilter={transactionTypeFilter}
+                  setTypeFilter={setTransactionTypeFilter}
+                  dateFromFilter={dateFromFilter}
+                  setDateFromFilter={setDateFromFilter}
+                  dateToFilter={dateToFilter}
+                  setDateToFilter={setDateToFilter}
+                  onViewDetails={(transaction) => {
+                    setSelectedTransaction(transaction);
+                    setIsDetailModalOpen(true);
+                  }}
+                />
+                <div className="mt-3 d-flex justify-content-end">
+                  <button
+                    type="button"
+                    className="btn btn-outline-success btn-sm d-flex align-items-center gap-2"
+                    onClick={handleExport}
+                    disabled={isExporting || transactions.length === 0}
+                  >
+                    {isExporting ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Exportando...
+                      </>
+                    ) : (
+                      <>
+                        <FiDownload size={14} />
+                        Exportar a Excel
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
             )}
           </div>
 

@@ -51,6 +51,26 @@ export const inventoryService = {
         return response.data;
     },
 
+    exportExcel: async ({ variant_id, transaction_type, date_from, date_to } = {}) => {
+        const params = {};
+        if (variant_id) params.variant_id = variant_id;
+        if (transaction_type) params.transaction_type = transaction_type;
+        if (date_from) params.date_from = date_from;
+        if (date_to) params.date_to = date_to;
+        const response = await api.get('/inventory/transactions/export/excel/', {
+            params,
+            responseType: 'blob',
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'transacciones.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    },
+
     createTransaction: async (data) => {
         const payload = {
             variant_id: data.variant_id,

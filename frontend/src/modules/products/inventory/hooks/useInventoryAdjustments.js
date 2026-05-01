@@ -239,5 +239,13 @@ export function useInventoryAdjustments() {
     createTransactionType,
     updateTransactionType,
     deleteTransactionType,
+    exportTransactions: async ({ variant_id, transaction_type, date_from, date_to } = {}) => {
+      await inventoryService.exportExcel({
+        variant_id: variant_id || undefined,
+        transaction_type: transaction_type || undefined,
+        date_from: date_from || undefined,
+        date_to: date_to || undefined,
+      });
+    },
   };
 }
