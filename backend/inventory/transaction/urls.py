@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from inventory.transaction.apis.views import InventoryTransactionViewSet
+from inventory.transaction.apis.views import InventoryTransactionViewSet, TransactionExportExcelAPIView
 
 transaction_router = DefaultRouter()
 transaction_router.register(r'', InventoryTransactionViewSet, basename='transaction')
 
 urlpatterns = [
     path('', include(transaction_router.urls)),
+    path('export/excel/', TransactionExportExcelAPIView.as_view(), name='transactions-export-excel'),
 ]

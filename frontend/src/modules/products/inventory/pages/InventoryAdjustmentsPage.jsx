@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiPackage, FiPlus } from "react-icons/fi";
+import { FiPackage, FiPlus, FiDownload } from "react-icons/fi";
 import FilterTabs from "~/core/components/FilterTabs";
 import { useInventoryAdjustments } from "../hooks/useInventoryAdjustments";
 import { useInventoryPageState } from "../hooks/useInventoryPageState";
@@ -8,7 +8,8 @@ import InventoryAdjustmentTable from "../components/InventoryAdjustmentTable";
 import InventoryAdjustmentModal from "../components/InventoryAdjustmentModal";
 import TransactionTypeModal from "../components/TransactionTypeModal";
 import TransactionTypeList from "../components/TransactionTypeList";
-import { TransactionsTab } from "../components/TransactionsTab";
+import TransactionHistoryTab from "../components/TransactionHistoryTab";
+import TransactionDetailModal from "../components/TransactionDetailModal";
 import AppAlert from "~/core/components/AppAlert";
 import AppCard from "~/core/components/AppCard";
 import AppPagination from "~/core/components/AppPagination";
@@ -27,6 +28,22 @@ const InventoryAdjustmentsPage = () => {
     typesNumPages,
     typesPage,
     setTypesPage,
+    transactions,
+    transactionsCount,
+    transactionsNumPages,
+    transactionsPage,
+    setTransactionsPage,
+    variants,
+    users,
+    userMap,
+    transactionVariantFilter,
+    setTransactionVariantFilter,
+    transactionTypeFilter,
+    setTransactionTypeFilter,
+    dateFromFilter,
+    setDateFromFilter,
+    dateToFilter,
+    setDateToFilter,
     isLoading,
     error,
     setError,
@@ -39,6 +56,7 @@ const InventoryAdjustmentsPage = () => {
     createTransactionType,
     updateTransactionType,
     deleteTransactionType,
+    exportTransactions,
   } = useInventoryAdjustments();
 
   const {
@@ -62,6 +80,9 @@ const InventoryAdjustmentsPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [adjustmentType, setAdjustmentType] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleAddStock = (product) => {
     setSelectedProduct(product);
@@ -81,6 +102,22 @@ const InventoryAdjustmentsPage = () => {
     setIsModalOpen(false);
   };
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportTransactions({
+        variant_id: transactionVariantFilter || undefined,
+        transaction_type: transactionTypeFilter || undefined,
+        date_from: dateFromFilter || undefined,
+        date_to: dateToFilter || undefined,
+      });
+    } catch {
+      setError("No se pudo exportar el Excel. Intente nuevamente.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const tabOptions = [
     {
       value: "adjustments",
@@ -91,6 +128,11 @@ const InventoryAdjustmentsPage = () => {
       value: "types",
       label: "Tipos de Transacción",
       badge: typesCount,
+    },
+    {
+      value: "history",
+      label: "Historial de Transacciones",
+      badge: transactionsCount,
     },
   ];
 
@@ -128,7 +170,11 @@ const InventoryAdjustmentsPage = () => {
 
         <AppCard.Section
           label={
-            activeTab === "adjustments" ? "Productos" : "Tipos de Transacción"
+            activeTab === "adjustments"
+              ? "Productos"
+              : activeTab === "types"
+                ? "Tipos de Transacción"
+                : "Historial de Transacciones"
           }
         >
           <div className="p-3 p-md-4">
@@ -187,13 +233,85 @@ const InventoryAdjustmentsPage = () => {
                 </table>
               </div>
             )}
+
+            {activeTab === "history" && (
+              <>
+                <TransactionHistoryTab
+                  transactions={transactions}
+                  isLoading={isLoading}
+                  variants={variants}
+                  transactionTypes={transactionTypes}
+                  userMap={userMap}
+                  variantFilter={transactionVariantFilter}
+                  setVariantFilter={setTransactionVariantFilter}
+                  typeFilter={transactionTypeFilter}
+                  setTypeFilter={setTransactionTypeFilter}
+                  dateFromFilter={dateFromFilter}
+                  setDateFromFilter={setDateFromFilter}
+                  dateToFilter={dateToFilter}
+                  setDateToFilter={setDateToFilter}
+                  onViewDetails={(transaction) => {
+                    setSelectedTransaction(transaction);
+                    setIsDetailModalOpen(true);
+                  }}
+                />
+                <div className="mt-3 d-flex justify-content-end">
+                  <button
+                    type="button"
+                    className="btn btn-outline-success btn-sm d-flex align-items-center gap-2"
+                    onClick={handleExport}
+                    disabled={isExporting || transactions.length === 0}
+                  >
+                    {isExporting ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Exportando...
+                      </>
+                    ) : (
+                      <>
+                        <FiDownload size={14} />
+                        Exportar a Excel
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           <AppPagination
-            page={activeTab === "adjustments" ? productsPage : typesPage}
-            numPages={activeTab === "adjustments" ? productsNumPages : typesNumPages}
-            count={activeTab === "adjustments" ? productsCount : typesCount}
-            onPageChange={activeTab === "adjustments" ? setProductsPage : setTypesPage}
+            page={
+              activeTab === "adjustments"
+                ? productsPage
+                : activeTab === "types"
+                  ? typesPage
+                  : transactionsPage
+            }
+            numPages={
+              activeTab === "adjustments"
+                ? productsNumPages
+                : activeTab === "types"
+                  ? typesNumPages
+                  : transactionsNumPages
+            }
+            count={
+              activeTab === "adjustments"
+                ? productsCount
+                : activeTab === "types"
+                  ? typesCount
+                  : transactionsCount
+            }
+            onPageChange={
+              activeTab === "adjustments"
+                ? setProductsPage
+                : activeTab === "types"
+                  ? setTypesPage
+                  : setTransactionsPage
+            }
           />
         </AppCard.Section>
       </AppCard>
@@ -216,6 +334,18 @@ const InventoryAdjustmentsPage = () => {
         onSave={handleSaveType}
         onDelete={handleDeleteType}
       />
+
+      {isDetailModalOpen && (
+        <TransactionDetailModal
+          isOpen={isDetailModalOpen}
+          transaction={selectedTransaction}
+          userMap={userMap}
+          onClose={() => {
+            setIsDetailModalOpen(false);
+            setSelectedTransaction(null);
+          }}
+        />
+      )}
 
       {alertConfig && (
         <AppAlert

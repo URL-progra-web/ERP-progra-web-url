@@ -39,11 +39,36 @@ export const inventoryService = {
         return response.data;
     },
 
-    getTransactions: async (productId = null) => {
+    getTransactions: async ({ variant_id, transaction_type, date_from, date_to, page, page_size } = {}) => {
         const params = {};
-        if (productId) params.product = productId;
+        if (variant_id) params.variant_id = variant_id;
+        if (transaction_type) params.transaction_type = transaction_type;
+        if (date_from) params.date_from = date_from;
+        if (date_to) params.date_to = date_to;
+        if (page) params.page = page;
+        if (page_size) params.page_size = page_size;
         const response = await api.get('/inventory/transactions/', { params });
         return response.data;
+    },
+
+    exportExcel: async ({ variant_id, transaction_type, date_from, date_to } = {}) => {
+        const params = {};
+        if (variant_id) params.variant_id = variant_id;
+        if (transaction_type) params.transaction_type = transaction_type;
+        if (date_from) params.date_from = date_from;
+        if (date_to) params.date_to = date_to;
+        const response = await api.get('/inventory/transactions/export/excel/', {
+            params,
+            responseType: 'blob',
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'transacciones.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
     },
 
     createTransaction: async (data) => {
@@ -59,8 +84,10 @@ export const inventoryService = {
         return response.data;
     },
 
-    getVariants: async (productId) => {
-        const response = await api.get('/products/variants/', { params: { product: productId } });
+    getVariants: async (productId = null) => {
+        const params = {};
+        if (productId) params.product = productId;
+        const response = await api.get('/products/variants/', { params });
         return response.data;
     },
 

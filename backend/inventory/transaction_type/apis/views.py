@@ -2,10 +2,11 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import HasRole
+from core.mixins import PaginationMixin
 from inventory.transaction_type.serializers.serializers import TransactionTypeSerializer, TransactionTypeCreateSerializer
 from inventory.transaction_type.services.services import TransactionTypeService
 
-class TransactionTypeViewSet(viewsets.ViewSet):
+class TransactionTypeViewSet(viewsets.ViewSet, PaginationMixin):
     permission_classes = [IsAuthenticated, HasRole]
     allowed_roles = ['ADMIN']
 
@@ -15,8 +16,7 @@ class TransactionTypeViewSet(viewsets.ViewSet):
 
     def list(self, request):
         transaction_types = self.service.list_transaction_types()
-        serializer = TransactionTypeSerializer(transaction_types, many=True)
-        return Response(serializer.data)
+        return self.paginate_queryset(transaction_types, TransactionTypeSerializer, request)
 
     def retrieve(self, request, pk=None):
         transaction_type = self.service.get_transaction_type(pk)

@@ -1,33 +1,49 @@
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from users.permissions import HasRole
+import io
+
+import openpyxl
 from core.mixins import PaginationMixin
-from inventory.transaction.serializers.serializers import InventoryTransactionSerializer, InventoryTransactionCreateSerializer
+from django.http import HttpResponse
+from rest_framework import status, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from users.permissions import HasRole
+
+from inventory.transaction.serializers.serializers import (
+    InventoryTransactionCreateSerializer,
+    InventoryTransactionSerializer,
+)
 from inventory.transaction.services.services import InventoryTransactionService
+
 
 class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
     permission_classes = [IsAuthenticated, HasRole]
-    allowed_roles = ['ADMIN']
+    allowed_roles = ["ADMIN"]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = InventoryTransactionService()
 
     def list(self, request):
-        variant_id = request.query_params.get('variant_id')
-        transaction_type_name = request.query_params.get('transaction_type')
-        
+        variant_id = request.query_params.get("variant_id")
+        transaction_type_name = request.query_params.get("transaction_type")
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
         qs = self.service.list_transactions_filtered(
             variant_id=int(variant_id) if variant_id else None,
-            transaction_type_name=transaction_type_name
+            transaction_type_name=transaction_type_name,
+            date_from=date_from,
+            date_to=date_to,
         )
         return self.paginate_queryset(qs, InventoryTransactionSerializer, request)
 
     def retrieve(self, request, pk=None):
         transaction = self.service.get_transaction(pk)
         if not transaction:
-            return Response({'error': 'Transacción no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Transacción no encontrada"}, status=status.HTTP_404_NOT_FOUND
+            )
         serializer = InventoryTransactionSerializer(transaction)
         return Response(serializer.data)
 
@@ -36,17 +52,22 @@ class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
         if serializer.is_valid():
             try:
                 transaction = self.service.create_transaction(
-                    variant_id=serializer.validated_data['variant_id'],
-                    transaction_type_name=serializer.validated_data['transaction_type_name'],
-                    quantity=serializer.validated_data['quantity'],
-                    selected_uom_id=serializer.validated_data['selected_uom_id'],
+                    variant_id=serializer.validated_data["variant_id"],
+                    transaction_type_name=serializer.validated_data[
+                        "transaction_type_name"
+                    ],
+                    quantity=serializer.validated_data["quantity"],
+                    selected_uom_id=serializer.validated_data["selected_uom_id"],
                     user=request.user if request.user.is_authenticated else None,
-                    reference=serializer.validated_data.get('reference'),
-                    notes=serializer.validated_data.get('notes')
+                    reference=serializer.validated_data.get("reference"),
+                    notes=serializer.validated_data.get("notes"),
                 )
-                return Response(InventoryTransactionSerializer(transaction).data, status=status.HTTP_201_CREATED)
+                return Response(
+                    InventoryTransactionSerializer(transaction).data,
+                    status=status.HTTP_201_CREATED,
+                )
             except ValueError as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
@@ -54,4 +75,42 @@ class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
             self.service.delete_transaction(pk)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TransactionExportExcelAPIView(APIView):
+    permission_classes = [IsAuthenticated, HasRole]
+    allowed_roles = ["ADMIN"]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = InventoryTransactionService()
+
+    def get(self, request):
+        variant_id = request.query_params.get("variant_id")
+        transaction_type_name = request.query_params.get("transaction_type")
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+
+        try:
+            content = self.service.export_transactions_excel(
+                variant_id=int(variant_id) if variant_id else None,
+                transaction_type_name=transaction_type_name,
+                date_from=date_from,
+                date_to=date_to,
+            )
+        except Exception:
+            return Response(
+                {
+                    "error": "No se pudo generar el archivo Excel",
+                    "code": "transaction_excel_failed",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        response = HttpResponse(
+            content,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = 'attachment; filename="transacciones.xlsx"'
+        return response
