@@ -151,8 +151,11 @@ export function useInventoryAdjustments() {
 
   useEffect(() => {
     setTransactionsPage(1);
+  }, [transactionVariantFilter, transactionTypeFilter, dateFromFilter, dateToFilter]);
+
+  useEffect(() => {
     fetchTransactions();
-  }, [transactionVariantFilter, transactionTypeFilter, dateFromFilter, dateToFilter, fetchTransactions]);
+  }, [fetchTransactions]);
 
   useEffect(() => {
     fetchVariants();
