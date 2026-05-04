@@ -457,9 +457,13 @@ const ProductBulkPage = () => {
     };
 
     const buildPayload = (row) => {
-        const productImage = images.find((image) => image.productNames?.includes(row.name));
+        const trimmedName = row.name.trim();
+        const normalizedRowName = normalizeText(trimmedName);
+        const productImage = images.find((image) => (
+            image.productNames?.some((productName) => normalizeText(productName) === normalizedRowName)
+        ));
         return {
-            name: row.name.trim(),
+            name: trimmedName,
             description: row.description || '',
             category: resolveCategoryId(row.category, categories),
             entrepreneur: resolveOptionId(row.entrepreneur, entrepreneurs),
