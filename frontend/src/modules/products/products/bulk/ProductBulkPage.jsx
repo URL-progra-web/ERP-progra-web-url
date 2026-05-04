@@ -423,6 +423,11 @@ const ProductBulkPage = () => {
     };
 
     const clearImages = () => {
+        images.forEach((image) => {
+            if (image?.previewUrl) {
+                URL.revokeObjectURL(image.previewUrl);
+            }
+        });
         setImages([]);
         setAlert(null);
     };
