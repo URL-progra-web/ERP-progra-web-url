@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useOutletContext, useParams } from 'react-router-dom';
 import {
   FiArrowLeft,
@@ -104,9 +104,7 @@ export const ProductDetailPage = () => {
         <FiArrowLeft size={14} /> Volver al catálogo
       </Link>
 
-      {/* FILA 1: Galería (X) + Panel de Compra (C) */}
       <section className="store-detail__top">
-        {/* GALERÍA DE IMÁGENES - Más compacta */}
         <div className="store-shell store-gallery position-relative" style={{ maxWidth: '420px' }}>
           <StorefrontLoader
             visible={!galleryPreload.loaded}
@@ -137,7 +135,6 @@ export const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* PANEL DE PRODUCTO - Para compra */}
         <div className="store-shell store-product-panel">
           <div className="store-product-panel__header">
             <div className="store-chip-row">
@@ -157,7 +154,6 @@ export const ProductDetailPage = () => {
             </div>
           </div>
 
-          {/* INFORMACIÓN DEL VENDEDOR */}
           {product.entrepreneur_name && (
             <div className="store-info-card" style={{ backgroundColor: 'rgba(var(--bs-primary-rgb), 0.06)' }}>
               <span className="store-info-card__icon"><FiUser size={16} /></span>
@@ -170,10 +166,8 @@ export const ProductDetailPage = () => {
             </div>
           )}
 
-          {/* SELECTOR DE VARIANTES - Mejorado */}
           {product.variants?.length > 0 && (
             <div className="d-grid gap-3">
-              {/* Colores disponibles */}
               {(() => {
                 const uniqueColors = [...new Map(
                   product.variants
@@ -206,14 +200,14 @@ export const ProductDetailPage = () => {
                               }}
                             >
                               {color.hex && (
-                                <span 
-                                  className="store-swatch" 
-                                  style={{ 
+                                <span
+                                  className="store-swatch"
+                                  style={{
                                     backgroundColor: color.hex,
-                                    width: '20px',
-                                    height: '20px',
+                                    width: '28px',
+                                    height: '28px',
                                     border: '2px solid rgba(var(--bs-border-color-rgb), 0.3)'
-                                  }} 
+                                  }}
                                 />
                               )}
                               <span>{color.name}</span>
@@ -227,7 +221,6 @@ export const ProductDetailPage = () => {
                 return null;
               })()}
 
-              {/* Tallas disponibles */}
               {(() => {
                 const uniqueSizes = [...new Set(
                   product.variants
@@ -275,7 +268,6 @@ export const ProductDetailPage = () => {
                 return null;
               })()}
 
-              {/* Tabla de variantes completa */}
               <div>
                 <span className="store-form-label" style={{ fontSize: '11px' }}>
                   TODAS LAS VARIANTES ({product.variants.length})
@@ -401,7 +393,6 @@ export const ProductDetailPage = () => {
         </div>
       </section>
 
-      {/* FILA 2: Contexto/Descripción (A) - Debajo de la foto */}
       <section className="store-panel mt-4">
         <span className="store-kicker">DESCRIPCIÓN</span>
         <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
@@ -412,7 +403,6 @@ export const ProductDetailPage = () => {
         </p>
       </section>
 
-      {/* FILA 3: Especificaciones Técnicas (Y) - Ancho completo */}
       <section className="store-panel mt-4">
         <div>
           <span className="store-kicker">ESPECIFICACIONES TÉCNICAS</span>
@@ -449,7 +439,6 @@ export const ProductDetailPage = () => {
             </div>
           </div>
 
-          {/* Colores disponibles */}
           {(() => {
             const uniqueColors = [...new Set(product.variants?.map(v => v.color_name).filter(Boolean))];
             if (uniqueColors.length > 0) {
@@ -465,7 +454,6 @@ export const ProductDetailPage = () => {
             return null;
           })()}
 
-          {/* Tallas disponibles */}
           {(() => {
             const uniqueSizes = [...new Set(product.variants?.map(v => v.size_name).filter(Boolean))];
             if (uniqueSizes.length > 0) {
@@ -481,7 +469,6 @@ export const ProductDetailPage = () => {
             return null;
           })()}
 
-          {/* Vendedor */}
           {product.entrepreneur_name && (
             <div className="col-md-6 col-lg-4">
               <div className="store-summary-line">

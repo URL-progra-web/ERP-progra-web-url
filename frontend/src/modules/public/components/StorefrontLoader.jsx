@@ -11,7 +11,7 @@ export const StorefrontLoader = ({ visible, progress = 0, label = 'Cargando expe
         <span className="storefront-kicker">Storefront</span>
         <h2 className="storefront-loader__title">{label}</h2>
         <p className="storefront-loader__text">
-          Estamos preparando las imagenes editoriales y el recorrido de compra.
+          Estamos preparando las imagenes editoriales y el recorrido de compra<span className="store-loader-dots"></span>
         </p>
         <div className="storefront-loader__bar">
           <span style={{ width: `${progress}%` }} />

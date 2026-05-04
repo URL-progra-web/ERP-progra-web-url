@@ -287,6 +287,10 @@ export const CheckoutPage = () => {
                 />
               </div>
 
+              <div className="store-checkout-section-divider">
+                <span>Dirección de entrega</span>
+              </div>
+
               <div>
                 <label className="store-form-label" htmlFor="checkoutShippingAddress">Direccion de envio</label>
                 <textarea
@@ -327,8 +331,18 @@ export const CheckoutPage = () => {
                 />
               </div>
 
-              <button type="submit" className="btn btn-store-primary w-100" disabled={loading || !turnstileToken}>
-                {loading ? 'Procesando solicitud...' : 'Enviar pedido'}
+              <button type="submit" className="btn btn-store-primary w-100 d-flex align-items-center justify-content-center gap-2" disabled={loading || !turnstileToken}>
+                {loading ? (
+                  <>
+                    <span className="store-spinner" />
+                    Procesando...
+                  </>
+                ) : (
+                  <>
+                    <FiCheck size={15} />
+                    Enviar pedido
+                  </>
+                )}
               </button>
             </form>
           </div>
