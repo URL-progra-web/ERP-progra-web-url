@@ -1,7 +1,7 @@
 export const BULK_TEMPLATE_COLUMNS = [
     { key: 'name', header: 'Nombre del producto', required: true },
-    { key: 'description', header: 'Descripcion', required: false },
-    { key: 'category', header: 'Categoria/Subcategoria', required: false },
+    { key: 'description', header: 'Descripción', required: false },
+    { key: 'category', header: 'Categoría/Subcategoría', required: false },
     { key: 'entrepreneur', header: 'Emprendedor', required: true },
     { key: 'business_unit', header: 'Sede', required: true },
     { key: 'base_uom', header: 'Unidad base', required: true },
