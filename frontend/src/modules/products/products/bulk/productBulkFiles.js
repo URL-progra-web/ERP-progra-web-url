@@ -7,8 +7,9 @@ const COLUMN_ALIASES = {
 
 const escapeCsvValue = (value) => {
     const text = String(value ?? '');
-    if (!/[",\n\r]/.test(text)) return text;
-    return `"${text.replace(/"/g, '""')}"`;
+    const sanitizedText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+    if (!/[",\n\r]/.test(sanitizedText)) return sanitizedText;
+    return `"${sanitizedText.replace(/"/g, '""')}"`;
 };
 
 const parseCsv = (text) => {
