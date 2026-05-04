@@ -106,7 +106,17 @@ export const readBulkFile = (file) => new Promise((resolve, reject) => {
     if (extension === 'csv') {
         reader.onload = () => {
             const parsedRows = parseCsv(String(reader.result || ''));
+            if (parsedRows.length === 0) {
+                reject(new Error('El archivo CSV está vacío o no contiene encabezados válidos.'));
+                return;
+            }
+
             const [headers, ...rows] = parsedRows;
+            if (!headers) {
+                reject(new Error('El archivo CSV está vacío o no contiene encabezados válidos.'));
+                return;
+            }
+
             const objects = rows.map((row) => Object.fromEntries(
                 headers.map((header, index) => [header, row[index] || ''])
             ));
