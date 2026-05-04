@@ -24,16 +24,7 @@ export const createEmptyBulkRow = (index = 0) => ({
     errors: [],
 });
 
-export const TEMPLATE_ROWS = [
-    {
-        name: 'Cafe molido premium',
-        description: 'Bolsa de cafe artesanal tostado',
-        category: 'Bebidas',
-        entrepreneur: 'Nombre del emprendedor',
-        business_unit: 'Sede principal',
-        base_uom: 'Unidad',
-    },
-];
+export const TEMPLATE_ROWS = [];
 
 export const normalizeText = (value) => String(value || '')
     .trim()
