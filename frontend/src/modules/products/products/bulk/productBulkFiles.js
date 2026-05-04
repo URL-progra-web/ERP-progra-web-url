@@ -127,10 +127,20 @@ export const readBulkFile = (file) => new Promise((resolve, reject) => {
     }
 
     reader.onload = () => {
-        const workbook = XLSX.read(reader.result, { type: 'array' });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const objects = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-        resolve(mapRowsFromObjects(objects));
+        try {
+            const workbook = XLSX.read(reader.result, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+
+            if (!sheetName) {
+                throw new Error('El archivo XLS/XLSX no contiene hojas.');
+            }
+
+            const worksheet = workbook.Sheets[sheetName];
+            const objects = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+            resolve(mapRowsFromObjects(objects));
+        } catch (error) {
+            reject(error instanceof Error ? error : new Error('No se pudo procesar el archivo XLS/XLSX.'));
+        }
     };
     reader.readAsArrayBuffer(file);
 });
