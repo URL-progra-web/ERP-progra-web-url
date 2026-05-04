@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FiPlus, FiPackage } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiPlus, FiPackage, FiUploadCloud } from 'react-icons/fi';
 import { useProducts } from '../hooks/useProducts';
 import ProductsFilters from '../components/ProductsFilters';
 import ProductsTable from '../components/ProductsTable';
@@ -10,6 +11,7 @@ import AppPagination from '~/core/components/AppPagination';
 import PageHeader from '~/core/components/PageHeader';
 
 const ProductsPage = () => {
+    const navigate = useNavigate();
     const {
         products, count, numPages, page, setPage, categories, entrepreneurs, businessUnits, uoms,
         isLoading, error,
@@ -56,7 +58,16 @@ const ProductsPage = () => {
                 actionLabel="Nuevo Producto"
                 actionIcon={FiPlus}
                 onAction={() => handleOpenModal()}
-                isDark
+                actions={(
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                        onClick={() => navigate('/dashboard/admin/products/bulk')}
+                    >
+                        <FiUploadCloud size={15} />
+                        Carga masiva de productos
+                    </button>
+                )}
             />
 
             {error && (

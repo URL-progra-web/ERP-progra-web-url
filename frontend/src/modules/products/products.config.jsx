@@ -7,6 +7,7 @@ import { FiSliders } from 'react-icons/fi';
 const UomsPage = React.lazy(() => import('./uoms/UomsPage'));
 const CategoriesPage = React.lazy(() => import('./categories/pages/CategoriesPage'));
 const ProductsPage = React.lazy(() => import('./products/pages/ProductsPage'));
+const ProductBulkPage = React.lazy(() => import('./products/bulk/ProductBulkPage'));
 const ColorsPage = React.lazy(() => import('./colors/pages/ColorsPage'));
 const SizesPage = React.lazy(() => import('./sizes/pages/SizesPage'));
 const VariantsPage = React.lazy(() => import('./variants/pages/VariantsPage'));
@@ -29,6 +30,14 @@ export const productsFeature = {
             icon: FiPackage,
             roles: ['ADMIN'],
             element: <ProductsPage />,
+        },
+        {
+            text: 'Carga masiva de productos',
+            path: 'products/bulk',
+            icon: FiPackage,
+            roles: ['ADMIN'],
+            hidden: true,
+            element: <ProductBulkPage />,
         },
         {
             text: 'Colores',

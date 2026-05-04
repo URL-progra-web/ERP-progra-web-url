@@ -16,4 +16,5 @@ class ProductViewSet(ModelViewSet):
         'category': ['exact'],
         'entrepreneur': ['exact'],
         'business_unit': ['exact'],
+        'base_uom': ['exact'],
     }
