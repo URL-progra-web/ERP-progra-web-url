@@ -28,6 +28,7 @@ export const useOrders = ({ autoFetch = true } = {}) => {
     );
 
     const fetchOrders = useCallback(async () => {
+        
         setIsLoadingOrders(true);
         setError(null);
         try {

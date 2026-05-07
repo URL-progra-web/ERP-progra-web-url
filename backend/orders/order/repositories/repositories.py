@@ -1,14 +1,27 @@
 from typing import Optional
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 
 from orders.order.models.models import Order
 from orders.order_status.models.models import OrderStatus
 
 
 class OrderRepository:
-    def list(self) -> QuerySet:
-        return Order.objects.select_related('customer', 'payment_method', 'status').order_by('-created_at')
+    def list(self, search=None) -> QuerySet:
+        queryset = Order.objects.select_related(
+            'customer',
+            'payment_method',
+            'status'
+        )
+
+        if search:
+            queryset = queryset.filter(
+                Q(short_id__icontains=search) |
+                Q(customer__name__icontains=search) |
+                Q(status__name__iexact=search)
+            )
+
+        return queryset.order_by('-created_at')
 
     def get_by_id(self, order_id: int) -> Optional[Order]:
         return (

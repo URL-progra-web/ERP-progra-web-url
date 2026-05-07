@@ -60,8 +60,8 @@ class OrderService:
             'No existe un estado inicial para las órdenes (SOLICITADO o BORRADOR)'
         )
 
-    def list_orders(self):
-        return self.repository.list()
+    def list_orders(self, search = None):
+        return self.repository.list(search=search)
 
     def get_order(self, order_id: int):
         order = self.repository.get_by_id(order_id)

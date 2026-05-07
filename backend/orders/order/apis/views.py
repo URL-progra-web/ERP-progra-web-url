@@ -1,3 +1,5 @@
+from re import search
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -67,7 +69,8 @@ class OrderAPIView(APIView):
 
     def get(self, request):
         try:
-            orders = self.service.list_orders()
+            search = request.query_params.get('search')
+            orders = self.service.list_orders(search=search)
             serializer = OrderSerializer(orders, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception:
