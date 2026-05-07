@@ -63,8 +63,8 @@ class OrderService:
             'No existe un estado inicial para las órdenes (SOLICITADO o BORRADOR)'
         )
 
-    def list_orders(self):
-        return self.repository.list()
+    def list_orders(self, search = None):
+        return self.repository.list(search=search)
 
     def export_orders_excel(self, date_from=None, date_to=None) -> bytes:
         orders = self.repository.list_for_export(date_from=date_from, date_to=date_to)
