@@ -334,7 +334,7 @@ export const CheckoutPage = () => {
               <button type="submit" className="btn btn-store-primary w-100 d-flex align-items-center justify-content-center gap-2" disabled={loading || !turnstileToken}>
                 {loading ? (
                   <>
-                    <span className="store-spinner" />
+                    <span className="store-spinner" aria-hidden="true" />
                     Procesando...
                   </>
                 ) : (

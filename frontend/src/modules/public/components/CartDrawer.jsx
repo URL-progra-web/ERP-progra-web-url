@@ -106,7 +106,7 @@ export const CartDrawer = ({
                   <span className="store-kicker">Total estimado</span>
                   <div className="store-price mt-2"><strong>{formatPrice(totalAmount)}</strong></div>
                 </div>
-                <p className="store-summary-meta mb-0">El monto final se confirma segun disponibilidad y coordinacion.</p>
+                <p className="store-summary-meta mb-0">El monto final se confirma según disponibilidad y coordinación.</p>
               </div>
             </div>
 

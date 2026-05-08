@@ -502,14 +502,20 @@
 }
 
 @keyframes loaderDots {
-  0%  { content: ''; }
-  25% { content: '.'; }
-  50% { content: '..'; }
-  75% { content: '...'; }
+  0% { width: 0; }
+  25% { width: 1ch; }
+  50% { width: 2ch; }
+  75%,
+  100% { width: 3ch; }
 }
 .store-loader-dots::after {
-  content: '';
-  animation: loaderDots 1.4s steps(1) infinite;
+  content: '...';
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  animation: loaderDots 1.4s steps(4, end) infinite;
 }
 
 .store-cart-item {
