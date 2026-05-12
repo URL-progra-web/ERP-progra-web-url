@@ -37,11 +37,12 @@ const CategoryNode = ({ category, selectedId, onSelect, level = 0 }) => {
       <button
         type="button"
         className={`${isSelected ? 'fw-semibold' : ''}`}
-        style={{ 
-          paddingLeft: `${level * 14 + 4}px`, 
-          padding: '4px 8px', 
+        style={{
+          paddingLeft: `${level * 14 + 4}px`,
+          padding: '6px 8px',
           fontSize: '0.875rem',
-          background: 'transparent',
+          background: isSelected ? 'rgba(var(--bs-primary-rgb), 0.1)' : 'transparent',
+          borderRadius: isSelected ? '10px' : '6px',
           border: 'none',
           width: '100%',
           textAlign: 'left',
@@ -49,8 +50,9 @@ const CategoryNode = ({ category, selectedId, onSelect, level = 0 }) => {
           alignItems: 'center',
           gap: '8px',
           color: isSelected ? 'var(--bs-primary)' : 'var(--bs-body-color)',
+          fontWeight: isSelected ? 600 : 400,
           cursor: 'pointer',
-          transition: 'color 0.2s'
+          transition: 'color 0.2s, background 0.2s, border-radius 0.2s'
         }}
         onClick={handleSelect}
         onMouseEnter={(e) => e.currentTarget.style.color = 'var(--bs-primary)'}
@@ -114,10 +116,11 @@ export const CategoryTree = ({ categories, selectedId, onSelect }) => {
       <button
         type="button"
         className={`${!selectedId ? 'fw-semibold' : ''}`}
-        style={{ 
-          padding: '4px 8px', 
+        style={{
+          padding: '6px 8px',
           fontSize: '0.875rem',
-          background: 'transparent',
+          background: !selectedId ? 'rgba(var(--bs-primary-rgb), 0.1)' : 'transparent',
+          borderRadius: !selectedId ? '10px' : '6px',
           border: 'none',
           width: '100%',
           textAlign: 'left',
@@ -125,8 +128,9 @@ export const CategoryTree = ({ categories, selectedId, onSelect }) => {
           alignItems: 'center',
           gap: '8px',
           color: !selectedId ? 'var(--bs-primary)' : 'var(--bs-body-color)',
+          fontWeight: !selectedId ? 600 : 400,
           cursor: 'pointer',
-          transition: 'color 0.2s'
+          transition: 'color 0.2s, background 0.2s, border-radius 0.2s'
         }}
         onClick={handleClearSelection}
         onMouseEnter={(e) => e.currentTarget.style.color = 'var(--bs-primary)'}
