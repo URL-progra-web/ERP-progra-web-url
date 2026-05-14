@@ -49,17 +49,22 @@ class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
         if serializer.is_valid():
             try:
                 transaction = self.service.create_transaction(
-                    variant_id=serializer.validated_data['variant_id'],
-                    transaction_type_name=serializer.validated_data['transaction_type_name'],
-                    quantity=serializer.validated_data['quantity'],
-                    selected_uom_id=serializer.validated_data['selected_uom_id'],
+                    variant_id=serializer.validated_data["variant_id"],
+                    transaction_type_name=serializer.validated_data[
+                        "transaction_type_name"
+                    ],
+                    quantity=serializer.validated_data["quantity"],
+                    selected_uom_id=serializer.validated_data["selected_uom_id"],
                     user=request.user if request.user.is_authenticated else None,
-                    reference=serializer.validated_data.get('reference'),
-                    notes=serializer.validated_data.get('notes')
+                    reference=serializer.validated_data.get("reference"),
+                    notes=serializer.validated_data.get("notes"),
                 )
-                return Response(InventoryTransactionSerializer(transaction).data, status=status.HTTP_201_CREATED)
+                return Response(
+                    InventoryTransactionSerializer(transaction).data,
+                    status=status.HTTP_201_CREATED,
+                )
             except ValueError as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
@@ -106,4 +111,3 @@ class TransactionExportExcelAPIView(APIView):
         )
         response["Content-Disposition"] = 'attachment; filename="transacciones.xlsx"'
         return response
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
