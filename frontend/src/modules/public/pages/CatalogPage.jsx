@@ -332,8 +332,9 @@ export const CatalogPage = () => {
                 <h2 className="store-section__title mt-2" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
                   {params.category ? categoryPath[categoryPath.length - 1]?.name : 'Toda la colección'}
                 </h2>
-                <p className="store-section__subtitle mb-0" style={{ fontSize: '0.875rem' }}>
-                  {products.length} producto{products.length !== 1 ? 's' : ''} {params.search ? `para "${params.search}"` : 'disponibles'}
+                <p className="store-section__subtitle mb-0 d-flex align-items-center gap-2" style={{ fontSize: '0.875rem' }}>
+                  <span className="badge rounded-pill bg-primary" style={{ fontSize: '0.7rem' }}>{products.length}</span>
+                  producto{products.length !== 1 ? 's' : ''} {params.search ? `para "${params.search}"` : 'disponibles'}
                 </p>
               </div>
             </div>
@@ -373,7 +374,10 @@ export const CatalogPage = () => {
                 <>
                   {products.length === 0 ? (
                     <div className="store-empty-state">
-                      <span className="store-kicker">SIN RESULTADOS</span>
+                      <div className="store-empty-state__icon">
+                        <FiSearch size={28} />
+                      </div>
+                      <span className="store-kicker mt-3">SIN RESULTADOS</span>
                       <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
                         No encontramos productos
                       </h3>
@@ -386,7 +390,7 @@ export const CatalogPage = () => {
                             Limpiar filtros
                           </button>
                         )}
-                        <button type="button" className="btn btn-store-secondary" onClick={() => setSearch('')}>
+                        <button type="button" className="btn btn-store-secondary" onClick={() => { setSearch(''); clearVariantFilters(); }}>
                           Ver todo el catálogo
                         </button>
                       </div>

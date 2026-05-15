@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiMessageCircle, FiMinus, FiPlus, FiTrash2, FiX } from 'react-icons/fi';
+import { FiArrowRight, FiMessageCircle, FiMinus, FiPlus, FiShoppingCart, FiTrash2, FiX } from 'react-icons/fi';
 import { formatPrice } from '../utils/currency';
 import { StoreImage } from './StoreImage';
 import { getProductMockImage } from '../utils/mockImages';
@@ -40,7 +40,10 @@ export const CartDrawer = ({
         <div className="store-cart-sheet__content">
           {items.length === 0 ? (
             <div className="store-empty-state">
-              <span className="store-kicker">Sin seleccion</span>
+              <div className="store-empty-state__icon">
+                <FiShoppingCart size={28} />
+              </div>
+              <span className="store-kicker mt-3">Sin seleccion</span>
               <h3 className="store-section__title mt-2 mb-3">Tu carrito aun esta vacio.</h3>
               <p className="store-lead mx-auto mb-4">
                 Explora el catalogo, descubre variantes y agrega piezas para armar tu siguiente pedido.
@@ -97,12 +100,14 @@ export const CartDrawer = ({
 
         {items.length > 0 && (
           <div className="store-cart-sheet__footer">
-            <div className="store-summary-line mb-3">
-              <div>
-                <span className="store-kicker">Total estimado</span>
-                <div className="store-price mt-2"><strong>{formatPrice(totalAmount)}</strong></div>
+            <div className="store-cart-total-block">
+              <div className="store-summary-line">
+                <div>
+                  <span className="store-kicker">Total estimado</span>
+                  <div className="store-price mt-2"><strong>{formatPrice(totalAmount)}</strong></div>
+                </div>
+                <p className="store-summary-meta mb-0">El monto final se confirma según disponibilidad y coordinación.</p>
               </div>
-              <p className="store-summary-meta mb-0">El monto final se confirma segun disponibilidad y coordinacion.</p>
             </div>
 
             <Link to="/tienda/checkout" className="btn btn-store-primary w-100 text-decoration-none" onClick={onClose}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiFilter } from 'react-icons/fi';
+import { FiX, FiFilter, FiTag } from 'react-icons/fi';
 import { formatPrice } from '../utils/currency';
 
 export const FilterSidebar = ({ 
