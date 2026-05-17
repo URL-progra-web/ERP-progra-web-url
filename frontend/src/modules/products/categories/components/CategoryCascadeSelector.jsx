@@ -20,10 +20,11 @@ const CategoryCascadeSelector = ({
             getId={(item) => item?.id}
             getParentId={(item) => item?.parent}
             getLabel={(item) => item?.name}
+            getIsLeaf={(item) => item?.is_leaf}
             rootOptionLabel="Ninguna (categoría raíz)"
             levelRootLabel="Selecciona la categoría principal"
             levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
-            selectionMode="any"
+            selectionMode="branch"
         />
     );
 };

@@ -20,6 +20,7 @@ const CategoriesPage = () => {
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [initialParentId, setInitialParentId] = useState('');
     const [alertConfig, setAlertConfig] = useState(null);
     const [activeRoot, setActiveRoot] = useState('all');
 
@@ -72,8 +73,21 @@ const CategoriesPage = () => {
         }
     }, [activeRoot, rootCategories]);
 
-    const handleOpenModal = (category = null) => { setSelectedCategory(category); setIsModalOpen(true); };
-    const handleCloseModal = () => { setSelectedCategory(null); setIsModalOpen(false); };
+    const handleOpenModal = (category = null) => {
+        setSelectedCategory(category);
+        setInitialParentId('');
+        setIsModalOpen(true);
+    };
+    const handleOpenCreateChildModal = (parentCategory) => {
+        setSelectedCategory(null);
+        setInitialParentId(parentCategory?.id || '');
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setSelectedCategory(null);
+        setInitialParentId('');
+        setIsModalOpen(false);
+    };
 
     const handleSave = async (data) => {
         await saveCategory(data, selectedCategory?.id);
@@ -143,6 +157,7 @@ const CategoriesPage = () => {
                             <CategoriesTable
                                 categories={filteredCategories}
                                 isLoading={isLoading}
+                                onCreateChild={handleOpenCreateChildModal}
                                 onEdit={handleOpenModal}
                                 onDelete={handleConfirmDelete}
                             />
@@ -155,6 +170,7 @@ const CategoriesPage = () => {
                 <CategoryModal
                     category={selectedCategory}
                     categories={categories}
+                    initialParentId={initialParentId}
                     onClose={handleCloseModal}
                     onSave={handleSave}
                 />

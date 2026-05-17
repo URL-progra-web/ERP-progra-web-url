@@ -11,7 +11,7 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-md">
+                <div className="col-12 col-lg-9">
                     <form onSubmit={handleSubmit} className="input-group">
                         <span className="input-group-text bg-body border-end-0 text-muted">
                             <FiSearch size={14} />
@@ -35,7 +35,7 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
                         </button>
                     </form>
                 </div>
-                <div className="col-md-auto">
+                <div className="col-12 col-md-6 col-lg-3">
                     <AppSelect
                         id="categoriesLeafFilter"
                         name="categories_leaf_filter"
@@ -44,8 +44,8 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
                         onChange={onLeafChange}
                         options={[
                             { value: '', label: 'Todas' },
-                            { value: 'leaf', label: 'Solo finales (se asignan a productos)' },
-                            { value: 'parent', label: 'Solo agrupadoras (contienen subcategorías)' },
+                            { value: 'leaf', label: 'Finales' },
+                            { value: 'parent', label: 'Categorias' },
                         ]}
                     />
                 </div>

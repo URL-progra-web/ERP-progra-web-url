@@ -36,7 +36,7 @@ const PageHeader = ({
                 {actionLabel && (
                     <button
                         type="button"
-                        className={`${actionClass} btn-sm d-flex align-items-center gap-2`}
+                        className={`${actionClass} page-header__action-button d-inline-flex align-items-center gap-2`}
                         onClick={onAction}
                     >
                         {ActionIcon && <ActionIcon size={15} />}

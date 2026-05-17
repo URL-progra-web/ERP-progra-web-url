@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
 import CategoryCascadeSelector from './CategoryCascadeSelector';
 
-const CategoryModal = ({ category, categories, onClose, onSave }) => {
+const CategoryModal = ({ category, categories, initialParentId = '', onClose, onSave }) => {
     const isEditing = !!category;
 
     const [formData, setFormData] = useState({
@@ -21,8 +21,15 @@ const CategoryModal = ({ category, categories, onClose, onSave }) => {
                 parent: category.parent || '',
                 is_leaf: category.is_leaf || false,
             });
+            return;
         }
-    }, [category]);
+
+        setFormData({
+            name: '',
+            parent: initialParentId || '',
+            is_leaf: false,
+        });
+    }, [category, initialParentId]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;

@@ -452,7 +452,9 @@ const ProductBulkPage = () => {
         } catch {
             setAlert({ type: 'danger', header: 'Importacion fallida', content: 'El archivo debe ser CSV, XLS o XLSX con los encabezados de la plantilla.' });
         } finally {
-            fileInputRef.current?.value = '';
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         }
     };
 

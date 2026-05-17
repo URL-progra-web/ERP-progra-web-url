@@ -10,7 +10,7 @@ const TONE_SUBMIT = {
     danger:    'btn btn-danger fw-semibold',
 };
 
-const SIZE_MAX = { sm: 400, md: 540, lg: 700, xl: 900 };
+const SIZE_MAX = { sm: 460, md: 760, lg: 940, xl: 1120 };
 
 const AppModal = ({
     isOpen,
@@ -55,7 +55,7 @@ const AppModal = ({
             onKeyDown={(e) => { if (e.key === 'Escape') onClose?.(); }}
             className="app-modal-backdrop"
         >
-            <div className="app-modal-dialog" style={{ maxWidth }}>
+            <div className="app-modal-dialog" style={{ '--app-modal-max-width': `${maxWidth}px` }}>
                 <Container
                     className="app-modal"
                     onSubmit={onSubmit}
@@ -84,11 +84,11 @@ const AppModal = ({
 
                     {footer ?? (
                         <div className="app-modal__footer">
-                            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
+                            <button type="button" className="btn btn-outline-secondary app-modal__footer-button" onClick={onClose}>
                                 {cancelLabel}
                             </button>
                             {onSubmit && (
-                                <button type="submit" className={`${submitClass} btn-sm`} disabled={submitDisabled}>
+                                <button type="submit" className={`${submitClass} app-modal__footer-button`} disabled={submitDisabled}>
                                     {submitLabel}
                                 </button>
                             )}

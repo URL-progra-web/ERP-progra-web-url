@@ -102,23 +102,6 @@
   background: color-mix(in srgb, var(--bs-body-bg) 92%, var(--bs-secondary-bg));
 }
 
-.sidebar::after {
-  content: '';
-  position: absolute;
-  top: var(--topbar-height);
-  bottom: 74px;
-  left: 24px;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, var(--erp-border-soft) 18%, var(--erp-border-soft) 82%, transparent);
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.sidebar--collapsed::after {
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 .sidebar-brand {
   height: var(--topbar-height);
   display: flex;

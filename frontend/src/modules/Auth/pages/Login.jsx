@@ -151,7 +151,7 @@ const BrandPanel = () => (
 
             {/* Feature list */}
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {FEATURES.map((feat) => (
+                {FEATURES.map((feat, i) => (
                     <li key={feat} style={{
                         display: 'flex', alignItems: 'center', gap: '10px',
                         fontSize: '13px', color: 'rgba(221,230,244,0.65)',

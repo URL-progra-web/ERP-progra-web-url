@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { FiChevronDown, FiChevronRight, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiChevronDown, FiChevronRight, FiEdit2, FiPlus, FiTrash2 } from 'react-icons/fi';
 import TableActions from '~/core/components/TableActions';
 
-const CategoriesTable = ({ categories, isLoading, onEdit, onDelete }) => {
+const CategoriesTable = ({ categories, isLoading, onEdit, onDelete, onCreateChild }) => {
     const [expanded, setExpanded] = useState(new Set());
 
     const groupedCategories = useMemo(() => {
@@ -85,6 +85,7 @@ const CategoriesTable = ({ categories, isLoading, onEdit, onDelete }) => {
                     </td>
                     <td className="px-4 py-3 text-end">
                         <TableActions actions={[
+                            { icon: FiPlus,   onClick: () => onCreateChild(category), title: 'Agregar subcategoría', variant: 'success' },
                             { icon: FiEdit2,  onClick: () => onEdit(category),   title: 'Editar',   variant: 'primary' },
                             { icon: FiTrash2, onClick: () => onDelete(category), title: 'Eliminar', variant: 'danger'  },
                         ]} />

@@ -52,10 +52,15 @@ const CategoryNode = ({ category, selectedId, onSelect, level = 0 }) => {
           color: isSelected ? 'var(--bs-primary)' : 'var(--bs-body-color)',
           fontWeight: isSelected ? 600 : 400,
           cursor: 'pointer',
-          transition: 'color 0.2s, background 0.2s, border-radius 0.2s',
-          onClick={handleSelect},
-        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--bs-primary)'},
+          transition: 'color 0.2s, background 0.2s, border-radius 0.2s'
+        }}
+        onClick={handleSelect}
+        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--bs-primary)'}
         onMouseLeave={(e) => {
+          if (!isSelected) e.currentTarget.style.color = 'var(--bs-body-color)';
+        }}
+      >
+        {hasChildren ? (
           <span
             onClick={handleToggle}
             aria-hidden="true"

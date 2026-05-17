@@ -6,7 +6,7 @@ const UsersFilters = ({ searchInput, onSearchChange, roleFilter, onRoleChange, s
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-md-5">
+                <div className="col-12 col-lg-6">
                     <div className="input-group">
                         <label className="visually-hidden" htmlFor="usersSearchInput">
                             Buscar usuarios por nombre o email
@@ -27,7 +27,7 @@ const UsersFilters = ({ searchInput, onSearchChange, roleFilter, onRoleChange, s
                         />
                     </div>
                 </div>
-                <div className="col-md-3 col-6">
+                <div className="col-12 col-md-6 col-lg-3">
                     <label className="visually-hidden" htmlFor="usersRoleFilter">Filtrar usuarios por rol</label>
                     <AppSelect
                         id="usersRoleFilter"
@@ -41,7 +41,7 @@ const UsersFilters = ({ searchInput, onSearchChange, roleFilter, onRoleChange, s
                         ]}
                     />
                 </div>
-                <div className="col-md-3 col-6">
+                <div className="col-12 col-md-6 col-lg-3">
                     <label className="visually-hidden" htmlFor="usersStatusFilter">Filtrar usuarios por estado</label>
                     <AppSelect
                         id="usersStatusFilter"
