@@ -39,10 +39,6 @@ export const useOrderStatuses = () => {
     useEffect(() => { fetchStatuses(); }, [fetchStatuses]);
     useEffect(() => { fetchWorkflow(); }, [fetchWorkflow]);
 
-    const runTransition = async (payload) => {
-        return orderStatusesService.transition(payload);
-    };
-
     return {
         statuses,
         search,
@@ -52,6 +48,5 @@ export const useOrderStatuses = () => {
         isLoadingWorkflow,
         error,
         setError,
-        runTransition,
     };
 };

@@ -138,7 +138,8 @@ const VariantsPage = () => {
                                     <th className="border-0 py-3">Costo</th>
                                     <th className="border-0 py-3">Precio</th>
                                     <th className="border-0 py-3">Stock / Estado</th>
-                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                    <th className="border-0 py-3 text-end">Acciones</th>
+                                    <th className="border-0 px-4 py-3 text-end">Eliminar</th>
                                 </tr>
                             </thead>
 

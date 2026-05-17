@@ -155,16 +155,23 @@ const OrderCreatePage = () => {
     }, [summary.subtotal, formData.shipping_cost]);
 
     const shippingCostValue = useMemo(() => Number(formData.shipping_cost), [formData.shipping_cost]);
+    const selectedPaymentMethod = useMemo(() => (
+        paymentMethods.find((method) => String(method.id) === String(formData.payment_method_id))
+    ), [formData.payment_method_id, paymentMethods]);
+    const selectedPaymentMethodUnavailable = Boolean(formData.payment_method_id) && !selectedPaymentMethod;
 
     const blockingIssues = useMemo(() => {
         const issues = [];
         if (!formData.customer_id) issues.push('Selecciona un cliente.');
         if (!items.length) issues.push('Agrega al menos una variante al carrito.');
+        if (selectedPaymentMethodUnavailable) {
+            issues.push('El método de pago seleccionado ya no está activo.');
+        }
         if (formData.shipping_cost !== '' && (!Number.isFinite(shippingCostValue) || shippingCostValue < 0)) {
             issues.push('Revisa el costo de envio; debe ser un numero valido mayor o igual a 0.');
         }
         return issues;
-    }, [formData.customer_id, formData.shipping_cost, items.length, shippingCostValue]);
+    }, [formData.customer_id, formData.shipping_cost, items.length, selectedPaymentMethodUnavailable, shippingCostValue]);
 
     const readinessSuggestions = useMemo(() => {
         const suggestions = [];
@@ -358,6 +365,11 @@ const OrderCreatePage = () => {
                                                     })),
                                                 ]}
                                             />
+                                            {selectedPaymentMethodUnavailable && (
+                                                <div className="form-text text-danger">
+                                                    El método de pago seleccionado ya no está activo. Elige otro antes de confirmar.
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="col-12 col-lg-6">

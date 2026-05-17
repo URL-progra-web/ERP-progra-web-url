@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiFileText, FiDownload } from 'react-icons/fi';
 import { jsPDF } from 'jspdf';
@@ -8,9 +8,16 @@ import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import AppPagination from '~/core/components/AppPagination';
+import AppCard from '~/core/components/AppCard';
 import { DEFAULT_PAGE_SIZE } from '~/core/constants/pagination';
 import ReceiptsTable from '../components/ReceiptsTable';
 import { receiptsService } from '../services/receiptsService';
+import './receipt-ui.css';
+
+const formatMoney = (value) => `Q ${Number(value ?? 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+})}`;
 
 const ReceiptsPage = () => {
     const navigate = useNavigate();
@@ -50,6 +57,23 @@ const ReceiptsPage = () => {
         };
         load();
     }, [page, fromDate, toDate, client]);
+
+    const listedGrandTotal = useMemo(() => receipts.reduce(
+        (sum, item) => sum + Number(item.grand_total ?? 0),
+        0,
+    ), [receipts]);
+
+    const listedAverageTicket = useMemo(() => {
+        if (!receipts.length) return 0;
+        return listedGrandTotal / receipts.length;
+    }, [listedGrandTotal, receipts.length]);
+
+    const activeRangeLabel = useMemo(() => {
+        if (fromDate && toDate) return `${fromDate} → ${toDate}`;
+        if (fromDate) return `Desde ${fromDate}`;
+        if (toDate) return `Hasta ${toDate}`;
+        return 'Todo el periodo';
+    }, [fromDate, toDate]);
 
     // Función para descargar el reporte masivo con los colores del sistema
     const downloadAllReceiptsPDF = () => {
@@ -106,80 +130,102 @@ const ReceiptsPage = () => {
                 icon={FiFileText}
             />
 
-            <div className="d-flex flex-column gap-4">
-                {/* FILTROS */}
-                <div className="card border-0 shadow-sm">
-                    <div className="card-body py-3">
-                        <h6 className="mb-3 text-uppercase text-muted small fw-bold">Filtros</h6>
-                        <div className="row g-2">
-                            <div className="col-md-4">
-                                <label htmlFor="receipts-from-date" className="form-label small text-muted">Desde</label>
-                                <input
-                                    id="receipts-from-date"
-                                    type="date"
-                                    className="form-control form-control-sm"
-                                    value={fromDate}
-                                    onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
-                                />
-                            </div>
-                            <div className="col-md-4">
-                                <label htmlFor="receipts-to-date" className="form-label small text-muted">Hasta</label>
-                                <input
-                                    id="receipts-to-date"
-                                    type="date"
-                                    className="form-control form-control-sm"
-                                    value={toDate}
-                                    onChange={(e) => { setToDate(e.target.value); setPage(1); }}
-                                />
-                            </div>
-                            <div className="col-md-4">
-                                <label htmlFor="receipts-search" className="form-label small text-muted">Buscar</label>
-                                <input
-                                    id="receipts-search"
-                                    type="text"
-                                    className="form-control form-control-sm"
-                                    placeholder="Buscar cliente o número..."
-                                    value={client}
-                                    onChange={(e) => { setClient(e.target.value); setPage(1); }}
-                                />
-                            </div>
-                        </div>
+            <div className="d-flex flex-column gap-4 receipts-page">
+                <div className="receipt-metrics-grid">
+                    <div className="receipt-metric-card">
+                        <div className="receipt-metric-card__label">Recibos visibles</div>
+                        <div className="receipt-metric-card__value">{receipts.length}</div>
+                        <div className="receipt-metric-card__hint">de {count} total en el listado</div>
+                    </div>
+                    <div className="receipt-metric-card">
+                        <div className="receipt-metric-card__label">Facturación visible</div>
+                        <div className="receipt-metric-card__value">{formatMoney(listedGrandTotal)}</div>
+                        <div className="receipt-metric-card__hint">solo lo cargado en esta página</div>
+                    </div>
+                    <div className="receipt-metric-card">
+                        <div className="receipt-metric-card__label">Ticket promedio</div>
+                        <div className="receipt-metric-card__value">{formatMoney(listedAverageTicket)}</div>
+                        <div className="receipt-metric-card__hint">{activeRangeLabel}</div>
                     </div>
                 </div>
 
-                {/* TABLA */}
-                <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-body py-3 d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center gap-2">
-                            <h6 className="mb-0 text-uppercase text-muted small fw-bold">Listado</h6>
-                            <span className="badge bg-secondary-subtle text-secondary small">{count}</span>
+                <AppCard accent="var(--bs-orange)">
+                    <AppCard.Section label="Filtros">
+                        <div className="p-3 p-md-4 border-bottom">
+                            <div className="receipt-section-copy mb-3">
+                                <div className="fw-semibold">Localiza recibos por rango y cliente.</div>
+                                <div className="small text-muted">
+                                    Usa el rango de fechas para cerrar periodos y el texto para ubicar cliente o número rápidamente.
+                                </div>
+                            </div>
+                            <div className="row g-3">
+                                <div className="col-md-4">
+                                    <label htmlFor="receipts-from-date" className="form-label small text-muted">Desde</label>
+                                    <input
+                                        id="receipts-from-date"
+                                        type="date"
+                                        className="form-control"
+                                        value={fromDate}
+                                        onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <label htmlFor="receipts-to-date" className="form-label small text-muted">Hasta</label>
+                                    <input
+                                        id="receipts-to-date"
+                                        type="date"
+                                        className="form-control"
+                                        value={toDate}
+                                        onChange={(e) => { setToDate(e.target.value); setPage(1); }}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <label htmlFor="receipts-search" className="form-label small text-muted">Buscar</label>
+                                    <input
+                                        id="receipts-search"
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Cliente o número de recibo"
+                                        value={client}
+                                        onChange={(e) => { setClient(e.target.value); setPage(1); }}
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        
-                        {/* Botón Rojo (Referencia Imagen) */}
-                        <button 
-                            type="button"
-                            className="btn btn-danger btn-sm d-flex align-items-center gap-2 px-3 shadow-sm"
-                            style={{ backgroundColor: '#dc3545', border: 'none', fontWeight: '500' }}
-                            onClick={downloadAllReceiptsPDF}
-                            disabled={isLoading || receipts.length === 0}
-                        >
-                            <FiDownload /> PDF
-                        </button>
-                    </div>
+                    </AppCard.Section>
 
-                    <ReceiptsTable
-                        receipts={receipts}
-                        isLoading={isLoading}
-                        onViewDetail={(id) => navigate(`${basePath}/receipts/detail/${id}`)}
-                    />
+                    <AppCard.Section label="Listado">
+                        <div className="receipt-list-toolbar">
+                            <div>
+                                <div className="fw-semibold">Recibos emitidos</div>
+                                <div className="small text-muted">
+                                    {count} registro(s) encontrados · {activeRangeLabel}
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-dark btn-sm d-flex align-items-center gap-2"
+                                onClick={downloadAllReceiptsPDF}
+                                disabled={isLoading || receipts.length === 0}
+                            >
+                                <FiDownload /> Exportar PDF
+                            </button>
+                        </div>
 
-                    <AppPagination
-                        page={page}
-                        numPages={numPages}
-                        count={count}
-                        onPageChange={setPage}
-                    />
-                </div>
+                        <ReceiptsTable
+                            receipts={receipts}
+                            isLoading={isLoading}
+                            onViewDetail={(id) => navigate(`${basePath}/receipts/detail/${id}`)}
+                        />
+
+                        <AppPagination
+                            page={page}
+                            numPages={numPages}
+                            count={count}
+                            onPageChange={setPage}
+                        />
+                    </AppCard.Section>
+                </AppCard>
             </div>
 
             {error && (

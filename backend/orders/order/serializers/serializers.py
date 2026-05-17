@@ -87,6 +87,11 @@ class OrderCreateSerializer(serializers.Serializer):
 
     items = ItemSerializer(many=True, required=False)
 
+    def validate_payment_method_id(self, value):
+        if value is not None and not value.is_active:
+            raise serializers.ValidationError('El método de pago seleccionado está inactivo.')
+        return value
+
 
 class OrderUpdateSerializer(serializers.Serializer):
     customer_id = serializers.PrimaryKeyRelatedField(
@@ -101,6 +106,11 @@ class OrderUpdateSerializer(serializers.Serializer):
     shipping_address = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     shipping_cost = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     notes = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
+    def validate_payment_method_id(self, value):
+        if value is not None and not value.is_active:
+            raise serializers.ValidationError('El método de pago seleccionado está inactivo.')
+        return value
 
 
 class CustomerLookupSerializer(serializers.ModelSerializer):
