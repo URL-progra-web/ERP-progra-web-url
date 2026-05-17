@@ -8,12 +8,8 @@ import './DashboardLayout.css';
 const MobileOverlay = ({ onClick }) => (
     <div
         onClick={onClick}
-        style={{
-            position: 'fixed', inset: 0,
-            background: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(2px)',
-            zIndex: 1040,
-        }}
+        className="dashboard-mobile-overlay"
+        aria-hidden="true"
     />
 );
 
@@ -39,11 +35,10 @@ const DashboardLayout = () => {
         : 'var(--sidebar-width)';
 
     return (
-        <div className="d-flex bg-body text-body min-vh-100 position-relative" style={{ overflow: 'hidden' }}>
+        <div className={`dashboard-shell ${isSidebarOpen ? 'sidebar-mobile-open' : ''}`}>
 
             {isSidebarOpen && <MobileOverlay onClick={closeSidebar} />}
 
-            {/* Sidebar */}
             <div
                 className={`sidebar-container ${isSidebarOpen ? 'show' : ''} ${isSidebarCollapsed ? 'collapsed' : ''}`}
                 style={{ width: sidebarWidth }}
@@ -55,23 +50,21 @@ const DashboardLayout = () => {
                 />
             </div>
 
-            {/* Main area */}
-            <div className="flex-grow-1 d-flex flex-column main-content-area" style={{ minWidth: 0 }}>
+            <div className="main-content-area">
                 <Topbar onMenuClick={openSidebar} />
 
-                <main
-                    className="flex-grow-1 overflow-auto p-3 p-md-4 has-bottom-nav page-enter"
-                    style={{ height: `calc(100vh - var(--topbar-height))`, background: 'var(--bs-body-bg)' }}
-                >
-                    <Outlet />
+                <main className="dashboard-main has-bottom-nav page-enter">
+                    <div className="dashboard-content">
+                        <Outlet />
 
-                    <footer className="mt-5 pt-4 pb-2 border-top text-center small" style={{ color: 'var(--bs-tertiary-color)' }}>
-                        &copy; 2026 ERP System
-                    </footer>
+                        <footer className="dashboard-footer">
+                            <span>ERP System</span>
+                            <span>2026</span>
+                        </footer>
+                    </div>
                 </main>
             </div>
 
-            {/* Mobile bottom navigation */}
             <BottomNav onMenuClick={openSidebar} />
         </div>
     );

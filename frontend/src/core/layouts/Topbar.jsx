@@ -1,10 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useTheme } from '../theme/ThemeContext';
-import { FiMenu, FiBell, FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
+import { FiBell, FiLogOut, FiMenu, FiMoon, FiSearch, FiSun } from 'react-icons/fi';
 import { orderService } from '~/modules/orders/orders/services/orderService';
 import { getDashboardPath } from '~/core/registry/dashboardPaths';
+import { getNavigationConfig } from '../registry/registryUtils';
 
 const NOTIFICATIONS_REFRESH_INTERVAL_MS = 20 * 60 * 1000;
 
@@ -77,8 +78,9 @@ const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
     };
 
     return (
-        <div className="d-flex align-items-center gap-2">
+        <div className="topbar-actions">
             <button
+                type="button"
                 className="topbar-icon-btn"
                 onClick={toggleTheme}
                 title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
@@ -146,9 +148,9 @@ const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
                 </div>
             )}
 
-            <button className="topbar-user-btn" onClick={logout} title="Cerrar sesión">
+            <button type="button" className="topbar-user-btn" onClick={logout} title="Cerrar sesión">
                 <div className="topbar-avatar">{initials}</div>
-                <span className="d-none d-sm-inline">{firstName}</span>
+                <span className="topbar-user-name">{firstName}</span>
                 <FiLogOut size={14} style={{ opacity: 0.6 }} />
             </button>
         </div>
@@ -157,15 +159,40 @@ const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
 
 /* ── Main Topbar ─────────────────────────────────────────── */
 
+const getCurrentNavigationContext = (pathname, role) => {
+    const groups = getNavigationConfig();
+
+    for (const group of groups) {
+        const activeItem = group.items.find(item => (
+            (!item.roles || item.roles.includes(role))
+            && (pathname === item.path || pathname.startsWith(`${item.path}/`))
+        ));
+
+        if (activeItem) {
+            return {
+                group: group.title,
+                title: activeItem.text,
+            };
+        }
+    }
+
+    return {
+        group: 'Panel',
+        title: 'Dashboard',
+    };
+};
+
 const Topbar = ({ onMenuClick }) => {
     const { logout, user } = useAuth();
     const { theme, toggleTheme } = useTheme();
+    const location = useLocation();
+    const current = getCurrentNavigationContext(location.pathname, user?.role?.name || 'VISITOR');
 
     return (
         <header className="topbar">
-            <div className="d-flex align-items-center gap-2">
-                {/* Mobile hamburger — opens sidebar overlay */}
+            <div className="topbar-left">
                 <button
+                    type="button"
                     className="topbar-icon-btn d-flex d-md-none"
                     onClick={onMenuClick}
                     aria-label="Abrir menú"
@@ -173,19 +200,15 @@ const Topbar = ({ onMenuClick }) => {
                     <FiMenu size={18} />
                 </button>
 
-                <span
-                    className="ms-1"
-                    style={{
-                        fontFamily: 'var(--font-display)',
-                        fontWeight: 700,
-                        fontSize: '13px',
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        color: 'var(--bs-tertiary-color)',
-                    }}
-                >
-                    Dashboard
-                </span>
+                <div className="topbar-title-block">
+                    <span className="topbar-kicker">{current.group}</span>
+                    <h1 className="topbar-title">{current.title}</h1>
+                </div>
+            </div>
+
+            <div className="topbar-command d-none d-lg-flex" aria-hidden="true">
+                <FiSearch size={15} />
+                <span>Buscar módulo, pedido o cliente</span>
             </div>
 
             <TopbarActions theme={theme} toggleTheme={toggleTheme} user={user} logout={logout} />
