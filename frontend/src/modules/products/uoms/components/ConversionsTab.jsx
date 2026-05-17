@@ -3,6 +3,17 @@ import { FiEdit2, FiTrash2, FiRefreshCw, FiArrowRight } from 'react-icons/fi';
 import { AppSelect } from '~/core/components';
 import TableActions from '~/core/components/TableActions';
 
+const DeleteActionButton = ({ onClick, title = 'Eliminar' }) => (
+    <button
+        type="button"
+        title={title}
+        onClick={onClick}
+        className="table-action-btn table-action-btn--danger"
+    >
+        <FiTrash2 size={15} />
+    </button>
+);
+
 /**
  * Tab completa de Conversiones: filtros + tabla.
  */
@@ -76,20 +87,21 @@ export function ConversionsTab({
                             <th className="border-0 py-3 text-center" style={{ width: 64 }}></th>
                             <th className="border-0 py-3">Hasta</th>
                             <th className="border-0 py-3">Multiplicador</th>
-                            <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                            <th className="border-0 py-3 text-end">Acciones</th>
+                            <th className="border-0 px-4 py-3 text-end">Eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
                         {isLoading ? (
                             <tr>
-                                <td colSpan={5} className="text-center py-5">
+                                <td colSpan={6} className="text-center py-5">
                                     <div className="spinner-border text-primary spinner-border-sm me-2" />
                                     <span className="text-muted">Cargando…</span>
                                 </td>
                             </tr>
                         ) : conversions.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="text-center py-5 text-muted">
+                                <td colSpan={6} className="text-center py-5 text-muted">
                                     {hasFilter
                                         ? 'No existen conversiones para la combinación de filtros actual.'
                                         : 'No hay conversiones registradas. Crea la primera para comenzar.'}
@@ -120,11 +132,13 @@ export function ConversionsTab({
                                             × {conv.multiplier}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-end">
+                                    <td className="py-3 text-end">
                                         <TableActions actions={[
                                             { icon: FiEdit2, onClick: () => onEdit(conv), title: 'Editar', variant: 'primary' },
-                                            { icon: FiTrash2, onClick: () => onDelete(conv), title: 'Eliminar', variant: 'danger' },
                                         ]} />
+                                    </td>
+                                    <td className="px-4 py-3 text-end">
+                                        <DeleteActionButton onClick={() => onDelete(conv)} />
                                     </td>
                                 </tr>
                             ))

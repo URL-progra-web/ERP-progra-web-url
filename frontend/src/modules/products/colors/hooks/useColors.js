@@ -35,6 +35,12 @@ export function useColors() {
         }
     }, [searchTerm, page]);
 
+    const parseError = (err, fallback) => (
+        err?.response?.data?.error
+        || err?.response?.data?.message
+        || fallback
+    );
+
     useEffect(() => {
         fetchColors();
     }, [fetchColors]);
@@ -54,8 +60,14 @@ export function useColors() {
     };
 
     const deleteColor = async (id) => {
-        await colorService.deleteColor(id);
-        fetchColors();
+        try {
+            await colorService.deleteColor(id);
+            await fetchColors();
+            return true;
+        } catch (err) {
+            setError(parseError(err, 'No se pudo eliminar el color.'));
+            return false;
+        }
     };
 
     return {

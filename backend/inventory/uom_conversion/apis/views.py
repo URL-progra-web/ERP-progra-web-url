@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -73,4 +74,9 @@ class UomConversionViewSet(viewsets.ViewSet, PaginationMixin):
             self.service.delete_conversion(pk)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
+        except IntegrityError:
+            return Response(
+                {'error': 'No se puede eliminar la conversión porque está referenciada por otros registros.'},
+                status=status.HTTP_409_CONFLICT,
+            )

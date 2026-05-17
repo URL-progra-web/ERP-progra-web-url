@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiPlus, FiSave, FiTrash2, FiClock } from 'react-icons/fi';
+import { FiArrowLeft, FiClock, FiMail, FiMapPin, FiPhone, FiPlus, FiSave, FiTrash2, FiTruck, FiUser } from 'react-icons/fi';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import { AppSelect } from '~/core/components';
@@ -14,6 +14,7 @@ import { formatCurrency } from './helpers/formatCurrency';
 import { normalizeList } from './helpers/normalizeList';
 import { OrderItemsTable } from './components/OrderItemsTable';
 import { OrderItemModal } from './components/OrderItemModal';
+import './order-detail.css';
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();
@@ -110,6 +111,28 @@ const OrderDetailPage = () => {
         if (!order) return 'Detalle del pedido';
         return `${order.customer_name || `Cliente #${order.customer}`} • ${order.status_name || 'Sin estado'}`;
     }, [order]);
+
+    const orderSummary = useMemo(() => {
+        if (!order) return [];
+        return [
+            {
+                label: 'Estado',
+                value: order.status_name || 'Sin estado',
+            },
+            {
+                label: 'Total',
+                value: formatCurrency(order.total_amount),
+            },
+            {
+                label: 'Items',
+                value: `${items.length} registro(s)`,
+            },
+            {
+                label: 'Actualizado',
+                value: order.updated_at ? new Date(order.updated_at).toLocaleString() : 'Sin fecha',
+            },
+        ];
+    }, [items.length, order]);
 
     const canMutateOrder = useMemo(() => (
         ['SOLICITADO', 'BORRADOR'].includes(String(order?.status_name || '').toUpperCase())
@@ -257,144 +280,167 @@ const OrderDetailPage = () => {
                 </div>
 
                 <form className="card-body" onSubmit={handleSave}>
-                    <div className="row g-3">
-                        <div className="col-md-6">
-                            <label className="form-label" htmlFor="orderDetailCustomer">Cliente</label>
-                            <input
-                                id="orderDetailCustomer"
-                                name="order_detail_customer"
-                                autoComplete="off"
-                                className="form-control"
-                                value={order.customer_name || `#${order.customer}`}
-                                readOnly
-                                disabled
-                            />
+                    <div className="order-detail-hero mb-4">
+                        <div className="order-detail-hero__main">
+                            <div className="small text-uppercase text-muted fw-semibold mb-2">Pedido {order.short_id}</div>
+                            <h3 className="order-detail-hero__title mb-2">
+                                {order.customer_name || `Cliente #${order.customer}`}
+                            </h3>
+                            <div className="order-detail-pills">
+                                {orderSummary.map((entry) => (
+                                    <span key={entry.label} className="order-detail-pill">
+                                        <strong>{entry.label}:</strong> {entry.value}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label" htmlFor="orderDetailCustomerType">Tipo de Cliente</label>
-                            <input
-                                id="orderDetailCustomerType"
-                                name="order_detail_customer_type"
-                                autoComplete="off"
-                                className="form-control"
-                                value={order.customer_type_label || order.customer_type || '-'}
-                                readOnly
-                                disabled
-                            />
+                        <div className="order-detail-hero__side">
+                            <div className="small text-uppercase text-muted fw-semibold mb-2">Resumen rapido</div>
+                            <div className="small text-muted">
+                                Creado {order.created_at ? new Date(order.created_at).toLocaleString() : 'Sin fecha'}
+                            </div>
+                            <div className="small text-muted mt-1">
+                                Metodo de pago: {order.payment_method_name || 'Por definir'}
+                            </div>
                         </div>
-                        <div className="col-md-6">
-                            <label className="form-label" htmlFor="orderDetailCustomerPhone">Teléfono del Cliente</label>
-                            <input
-                                id="orderDetailCustomerPhone"
-                                name="order_detail_customer_phone"
-                                autoComplete="tel"
-                                className="form-control"
-                                value={order.customer_phone || '-'}
-                                readOnly
-                                disabled
-                            />
-                        </div>
-                        <div className="col-md-6">
-                            <label className="form-label" htmlFor="orderDetailCustomerEmail">Email del Cliente</label>
-                            <input
-                                id="orderDetailCustomerEmail"
-                                name="order_detail_customer_email"
-                                autoComplete="email"
-                                className="form-control"
-                                value={order.customer_email || '-'}
-                                readOnly
-                                disabled
-                            />
-                        </div>
-                        <div className="col-12">
-                            <label className="form-label" htmlFor="orderDetailCustomerAddress">Dirección del Cliente</label>
-                            <textarea
-                                id="orderDetailCustomerAddress"
-                                className="form-control"
-                                rows="2"
-                                name="order_detail_customer_address"
-                                autoComplete="street-address"
-                                value={order.customer_address || '-'}
-                                readOnly
-                                disabled
-                            />
-                        </div>
-                        <div className="col-md-6">
+                    </div>
 
-                            <label className="form-label" htmlFor="orderDetailStatus">Estado</label>
-                            <input
-                                id="orderDetailStatus"
-                                name="order_detail_status"
-                                autoComplete="off"
-                                className="form-control"
-                                value={order.status_name || `#${order.status}`}
-                                readOnly
-                                disabled
-                            />
+                    <div className="row g-4">
+                        <div className="col-12 col-xl-5">
+                            <div className="order-detail-panel h-100">
+                                <div className="order-detail-panel__header">
+                                    <span className="order-detail-panel__icon"><FiUser size={16} /></span>
+                                    <div>
+                                        <div className="fw-semibold">Cliente y destinatario</div>
+                                        <div className="small text-muted">Datos de contacto del pedido</div>
+                                    </div>
+                                </div>
+
+                                <div className="order-detail-contact-list">
+                                    <div className="order-detail-contact-item">
+                                        <span className="order-detail-contact-item__icon"><FiUser size={15} /></span>
+                                        <div>
+                                            <div className="small text-muted">Cliente</div>
+                                            <div className="fw-semibold">{order.customer_name || `#${order.customer}`}</div>
+                                            <div className="small text-muted">{order.customer_type_label || order.customer_type || '-'}</div>
+                                        </div>
+                                    </div>
+                                    <div className="order-detail-contact-item">
+                                        <span className="order-detail-contact-item__icon"><FiPhone size={15} /></span>
+                                        <div>
+                                            <div className="small text-muted">Telefono</div>
+                                            <div className="fw-semibold">{order.customer_phone || '-'}</div>
+                                        </div>
+                                    </div>
+                                    <div className="order-detail-contact-item">
+                                        <span className="order-detail-contact-item__icon"><FiMail size={15} /></span>
+                                        <div>
+                                            <div className="small text-muted">Correo</div>
+                                            <div className="fw-semibold">{order.customer_email || '-'}</div>
+                                        </div>
+                                    </div>
+                                    <div className="order-detail-contact-item">
+                                        <span className="order-detail-contact-item__icon"><FiMapPin size={15} /></span>
+                                        <div>
+                                            <div className="small text-muted">Direccion del cliente</div>
+                                            <div className="fw-semibold">{order.customer_address || '-'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="col-md-6">
-                            <label className="form-label" htmlFor="orderDetailPaymentMethod">Método de Pago</label>
-                            <AppSelect
-                                id="orderDetailPaymentMethod"
-                                name="payment_method_id"
-                                value={formData.payment_method_id}
-                                onChange={(paymentMethodId) => handleChange({ target: { name: 'payment_method_id', value: paymentMethodId } })}
-                                disabled={!canMutateOrder}
-                                options={[
-                                    { value: '', label: '(Ninguno / Por definir)' },
-                                    ...catalogs.payment_methods.map((pm) => ({ value: pm.id, label: pm.name })),
-                                ]}
-                            />
-                        </div>
+                        <div className="col-12 col-xl-7">
+                            <div className="order-detail-panel h-100">
+                                <div className="order-detail-panel__header">
+                                    <span className="order-detail-panel__icon"><FiTruck size={16} /></span>
+                                    <div>
+                                        <div className="fw-semibold">Envio y gestion interna</div>
+                                        <div className="small text-muted">Actualiza la informacion operativa del pedido</div>
+                                    </div>
+                                </div>
 
-                        <div className="col-md-6">
-                            <label className="form-label" htmlFor="orderDetailShippingCost">Costo de Envío</label>
-                            <input
-                                id="orderDetailShippingCost"
-                                type="number"
-                                step="0.01"
-                                className="form-control"
-                                name="shipping_cost"
-                                autoComplete="off"
-                                value={formData.shipping_cost}
-                                onChange={handleChange}
-                                disabled={!canMutateOrder}
-                            />
-                        </div>
+                                <div className="row g-3">
+                                    <div className="col-md-6">
+                                        <label className="form-label" htmlFor="orderDetailStatus">Estado</label>
+                                        <input
+                                            id="orderDetailStatus"
+                                            name="order_detail_status"
+                                            autoComplete="off"
+                                            className="form-control"
+                                            value={order.status_name || `#${order.status}`}
+                                            readOnly
+                                            disabled
+                                        />
+                                    </div>
 
-                        <div className="col-12">
-                            <label className="form-label" htmlFor="orderDetailShippingAddress">Dirección de Envío</label>
-                            <textarea
-                                id="orderDetailShippingAddress"
-                                className="form-control"
-                                rows="2"
-                                name="shipping_address"
-                                autoComplete="street-address"
-                                value={formData.shipping_address}
-                                onChange={handleChange}
-                                disabled={!canMutateOrder}
-                            />
-                        </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label" htmlFor="orderDetailPaymentMethod">Método de Pago</label>
+                                        <AppSelect
+                                            id="orderDetailPaymentMethod"
+                                            name="payment_method_id"
+                                            value={formData.payment_method_id}
+                                            onChange={(paymentMethodId) => handleChange({ target: { name: 'payment_method_id', value: paymentMethodId } })}
+                                            disabled={!canMutateOrder}
+                                            options={[
+                                                { value: '', label: '(Ninguno / Por definir)' },
+                                                ...catalogs.payment_methods.map((pm) => ({ value: pm.id, label: pm.name })),
+                                            ]}
+                                        />
+                                    </div>
 
-                        <div className="col-12">
-                            <label className="form-label" htmlFor="orderDetailNotes">Notas</label>
-                            <textarea
-                                id="orderDetailNotes"
-                                className="form-control"
-                                rows="3"
-                                name="notes"
-                                autoComplete="off"
-                                value={formData.notes}
-                                onChange={handleChange}
-                                disabled={!canMutateOrder}
-                            />
-                        </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label" htmlFor="orderDetailShippingCost">Costo de Envío</label>
+                                        <input
+                                            id="orderDetailShippingCost"
+                                            type="number"
+                                            step="0.01"
+                                            className="form-control"
+                                            name="shipping_cost"
+                                            autoComplete="off"
+                                            value={formData.shipping_cost}
+                                            onChange={handleChange}
+                                            disabled={!canMutateOrder}
+                                        />
+                                    </div>
 
-                        <div className="col-12 d-flex justify-content-end">
-                            <button type="submit" className="btn btn-dark" disabled={isSaving || !canMutateOrder}>
-                                {isSaving ? 'Guardando…' : 'Guardar cambios'}
-                            </button>
+                                    <div className="col-12">
+                                        <label className="form-label" htmlFor="orderDetailShippingAddress">Dirección de Envío</label>
+                                        <textarea
+                                            id="orderDetailShippingAddress"
+                                            className="form-control"
+                                            rows="2"
+                                            name="shipping_address"
+                                            autoComplete="street-address"
+                                            value={formData.shipping_address}
+                                            onChange={handleChange}
+                                            disabled={!canMutateOrder}
+                                            placeholder="Direccion final donde se entrega el pedido"
+                                        />
+                                    </div>
+
+                                    <div className="col-12">
+                                        <label className="form-label" htmlFor="orderDetailNotes">Notas</label>
+                                        <textarea
+                                            id="orderDetailNotes"
+                                            className="form-control"
+                                            rows="3"
+                                            name="notes"
+                                            autoComplete="off"
+                                            value={formData.notes}
+                                            onChange={handleChange}
+                                            disabled={!canMutateOrder}
+                                            placeholder="Indicaciones internas, observaciones o acuerdos con el cliente"
+                                        />
+                                    </div>
+
+                                    <div className="col-12 d-flex justify-content-end">
+                                        <button type="submit" className="btn btn-dark" disabled={isSaving || !canMutateOrder}>
+                                            {isSaving ? 'Guardando…' : 'Guardar cambios'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -432,44 +478,38 @@ const OrderDetailPage = () => {
                     <FiClock className="me-2" />
                     <h6 className="mb-0 text-uppercase text-muted small">Historial de Estados</h6>
                 </div>
-                <div className="card-body p-0">
+                <div className="card-body">
                     {isLoadingHistory ? (
-                        <div className="p-3 text-muted">Cargando historial…</div>
+                        <div className="text-muted">Cargando historial…</div>
                     ) : history.length === 0 ? (
-                        <div className="p-3 text-muted">No hay historial de cambios.</div>
+                        <div className="text-muted">No hay historial de cambios.</div>
                     ) : (
-                        <div className="table-responsive">
-                            <table className="table table-hover mb-0">
-                                <thead className="table-light">
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Usuario</th>
-                                        <th>Estado Anterior</th>
-                                        <th>Estado Nuevo</th>
-                                        <th>Notas</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {history.map((entry) => (
-                                        <tr key={entry.id}>
-                                            <td>
-                                                <div>{new Date(entry.created_at).toLocaleDateString()}</div>
+                        <div className="order-history-timeline">
+                            {history.map((entry, index) => (
+                                <article key={entry.id} className="order-history-item">
+                                    <div className="order-history-item__rail">
+                                        <span className="order-history-item__dot" />
+                                        {index < history.length - 1 && <span className="order-history-item__line" />}
+                                    </div>
+                                    <div className="order-history-item__content">
+                                        <div className="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-2">
+                                            <div>
+                                                <div className="fw-semibold">{entry.status_name}</div>
                                                 <div className="small text-muted">
-                                                    {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {entry.user_name || 'Sistema'} · {new Date(entry.created_at).toLocaleDateString()} · {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
-                                            </td>
-                                            <td>{entry.user_name || 'Sistema'}</td>
-                                            <td>
-                                                <span className="badge bg-secondary">{entry.previous_status_name || '-'}</span>
-                                            </td>
-                                            <td>
-                                                <span className="badge bg-primary">{entry.status_name}</span>
-                                            </td>
-                                            <td>{entry.notes || '-'}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            </div>
+                                            <div className="order-detail-pills">
+                                                <span className="order-detail-pill">Antes: {entry.previous_status_name || '-'}</span>
+                                                <span className="order-detail-pill order-detail-pill--primary">Ahora: {entry.status_name}</span>
+                                            </div>
+                                        </div>
+                                        <div className="small text-muted">
+                                            {entry.notes || 'Sin notas para este cambio.'}
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
                         </div>
                     )}
                 </div>

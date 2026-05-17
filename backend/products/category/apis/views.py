@@ -1,5 +1,7 @@
 from django.db.models import Q
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 from products.category.models.models import Category
 from products.category.serializers.serializers import CategorySerializer
 
@@ -34,3 +36,12 @@ class CategoryViewSet(ModelViewSet):
             queryset = queryset.filter(parent_id=parent_id)
 
         return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.subcategories.exists():
+            return Response(
+                {'error': 'No puedes eliminar una categoría que tiene subcategorías.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return super().destroy(request, *args, **kwargs)

@@ -105,7 +105,8 @@ const UomsPage = () => {
                                         <tr>
                                             <th className="border-0 px-4 py-3">Código</th>
                                             <th className="border-0 py-3">Nombre</th>
-                                            <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                            <th className="border-0 py-3 text-end">Acciones</th>
+                                            <th className="border-0 px-4 py-3 text-end">Eliminar</th>
                                         </tr>
                                     </thead>
                                     <UomsTable

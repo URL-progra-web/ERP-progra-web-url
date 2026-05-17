@@ -13,7 +13,7 @@
   --topbar-height:              60px;
   --sidebar-width:              256px;
   --sidebar-collapsed-width:    72px;
-  --mobile-nav-height:          62px;
+  --mobile-nav-height:          72px;
 
   --radius-xs:  4px;
   --radius-sm:  6px;
@@ -365,6 +365,37 @@ code, pre, .font-mono, kbd {
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
 }
 
+.app-select__search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 4px 4px 8px;
+  background: inherit;
+}
+
+.app-select__search-input {
+  width: 100%;
+  min-height: 36px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.105);
+  border-radius: 8px;
+  background: rgba(var(--bs-body-color-rgb), 0.035);
+  color: var(--bs-body-color);
+  font: inherit;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.app-select__search-input::placeholder {
+  color: var(--bs-secondary-color);
+}
+
+.app-select__search-input:focus {
+  outline: 0;
+  background: rgba(var(--bs-body-color-rgb), 0.05);
+  border-color: rgba(var(--bs-primary-rgb), 0.45);
+  box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.12);
+}
+
 .app-select__option {
   width: 100%;
   min-height: 34px;
@@ -397,6 +428,12 @@ code, pre, .font-mono, kbd {
 .app-select__option:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.app-select__empty {
+  padding: 10px 9px 8px;
+  color: var(--bs-secondary-color);
+  font-size: 0.92rem;
 }
 
 /* Input groups */
@@ -642,6 +679,67 @@ code, pre, .font-mono, kbd {
 
 .page-header__action-button svg {
   flex-shrink: 0;
+}
+
+.app-table-shell,
+.table-responsive {
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: color-mix(in srgb, var(--bs-secondary-bg) 92%, var(--bs-body-bg));
+}
+
+.app-table-shell .table,
+.table-responsive .table,
+.card > .table {
+  margin-bottom: 0;
+}
+
+.app-table-shell .table thead,
+.table-responsive .table thead,
+.card > .table thead {
+  background: color-mix(in srgb, var(--bs-tertiary-bg) 88%, transparent);
+}
+
+.app-table-shell .table thead th,
+.table-responsive .table thead th,
+.card > .table thead th {
+  border: 0;
+  background: transparent;
+  color: var(--bs-secondary-color);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding-top: 0.95rem;
+  padding-bottom: 0.95rem;
+}
+
+.app-table-shell .table tbody td,
+.table-responsive .table tbody td,
+.card > .table tbody td {
+  border-color: rgba(var(--bs-body-color-rgb), 0.065);
+}
+
+.app-table-shell .table tbody tr:last-child td,
+.table-responsive .table tbody tr:last-child td,
+.card > .table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.app-empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--bs-secondary-color);
+}
+
+.app-empty-state strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--bs-body-color);
+  font-family: var(--font-display);
+  font-size: 1rem;
 }
 
 .table-actions {

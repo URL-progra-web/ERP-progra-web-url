@@ -1,0 +1,271 @@
+.order-create-page {
+  --order-create-accent: #dd6b20;
+  --order-create-accent-soft: rgba(221, 107, 32, 0.12);
+  --order-create-success-soft: rgba(34, 197, 94, 0.12);
+  --order-create-warning-soft: rgba(245, 158, 11, 0.14);
+  --order-create-danger-soft: rgba(239, 68, 68, 0.12);
+}
+
+.order-create-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(221, 107, 32, 0.16), transparent 30%),
+    linear-gradient(135deg, color-mix(in srgb, var(--bs-body-bg) 94%, #fff) 0%, var(--bs-secondary-bg) 100%);
+}
+
+.order-create-hero__eyebrow {
+  margin-bottom: 0.55rem;
+  color: var(--order-create-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.order-create-hero__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 1.15rem + 1vw, 2.1rem);
+  line-height: 1.05;
+}
+
+.order-create-hero__copy {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--bs-secondary-color);
+}
+
+.order-create-hero__status {
+  align-self: stretch;
+  padding: 1rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 18px;
+  background: rgba(var(--bs-body-color-rgb), 0.03);
+}
+
+.order-create-sticky {
+  position: sticky;
+  top: 1rem;
+}
+
+.order-create-section-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.order-create-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: var(--order-create-accent);
+  background: var(--order-create-accent-soft);
+  flex-shrink: 0;
+}
+
+.order-create-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.order-create-checklist__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 16px;
+  background: rgba(var(--bs-body-color-rgb), 0.025);
+}
+
+.order-create-checklist__item.is-complete {
+  background: var(--order-create-success-soft);
+}
+
+.order-create-checklist__item.is-pending {
+  background: var(--order-create-warning-soft);
+}
+
+.order-create-checklist__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-top: 0.05rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.order-create-checklist__item.is-complete .order-create-checklist__icon {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.16);
+}
+
+.order-create-checklist__item.is-pending .order-create-checklist__icon {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.order-create-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.order-create-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 999px;
+  background: rgba(var(--bs-body-color-rgb), 0.04);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.order-create-pill--success {
+  color: #166534;
+  background: var(--order-create-success-soft);
+}
+
+.order-create-pill--warning {
+  color: #b45309;
+  background: var(--order-create-warning-soft);
+}
+
+.order-create-readiness {
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 16px;
+}
+
+.order-create-readiness--danger {
+  background: var(--order-create-danger-soft);
+}
+
+.order-create-readiness--info {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.order-create-total-card {
+  padding: 1rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(var(--bs-body-color-rgb), 0.03) 0%, rgba(var(--bs-body-color-rgb), 0.015) 100%),
+    var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+}
+
+.order-create-total-card__label {
+  color: var(--bs-secondary-color);
+}
+
+.order-create-total-card__total {
+  border-top-color: rgba(var(--bs-body-color-rgb), 0.12) !important;
+}
+
+.order-customer-search__modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.order-customer-search__mode {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 999px;
+  background: rgba(var(--bs-body-color-rgb), 0.04);
+  color: var(--bs-body-color);
+  font-size: 0.9rem;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.order-customer-search__mode.is-active {
+  border-color: rgba(221, 107, 32, 0.3);
+  background: var(--order-create-accent-soft);
+  color: var(--order-create-accent);
+}
+
+.order-customer-search__selected {
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(34, 197, 94, 0.18);
+  border-radius: 16px;
+  background: var(--order-create-success-soft);
+}
+
+.order-customer-search__results {
+  max-height: 18rem;
+  overflow-y: auto;
+  border-radius: 16px;
+}
+
+.order-customer-search__result {
+  border-left: 0;
+  border-right: 0;
+}
+
+.order-customer-search__result:first-child {
+  border-top: 0;
+}
+
+.order-customer-search__result:last-child {
+  border-bottom: 0;
+}
+
+.order-catalog-card {
+  padding: 1rem;
+  border: 1px solid rgba(var(--bs-body-color-rgb), 0.08);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--bs-secondary-bg) 94%, var(--bs-body-bg));
+}
+
+.order-catalog-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+}
+
+.order-catalog-card__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.order-catalog-action--card .app-select {
+  width: 100%;
+}
+
+@media (max-width: 1199.98px) {
+  .order-create-sticky {
+    position: static;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .order-create-hero {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .order-create-checklist__item,
+  .order-catalog-card,
+  .order-customer-search__selected,
+  .order-create-readiness {
+    border-radius: 14px;
+  }
+}
