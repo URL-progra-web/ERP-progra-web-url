@@ -19,7 +19,7 @@ const NestedRouteLoader = () => (
                 }}
             />
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--bs-secondary-color)' }}>
-                Cargando vista...
+                Cargando vista…
             </span>
         </div>
     </div>

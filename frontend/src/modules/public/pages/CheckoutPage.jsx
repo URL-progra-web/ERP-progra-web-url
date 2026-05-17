@@ -335,7 +335,7 @@ export const CheckoutPage = () => {
                 {loading ? (
                   <>
                     <span className="store-spinner" aria-hidden="true" />
-                    Procesando...
+                    Procesando…
                   </>
                 ) : (
                   <>

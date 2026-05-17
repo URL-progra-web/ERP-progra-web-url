@@ -1,6 +1,8 @@
 import React, { useId, useMemo, useRef, useEffect } from 'react';
 
-const DatalistCellEditor = ({ value, onValueChange, values = [] }) => {
+const EMPTY_VALUES = [];
+
+const DatalistCellEditor = ({ value, onValueChange, values = EMPTY_VALUES }) => {
     const inputRef = useRef(null);
     const listId = useId();
     const options = useMemo(() => values.filter(Boolean), [values]);

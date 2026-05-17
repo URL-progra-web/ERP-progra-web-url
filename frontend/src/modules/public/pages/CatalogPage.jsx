@@ -229,7 +229,7 @@ export const CatalogPage = () => {
             </div>
 
             {filtersLoading ? (
-              <div className="store-muted" style={{ fontSize: '0.8rem' }}>Cargando filtros...</div>
+              <div className="store-muted" style={{ fontSize: '0.8rem' }}>Cargando filtros…</div>
             ) : (
               <FilterSidebar
                 filters={filters}

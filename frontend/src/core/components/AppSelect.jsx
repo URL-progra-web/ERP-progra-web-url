@@ -2,6 +2,8 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FiChevronDown } from 'react-icons/fi';
 
+const EMPTY_OPTIONS = [];
+
 const normalizeOptions = (options) => (
     options.map((option) => ({
         ...option,
@@ -14,7 +16,7 @@ const AppSelect = ({
     id,
     name,
     value = '',
-    options = [],
+    options = EMPTY_OPTIONS,
     onChange,
     placeholder = 'Seleccionar',
     ariaLabel,

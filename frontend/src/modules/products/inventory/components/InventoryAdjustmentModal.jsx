@@ -142,6 +142,7 @@ const InventoryAdjustmentModal = ({
                     autoComplete="off"
                     className="form-control"
                     value={product?.name || ''}
+                    readOnly
                     disabled
                 />
             </div>
@@ -153,7 +154,7 @@ const InventoryAdjustmentModal = ({
                 {isLoadingVariants ? (
                     <div className="form-control text-muted">
                         <span className="spinner-border spinner-border-sm me-2"></span>
-                        Cargando variantes...
+                        Cargando variantes…
                     </div>
                 ) : hasVariants ? (
                     <AppSelect

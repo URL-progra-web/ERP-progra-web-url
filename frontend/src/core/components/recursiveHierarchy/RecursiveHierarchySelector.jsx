@@ -8,7 +8,7 @@ const RecursiveHierarchySelector = ({
     value = '',
     onChange,
     disabled = false,
-    excludeIds = [],
+    excludeIds = EMPTY_ITEMS,
     getId = (item) => item?.id,
     getParentId = (item) => item?.parent,
     getLabel = (item) => item?.name,

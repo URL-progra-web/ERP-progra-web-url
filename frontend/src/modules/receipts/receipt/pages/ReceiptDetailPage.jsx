@@ -33,7 +33,7 @@ const ReceiptDetailPage = () => {
         load();
     }, [receiptId]);
 
-    if (isLoading) return <div className="p-3 text-muted">Cargando recibo...</div>;
+    if (isLoading) return <div className="p-3 text-muted">Cargando recibo…</div>;
 
     if (!receipt) {
         return (

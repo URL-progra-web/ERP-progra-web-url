@@ -31,7 +31,7 @@ const RouteLoader = () => (
                 }}
             />
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--bs-secondary-color)' }}>
-                Cargando modulo...
+                Cargando modulo…
             </span>
         </div>
     </div>

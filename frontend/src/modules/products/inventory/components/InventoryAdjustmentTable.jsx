@@ -9,7 +9,7 @@ const InventoryAdjustmentTable = ({ products, isLoading, onAddStock, onRemoveSto
                 <tr>
                     <td colSpan="6" className="text-center py-5">
                         <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-                        <span className="text-muted">Cargando...</span>
+                        <span className="text-muted">Cargando…</span>
                     </td>
                 </tr>
             </tbody>
@@ -41,13 +41,13 @@ const InventoryAdjustmentTable = ({ products, isLoading, onAddStock, onRemoveSto
                         }
                     </td>
                     <td className="py-3 text-secondary">
-                        {product.entrepreneur_name || <span className="text-muted fst-italic">—</span>}
+                        {product.entrepreneur_name || <span className="text-muted fst-italic">-</span>}
                     </td>
                     <td className="py-3 text-secondary">
-                        {product.business_unit_name || <span className="text-muted fst-italic">—</span>}
+                        {product.business_unit_name || <span className="text-muted fst-italic">-</span>}
                     </td>
                     <td className="py-3 text-secondary">
-                        {product.base_uom_name || <span className="text-muted fst-italic">—</span>}
+                        {product.base_uom_name || <span className="text-muted fst-italic">-</span>}
                     </td>
                     <td className="px-4 py-3 text-end">
                         <TableActions actions={[

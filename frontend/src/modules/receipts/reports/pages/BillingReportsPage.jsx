@@ -271,7 +271,7 @@ const BillingReportsPage = () => {
                 </div>
 
                 {isLoading ? (
-                    <div className="text-muted p-3">Cargando reportes...</div>
+                    <div className="text-muted p-3">Cargando reportes…</div>
                 ) : (
                     <>
                         {/* RESUMEN */}

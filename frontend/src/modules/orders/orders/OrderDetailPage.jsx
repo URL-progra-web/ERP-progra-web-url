@@ -104,7 +104,7 @@ const OrderDetailPage = () => {
     useEffect(() => {
         if (!location.state?.successMessage) return;
         navigate(location.pathname, { replace: true, state: {} });
-    }, [location.pathname, location.state, navigate]);
+    }, [location, navigate]);
 
     const subtitle = useMemo(() => {
         if (!order) return 'Detalle del pedido';
@@ -195,7 +195,7 @@ const OrderDetailPage = () => {
     };
 
     if (isLoading) {
-        return <div className="p-3">Cargando detalle del pedido...</div>;
+        return <div className="p-3">Cargando detalle del pedido…</div>;
     }
 
     if (!order) {
@@ -266,6 +266,7 @@ const OrderDetailPage = () => {
                                 autoComplete="off"
                                 className="form-control"
                                 value={order.customer_name || `#${order.customer}`}
+                                readOnly
                                 disabled
                             />
                         </div>
@@ -277,6 +278,7 @@ const OrderDetailPage = () => {
                                 autoComplete="off"
                                 className="form-control"
                                 value={order.customer_type_label || order.customer_type || '-'}
+                                readOnly
                                 disabled
                             />
                         </div>
@@ -288,6 +290,7 @@ const OrderDetailPage = () => {
                                 autoComplete="tel"
                                 className="form-control"
                                 value={order.customer_phone || '-'}
+                                readOnly
                                 disabled
                             />
                         </div>
@@ -299,6 +302,7 @@ const OrderDetailPage = () => {
                                 autoComplete="email"
                                 className="form-control"
                                 value={order.customer_email || '-'}
+                                readOnly
                                 disabled
                             />
                         </div>
@@ -311,6 +315,7 @@ const OrderDetailPage = () => {
                                 name="order_detail_customer_address"
                                 autoComplete="street-address"
                                 value={order.customer_address || '-'}
+                                readOnly
                                 disabled
                             />
                         </div>
@@ -323,6 +328,7 @@ const OrderDetailPage = () => {
                                 autoComplete="off"
                                 className="form-control"
                                 value={order.status_name || `#${order.status}`}
+                                readOnly
                                 disabled
                             />
                         </div>
@@ -387,7 +393,7 @@ const OrderDetailPage = () => {
 
                         <div className="col-12 d-flex justify-content-end">
                             <button type="submit" className="btn btn-dark" disabled={isSaving || !canMutateOrder}>
-                                {isSaving ? 'Guardando...' : 'Guardar cambios'}
+                                {isSaving ? 'Guardando…' : 'Guardar cambios'}
                             </button>
                         </div>
                     </div>
@@ -428,7 +434,7 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="card-body p-0">
                     {isLoadingHistory ? (
-                        <div className="p-3 text-muted">Cargando historial...</div>
+                        <div className="p-3 text-muted">Cargando historial…</div>
                     ) : history.length === 0 ? (
                         <div className="p-3 text-muted">No hay historial de cambios.</div>
                     ) : (

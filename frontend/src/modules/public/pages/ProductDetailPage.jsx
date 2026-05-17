@@ -338,7 +338,7 @@ export const ProductDetailPage = () => {
                 onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
                 min="1"
               />
-              <button type="button" onClick={() => setQuantity(quantity + 1)} aria-label="Aumentar cantidad">
+              <button type="button" onClick={() => setQuantity(prev => prev + 1)} aria-label="Aumentar cantidad">
                 <FiPlus size={14} />
               </button>
             </div>

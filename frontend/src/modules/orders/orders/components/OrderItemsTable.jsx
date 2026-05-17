@@ -5,7 +5,7 @@ import TableActions from '~/core/components/TableActions';
 
 export const OrderItemsTable = ({ items, isLoading, onEdit, onDelete, canEdit = true }) => {
     if (isLoading) {
-        return <div className="text-center p-3">Cargando items...</div>;
+        return <div className="text-center p-3">Cargando items…</div>;
     }
 
     if (!items?.length) {

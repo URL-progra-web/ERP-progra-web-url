@@ -2,6 +2,8 @@ import React from 'react';
 import { FiRefreshCcw, FiSearch } from 'react-icons/fi';
 import { AppSelect } from '~/core/components';
 
+const EMPTY_ARRAY = [];
+
 export const OrderCatalogFilters = ({
     searchInput,
     onSearchChange,
@@ -18,12 +20,12 @@ export const OrderCatalogFilters = ({
     onSizeChange,
     uomFilter,
     onUomChange,
-    products = [],
-    entrepreneurs = [],
-    businessUnits = [],
-    colors = [],
-    sizes = [],
-    uoms = [],
+    products = EMPTY_ARRAY,
+    entrepreneurs = EMPTY_ARRAY,
+    businessUnits = EMPTY_ARRAY,
+    colors = EMPTY_ARRAY,
+    sizes = EMPTY_ARRAY,
+    uoms = EMPTY_ARRAY,
     onReset,
 }) => {
     const handleSubmit = (e) => {

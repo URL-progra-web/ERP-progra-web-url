@@ -2,7 +2,7 @@ import React from 'react';
 import ReceiptPDFButton from './ReceiptPDFButton'; // Importamos el componente
 
 const ReceiptsTable = ({ receipts, isLoading, onViewDetail }) => {
-    if (isLoading) return <div className="p-3 text-muted">Cargando recibos...</div>;
+    if (isLoading) return <div className="p-3 text-muted">Cargando recibos…</div>;
 
     return (
         <table className="table table-hover mb-0">

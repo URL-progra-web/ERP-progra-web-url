@@ -2,6 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { FiPlus, FiShoppingCart } from 'react-icons/fi';
 import { AppSelect } from '~/core/components';
 
+const EMPTY_ARRAY = [];
+const EMPTY_CONVERSIONS = {};
+
 const formatMoney = (value) => `Q ${Number(value ?? 0).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -12,7 +15,7 @@ const renderSpec = (variant) => {
     return parts.length ? parts.join(' / ') : 'Sin especificaciones';
 };
 
-export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = [], uoms = [], conversionsByBaseUom = {} }) => {
+export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = EMPTY_ARRAY, uoms = EMPTY_ARRAY, conversionsByBaseUom = EMPTY_CONVERSIONS }) => {
     const [selectedUoms, setSelectedUoms] = useState({});
     const quantitiesByVariant = cartItems.reduce((acc, item) => {
         acc[Number(item.variant_id)] = Number(item.base_quantity || item.quantity || 0);
@@ -21,7 +24,7 @@ export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = [], 
     const uomsById = useMemo(() => Object.fromEntries(uoms.map((uom) => [Number(uom.id), uom])), [uoms]);
 
     if (isLoading) {
-        return <div className="text-center py-5 text-muted">Cargando catalogo...</div>;
+        return <div className="text-center py-5 text-muted">Cargando catalogo…</div>;
     }
 
     if (!variants.length) {

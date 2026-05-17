@@ -146,7 +146,7 @@ const BrandPanel = () => (
                 margin: '0 0 28px', maxWidth: '360px',
                 animation: 'fadeSlideUp 0.6s 0.3s both',
             }}>
-                Control de pedidos, inventario, clientes y reportes — todo en un solo lugar.
+                Control de pedidos, inventario, clientes y reportes: todo en un solo lugar.
             </p>
 
             {/* Feature list */}
@@ -212,7 +212,7 @@ const FormField = ({ icon: Icon, type, placeholder, value, onChange, required, a
                 style={{
                     flex: 1, border: 'none', background: 'transparent',
                     color: 'var(--bs-body-color)', fontFamily: 'var(--font-body)',
-                    fontSize: '15px', padding: '13px 0', outline: 'none',
+                    fontSize: '15px', padding: '13px 0', outline: '0',
                 }}
             />
         </div>
@@ -239,7 +239,7 @@ const ThemeToggle = ({ theme, onToggle }) => {
                 cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: hovered ? 'var(--bs-body-color)' : 'var(--bs-secondary-color)',
-                transition: 'all 0.2s',
+                transition: 'background-color 0.2s, color 0.2s',
                 animation: 'fadeIn 0.5s 0.5s both',
             }}
         >
@@ -370,7 +370,7 @@ const Login = () => {
                                         animation: 'spinnerRotate 0.7s linear infinite',
                                         flexShrink: 0,
                                     }} />
-                                    Verificando...
+                                    Verificando…
                                 </>
                             ) : (
                                 <>Continuar <FiArrowRight size={17} /></>

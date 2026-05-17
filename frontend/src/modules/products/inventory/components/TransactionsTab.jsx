@@ -12,7 +12,7 @@ export const TransactionsTab = ({
     return (
       <div className="text-center py-5">
         <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-        <span className="text-muted">Cargando tipos de transacción...</span>
+        <span className="text-muted">Cargando tipos de transacción…</span>
       </div>
     );
   }

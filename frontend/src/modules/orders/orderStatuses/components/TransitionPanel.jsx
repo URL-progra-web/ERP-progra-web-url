@@ -67,7 +67,7 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                 <div className="mb-4">
                     <h6 className="text-uppercase text-muted small">Flujo disponible</h6>
                     {isLoadingWorkflow ? (
-                        <div className="text-muted small">Cargando flujo...</div>
+                        <div className="text-muted small">Cargando flujo…</div>
                     ) : (
                         <div className="d-flex flex-column gap-2">
                             {workflowEntries.map(([from, toList]) => (
@@ -108,7 +108,7 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                         {form.order_id && (
                             <div className="col-12">
                                 {isLoadingPreview ? (
-                                    <div className="text-muted small py-2">Buscando pedido...</div>
+                                    <div className="text-muted small py-2">Buscando pedido…</div>
                                 ) : orderPreview ? (
                                     <div className="card bg-body border mt-2">
                                         <div className="card-body py-2 px-3">
@@ -164,7 +164,7 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                                 value={form.target_status}
                                 onChange={(targetStatus) => handleChange({ target: { name: 'target_status', value: targetStatus } })}
                                 options={[
-                                    { value: '', label: 'Selecciona...' },
+                                    { value: '', label: 'Selecciona…' },
                                     ...statusOptions,
                                 ]}
                             />

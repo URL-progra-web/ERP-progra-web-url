@@ -269,7 +269,7 @@ const InventoryAdjustmentsPage = () => {
                           role="status"
                           aria-hidden="true"
                         ></span>
-                        Exportando...
+                        Exportando…
                       </>
                     ) : (
                       <>

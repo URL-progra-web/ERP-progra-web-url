@@ -44,7 +44,7 @@ const StatusToggle = ({ label, color, active, onClick }) => (
             border: `2px solid ${active ? color : 'var(--bs-border-color)'}`,
             background: active ? `${color}22` : 'transparent',
             color: active ? color : 'var(--bs-secondary-color)',
-            cursor: 'pointer', transition: 'all 0.15s',
+            cursor: 'pointer', transition: 'background-color 0.15s, color 0.15s, border-color 0.15s',
         }}
     >
         <span style={{
@@ -97,8 +97,8 @@ const OrdersChartPage = () => {
 
     // date range
     const [quickRange, setQuickRange] = React.useState('30d');
-    const [customFrom, setCustomFrom] = React.useState(daysAgoStr(30));
-    const [customTo,   setCustomTo]   = React.useState(todayStr());
+    const [customFrom, setCustomFrom] = React.useState(() => daysAgoStr(30));
+    const [customTo,   setCustomTo]   = React.useState(() => todayStr());
 
     const { dateFrom, dateTo } = React.useMemo(() => {
         if (quickRange === 'today') return { dateFrom: todayStr(),     dateTo: todayStr() };
@@ -136,7 +136,7 @@ const OrdersChartPage = () => {
             setInitialLoaded(true);
         } else {
             setAvailableStatuses(prev => {
-                const merged = [...new Set([...prev, ...statuses])].sort();
+                const merged = [...new Set([...prev, ...statuses])].toSorted();
                 return merged;
             });
         }

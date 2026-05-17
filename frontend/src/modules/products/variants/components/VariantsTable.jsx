@@ -9,7 +9,7 @@ const VariantsTable = ({ variants, isLoading, onEdit, onDelete }) => {
                 <tr>
                     <td colSpan="10" className="text-center py-5">
                         <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-                        <span className="text-muted">Cargando...</span>
+                        <span className="text-muted">Cargando…</span>
                     </td>
                 </tr>
             </tbody>

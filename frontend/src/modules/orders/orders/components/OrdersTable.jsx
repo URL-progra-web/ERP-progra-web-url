@@ -24,7 +24,7 @@ export const OrdersTable = ({
     transitioningOrderId,
 }) => {
     if (isLoading) {
-        return <div className="text-center p-4">Cargando pedidos...</div>;
+        return <div className="text-center p-4">Cargando pedidos…</div>;
     }
 
     if (!orders || orders.length === 0) {

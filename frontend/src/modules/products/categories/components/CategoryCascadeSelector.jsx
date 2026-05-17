@@ -1,12 +1,14 @@
 import React from 'react';
 import { RecursiveHierarchySelector } from '~/core/components';
 
+const EMPTY_ARRAY = [];
+
 const CategoryCascadeSelector = ({
-    categories = [],
+    categories = EMPTY_ARRAY,
     value = '',
     onChange,
     disabled = false,
-    excludeIds = [],
+    excludeIds = EMPTY_ARRAY,
 }) => {
     return (
         <RecursiveHierarchySelector

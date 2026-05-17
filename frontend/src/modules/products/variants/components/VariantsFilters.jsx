@@ -2,6 +2,8 @@ import React from 'react';
 import { FiSearch, FiRefreshCcw } from 'react-icons/fi';
 import { AppSelect } from '~/core/components';
 
+const EMPTY_ARRAY = [];
+
 const VariantsFilters = ({
     searchInput,
     onSearchChange,
@@ -20,12 +22,12 @@ const VariantsFilters = ({
     onSizeChange,
     uomFilter,
     onUomChange,
-    products = [],
-    entrepreneurs = [],
-    businessUnits = [],
-    colors = [],
-    sizes = [],
-    uoms = [],
+    products = EMPTY_ARRAY,
+    entrepreneurs = EMPTY_ARRAY,
+    businessUnits = EMPTY_ARRAY,
+    colors = EMPTY_ARRAY,
+    sizes = EMPTY_ARRAY,
+    uoms = EMPTY_ARRAY,
     onReset,
 }) => {
     const handleSubmit = (e) => {

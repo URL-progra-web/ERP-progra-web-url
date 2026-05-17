@@ -113,7 +113,7 @@ const TopbarActions = ({ theme, toggleTheme, user, logout }) => {
                             </div>
 
                             {isLoadingNotifications && (
-                                <div className="topbar-notification-state">Cargando notificaciones...</div>
+                                <div className="topbar-notification-state">Cargando notificaciones…</div>
                             )}
 
                             {!isLoadingNotifications && notificationsError && (

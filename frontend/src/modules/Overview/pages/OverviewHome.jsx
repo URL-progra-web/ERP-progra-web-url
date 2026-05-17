@@ -85,7 +85,7 @@ const QuickNavItem = ({ item }) => {
                 border: '1px solid var(--bs-border-color)',
                 borderRadius: 'var(--radius-md)',
                 textDecoration: 'none',
-                transition: 'all var(--transition)',
+                transition: 'border-color var(--transition), transform var(--transition)',
             }}
             onMouseOver={e => {
                 e.currentTarget.style.borderColor = 'rgba(var(--bs-primary-rgb),0.4)';

@@ -107,7 +107,7 @@ const TransactionHistoryTab = ({
       {isLoading ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-          <span className="text-muted">Cargando transacciones...</span>
+          <span className="text-muted">Cargando transacciones…</span>
         </div>
       ) : transactions.length === 0 ? (
         <div className="text-center py-5">

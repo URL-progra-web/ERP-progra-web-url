@@ -20,7 +20,7 @@ export function UomsTable({ uoms, isLoading, onEdit, onDelete }) {
                     {isLoading ? (
                         <tr>
                             <td colSpan={3} className="text-center py-5 text-muted">
-                                <div className="spinner-border spinner-border-sm me-2" /> Cargando...
+                                <div className="spinner-border spinner-border-sm me-2" /> Cargando…
                             </td>
                         </tr>
                     ) : uoms.length === 0 ? (

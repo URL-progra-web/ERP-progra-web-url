@@ -43,7 +43,7 @@ const FilterTabs = ({ options, value, onChange, size = 'sm' }) => {
                                 ? 'var(--bs-primary)'
                                 : 'var(--bs-secondary-color)',
                             cursor: 'pointer',
-                            transition: 'all 0.15s',
+                            transition: 'background-color 0.15s, color 0.15s',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '6px',
@@ -67,7 +67,7 @@ const FilterTabs = ({ options, value, onChange, size = 'sm' }) => {
                                         ? 'var(--bs-primary)'
                                         : 'var(--bs-border-color)',
                                     color: isActive ? 'white' : 'var(--bs-secondary-color)',
-                                    transition: 'all 0.15s',
+                                    transition: 'background-color 0.15s, color 0.15s',
                                 }}
                             >
                                 {opt.badge}
