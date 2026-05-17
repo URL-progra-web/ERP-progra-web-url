@@ -61,7 +61,7 @@ const ProductsPage = () => {
                 actions={(
                     <button
                         type="button"
-                        className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                        className="btn btn-outline-secondary page-header__action-button d-inline-flex align-items-center gap-2"
                         onClick={() => navigate('/dashboard/admin/products/bulk')}
                     >
                         <FiUploadCloud size={15} />

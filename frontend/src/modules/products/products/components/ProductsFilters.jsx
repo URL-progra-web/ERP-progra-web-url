@@ -18,7 +18,25 @@ const ProductsFilters = ({
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-12 col-lg-5 d-flex flex-column gap-2">
+                <div className="col-12 col-lg-6">
+                    <div className="h-100">
+                        <RecursiveHierarchySelector
+                            items={categories}
+                            value={categoryFilter}
+                            onChange={onCategoryChange}
+                            getId={(item) => item?.id}
+                            getParentId={(item) => item?.parent}
+                            getLabel={(item) => item?.name}
+                            getIsLeaf={(item) => item?.is_leaf}
+                            rootOptionLabel="Todas las categorías"
+                            levelRootLabel="Filtrar por categoría"
+                            levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
+                            selectionMode="any"
+                        />
+                    </div>
+                </div>
+
+                <div className="col-12 col-lg-6 d-flex flex-column gap-2">
                     <form onSubmit={handleSubmit} className="input-group">
                         <span className="input-group-text bg-body border-end-0 text-muted">
                             <FiSearch size={14} />
@@ -34,13 +52,14 @@ const ProductsFilters = ({
                             value={searchInput}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
-                        <button 
-                            className="btn btn-primary" 
+                        <button
+                            className="btn btn-primary"
                             type="submit"
                         >
                             Buscar
                         </button>
                     </form>
+
                     <AppSelect
                         id="productsEntrepreneurFilter"
                         name="products_entrepreneur_filter"
@@ -76,24 +95,6 @@ const ProductsFilters = ({
                             ...uoms.map((uom) => ({ value: uom.id, label: uom.name })),
                         ]}
                     />
-                </div>
-
-                <div className="col-12 col-lg-7 d-flex justify-content-lg-end">
-                    <div className="w-100" style={{ maxWidth: '700px' }}>
-                        <RecursiveHierarchySelector
-                            items={categories}
-                            value={categoryFilter}
-                            onChange={onCategoryChange}
-                            getId={(item) => item?.id}
-                            getParentId={(item) => item?.parent}
-                            getLabel={(item) => item?.name}
-                            getIsLeaf={(item) => item?.is_leaf}
-                            rootOptionLabel="Todas las categorías"
-                            levelRootLabel="Filtrar por categoría"
-                            levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
-                            selectionMode="any"
-                        />
-                    </div>
                 </div>
             </div>
         </div>
