@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom';
 import { FiChevronDown } from 'react-icons/fi';
 
 const EMPTY_OPTIONS = [];
+const normalizeSearchText = (text) => String(text ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 const normalizeOptions = (options) => (
     options.map((option) => ({
@@ -22,17 +27,31 @@ const AppSelect = ({
     ariaLabel,
     disabled = false,
     className = '',
+    searchable = true,
+    searchPlaceholder = 'Buscar...',
+    emptySearchLabel = 'No se encontraron opciones.',
 }) => {
     const generatedId = useId();
     const selectId = id || generatedId;
     const triggerRef = useRef(null);
     const listRef = useRef(null);
+    const searchInputRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
     const [menuStyle, setMenuStyle] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const normalizedOptions = useMemo(() => normalizeOptions(options), [options]);
     const normalizedValue = String(value ?? '');
     const selectedOption = normalizedOptions.find((option) => option.value === normalizedValue);
+    const filteredOptions = useMemo(() => {
+        const normalizedQuery = normalizeSearchText(searchQuery);
+        if (!normalizedQuery) return normalizedOptions;
+
+        return normalizedOptions.filter((option) => (
+            normalizeSearchText(option.label).includes(normalizedQuery)
+            || normalizeSearchText(option.value).includes(normalizedQuery)
+        ));
+    }, [normalizedOptions, searchQuery]);
 
     const syncMenuPosition = () => {
         const trigger = triggerRef.current;
@@ -62,6 +81,9 @@ const AppSelect = ({
 
         syncMenuPosition();
         const frameId = window.requestAnimationFrame(syncMenuPosition);
+        const focusFrameId = searchable
+            ? window.requestAnimationFrame(() => searchInputRef.current?.focus())
+            : null;
 
         const handlePointerDown = (event) => {
             if (
@@ -85,17 +107,25 @@ const AppSelect = ({
 
         return () => {
             window.cancelAnimationFrame(frameId);
+            if (focusFrameId) window.cancelAnimationFrame(focusFrameId);
             document.removeEventListener('mousedown', handlePointerDown);
             window.removeEventListener('resize', handleViewportChange);
             window.removeEventListener('scroll', handleViewportChange, true);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isOpen, normalizedOptions]);
+    }, [filteredOptions.length, isOpen, searchable]);
 
     const handleSelect = (nextValue) => {
         onChange?.(nextValue);
+        setSearchQuery('');
         setIsOpen(false);
         triggerRef.current?.focus();
+    };
+
+    const handleToggle = () => {
+        if (disabled) return;
+        setSearchQuery('');
+        setIsOpen((open) => !open);
     };
 
     return (
@@ -110,7 +140,7 @@ const AppSelect = ({
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
                 disabled={disabled}
-                onClick={() => setIsOpen((open) => !open)}
+                onClick={handleToggle}
             >
                 <span className={`app-select__value ${selectedOption ? '' : 'is-placeholder'}`}>
                     {selectedOption?.label || placeholder}
@@ -126,19 +156,47 @@ const AppSelect = ({
                     role="listbox"
                     aria-labelledby={selectId}
                 >
-                    {normalizedOptions.map((option) => (
-                        <button
-                            key={`${option.value}-${option.label}`}
-                            type="button"
-                            role="option"
-                            aria-selected={option.value === normalizedValue}
-                            disabled={option.disabled}
-                            className={`app-select__option ${option.value === normalizedValue ? 'is-selected' : ''}`}
-                            onClick={() => handleSelect(option.value)}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
+                    {searchable && (
+                        <div className="app-select__search">
+                            <input
+                                ref={searchInputRef}
+                                type="text"
+                                className="app-select__search-input"
+                                value={searchQuery}
+                                onChange={(event) => setSearchQuery(event.target.value)}
+                                placeholder={searchPlaceholder}
+                                aria-label={`${ariaLabel || placeholder} buscar`}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Escape') {
+                                        event.preventDefault();
+                                        setSearchQuery('');
+                                        setIsOpen(false);
+                                        triggerRef.current?.focus();
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {filteredOptions.length > 0 ? (
+                        filteredOptions.map((option) => (
+                            <button
+                                key={`${option.value}-${option.label}`}
+                                type="button"
+                                role="option"
+                                aria-selected={option.value === normalizedValue}
+                                disabled={option.disabled}
+                                className={`app-select__option ${option.value === normalizedValue ? 'is-selected' : ''}`}
+                                onClick={() => handleSelect(option.value)}
+                            >
+                                {option.label}
+                            </button>
+                        ))
+                    ) : (
+                        <div className="app-select__empty">
+                            {emptySearchLabel}
+                        </div>
+                    )}
                 </div>,
                 document.body
             )}

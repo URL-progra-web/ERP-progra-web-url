@@ -33,7 +33,7 @@ const BottomNav = ({ onMenuClick }) => {
                         <span className="bnav-icon">
                             <Icon size={20} />
                         </span>
-                        <span>{item.text.split(' ')[0]}</span>
+                        <span className="bottom-nav-label">{item.text}</span>
                     </NavLink>
                 );
             })}
@@ -42,7 +42,7 @@ const BottomNav = ({ onMenuClick }) => {
                 <span className="bnav-icon">
                     <FiMenu size={20} />
                 </span>
-                <span>Menú</span>
+                <span className="bottom-nav-label">Menú</span>
             </button>
         </nav>
     );
