@@ -28,8 +28,8 @@ const ActionBtn = ({ icon: Icon, onClick, title, variant = 'default', disabled =
 
 const TableActions = ({ actions, justify = 'flex-end' }) => (
     <div className="table-actions" style={{ justifyContent: justify }}>
-        {actions.map((action, i) => (
-            <ActionBtn key={i} {...action} />
+        {actions.map((action) => (
+            <ActionBtn key={action.title} {...action} />
         ))}
     </div>
 );

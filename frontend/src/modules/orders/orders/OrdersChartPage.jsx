@@ -202,9 +202,9 @@ const OrdersChartPage = () => {
                         <div className="row g-3 align-items-end">
 
                             <div className="col-12 col-md-auto">
-                                <label className="form-label fw-semibold mb-1" style={{ fontSize: 12 }}>
+                                <p className="form-label fw-semibold mb-1" style={{ fontSize: 12 }}>
                                     Rango de fechas
-                                </label>
+                                </p>
                                 <div className="d-flex gap-2 flex-wrap">
                                     {QUICK_RANGES.map(r => (
                                         <button

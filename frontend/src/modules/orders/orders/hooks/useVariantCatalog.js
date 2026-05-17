@@ -82,7 +82,7 @@ export const useVariantCatalog = () => {
 
     useEffect(() => {
         const loadApplicableConversions = async () => {
-            const baseUomIds = [...new Set(variants.map((variant) => variant.base_uom).filter(Boolean))];
+            const baseUomIds = [...new Set(variants.flatMap((variant) => variant.base_uom ? [variant.base_uom] : []))];
             if (!baseUomIds.length) {
                 setConversionsByBaseUom({});
                 return;

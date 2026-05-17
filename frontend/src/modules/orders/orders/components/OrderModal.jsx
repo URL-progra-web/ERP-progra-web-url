@@ -154,7 +154,7 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             submitDisabled={submitDisabled}
         >
             <div className="mb-3">
-                <label className="form-label">Cliente *</label>
+                <label className="form-label" htmlFor="customerSearchInput">Cliente *</label>
                 <CustomerSearch
                     selectedCustomer={selectedCustomer}
                     onSelect={handleSelectCustomer}
@@ -165,8 +165,9 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             </div>
 
             <div className="mb-3">
-                <label className="form-label">Método de Pago</label>
+                <label className="form-label" htmlFor="orderModalPaymentMethod">Método de Pago</label>
                 <AppSelect
+                    id="orderModalPaymentMethod"
                     name="payment_method_id"
                     value={formData.payment_method_id}
                     onChange={(paymentMethodId) => handleChange({ target: { name: 'payment_method_id', value: paymentMethodId } })}
@@ -182,8 +183,9 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             </div>
 
             <div className="mb-3">
-                <label className="form-label">Dirección de Envío</label>
+                <label className="form-label" htmlFor="orderModalShippingAddress">Dirección de Envío</label>
                 <textarea
+                    id="orderModalShippingAddress"
                     className="form-control"
                     name="shipping_address"
                     value={formData.shipping_address}
@@ -194,8 +196,9 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             </div>
 
             <div className="mb-3">
-                <label className="form-label">Notas</label>
+                <label className="form-label" htmlFor="orderModalNotes">Notas</label>
                 <textarea
+                    id="orderModalNotes"
                     className="form-control"
                     name="notes"
                     value={formData.notes}
@@ -205,11 +208,12 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
             </div>
 
             <div className="mb-0">
-                <label className="form-label">Items del Pedido (Opcional)</label>
+                <p className="form-label mb-2">Items del Pedido (Opcional)</p>
                 <div className="row g-2 align-items-end">
                     <div className="col-6">
-                        <label className="form-label small text-muted mb-1">Variant ID</label>
+                        <label className="form-label small text-muted mb-1" htmlFor="orderModalVariantId">Variant ID</label>
                         <input
+                            id="orderModalVariantId"
                             type="number"
                             min="1"
                             className="form-control"
@@ -219,8 +223,9 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                         />
                     </div>
                     <div className="col-3">
-                        <label className="form-label small text-muted mb-1">Cantidad</label>
+                        <label className="form-label small text-muted mb-1" htmlFor="orderModalItemQty">Cantidad</label>
                         <input
+                            id="orderModalItemQty"
                             type="number"
                             min="1"
                             className="form-control"
@@ -238,7 +243,7 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
                 {!!items.length && (
                     <div className="list-group mt-2">
                         {items.map((item, index) => (
-                            <div key={`${item.variant_id}-${index}`} className="list-group-item d-flex justify-content-between align-items-center">
+                            <div key={item.variant_id} className="list-group-item d-flex justify-content-between align-items-center">
                                 <span className="small">
                                     Variant #{item.variant_id} • Cantidad: {item.quantity}
                                 </span>

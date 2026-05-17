@@ -39,11 +39,11 @@ const DynamicRoutes = ({ role }) => {
                 <Route index element={<OverviewHome />} />
 
                 {/* Inyectamos dinámicamente todas las rutas de las features registradas */}
-                {roleRoutes.map((route, index) => (
-                    <Route 
-                        key={`${role}-${index}`} 
-                        path={route.path} 
-                        element={route.element} 
+                {roleRoutes.map((route) => (
+                    <Route
+                        key={route.path}
+                        path={route.path}
+                        element={route.element}
                     />
                 ))}
 

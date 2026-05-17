@@ -142,7 +142,7 @@ const Sidebar = ({ onItemClick, isCollapsed = false, onToggleCollapse }) => {
 
                     return (
                         <SidebarNavGroup
-                            key={i}
+                            key={group.title}
                             group={group}
                             isCollapsed={isCollapsed}
                             onItemClick={onItemClick}

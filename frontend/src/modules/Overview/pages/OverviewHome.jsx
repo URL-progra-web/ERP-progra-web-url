@@ -45,7 +45,7 @@ const WelcomeCard = ({ user }) => {
                 <h2 style={{
                     margin: '0 0 4px',
                     fontSize: '1.4rem',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '-0.02em',
                     color: 'var(--bs-body-color)',
                 }}>
@@ -128,8 +128,7 @@ const OverviewHome = () => {
     const userRole = user?.role?.name || 'VISITOR';
 
     const allItems = navigationConfig
-        .flatMap(g => g.items)
-        .filter(item => !item.roles || item.roles.includes(userRole))
+        .flatMap(g => g.items.filter(item => !item.roles || item.roles.includes(userRole)))
         .slice(0, 8);
 
     return (
@@ -154,8 +153,8 @@ const OverviewHome = () => {
                         gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
                         gap: '12px',
                     }}>
-                        {allItems.map((item, i) => (
-                            <QuickNavItem key={i} item={item} />
+                        {allItems.map((item) => (
+                            <QuickNavItem key={item.path} item={item} />
                         ))}
                     </div>
                 </div>

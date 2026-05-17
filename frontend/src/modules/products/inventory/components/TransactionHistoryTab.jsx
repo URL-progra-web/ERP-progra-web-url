@@ -49,10 +49,11 @@ const TransactionHistoryTab = ({
     <div>
       <div className="row g-3 mb-3">
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryDateFrom">
             Fecha Desde
           </label>
           <input
+            id="txHistoryDateFrom"
             type="date"
             className="form-control"
             value={dateFromFilter}
@@ -60,10 +61,11 @@ const TransactionHistoryTab = ({
           />
         </div>
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryDateTo">
             Fecha Hasta
           </label>
           <input
+            id="txHistoryDateTo"
             type="date"
             className="form-control"
             value={dateToFilter}
@@ -71,10 +73,11 @@ const TransactionHistoryTab = ({
           />
         </div>
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryVariantFilter">
             Filtrar por Variante (SKU)
           </label>
           <AppSelect
+            id="txHistoryVariantFilter"
             value={variantFilter}
             onChange={setVariantFilter}
             options={[
@@ -87,10 +90,11 @@ const TransactionHistoryTab = ({
           />
         </div>
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryTypeFilter">
             Filtrar por Tipo de Transacción
           </label>
           <AppSelect
+            id="txHistoryTypeFilter"
             value={typeFilter}
             onChange={setTypeFilter}
             options={[

@@ -10,21 +10,23 @@ export const buildPreparedItems = ({
     getLabel,
     getIsLeaf,
 }) => {
-    return items
-        .map((item) => ({
+    return items.flatMap((item) => {
+        const id = normalizeId(getId(item));
+        if (id === null) return [];
+        return [{
             raw: item,
-            id: normalizeId(getId(item)),
+            id,
             parentId: normalizeId(getParentId(item)),
             label: getLabel(item) || '',
             isLeaf: Boolean(getIsLeaf(item)),
-        }))
-        .filter((item) => item.id !== null);
+        }];
+    });
 };
 
 export const buildBlockedIds = (excludeIds = []) => {
     return new Set(
-        (excludeIds || [])
-            .filter((id) => id !== null && id !== undefined && id !== '')
-            .map((id) => String(id)),
+        (excludeIds || []).flatMap((id) =>
+            (id !== null && id !== undefined && id !== '') ? [String(id)] : []
+        ),
     );
 };

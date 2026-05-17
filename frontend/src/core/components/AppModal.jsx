@@ -50,7 +50,9 @@ const AppModal = ({
 
     return ReactDOM.createPortal(
         <div
+            role="presentation"
             onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
+            onKeyDown={(e) => { if (e.key === 'Escape') onClose?.(); }}
             className="app-modal-backdrop"
         >
             <div className="app-modal-dialog" style={{ maxWidth }}>

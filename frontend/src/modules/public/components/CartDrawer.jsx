@@ -17,7 +17,7 @@ export const CartDrawer = ({
 
   return (
     <div className="store-cart-sheet">
-      <div className="store-cart-sheet__backdrop" onClick={onClose} />
+      <div className="store-cart-sheet__backdrop" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose?.(); }} />
 
       <aside className="store-cart-sheet__panel" aria-label="Carrito de compras">
         <div className="store-cart-sheet__header">
