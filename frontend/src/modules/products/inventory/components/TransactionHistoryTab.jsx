@@ -1,5 +1,6 @@
 import React from "react";
 import { FiEye } from "react-icons/fi";
+import { AppSelect } from "~/core/components";
 import TableActions from "~/core/components/TableActions";
 
 const TransactionHistoryTab = ({
@@ -73,35 +74,33 @@ const TransactionHistoryTab = ({
           <label className="form-label small text-muted text-uppercase">
             Filtrar por Variante (SKU)
           </label>
-          <select
-            className="form-select"
+          <AppSelect
             value={variantFilter}
-            onChange={(e) => setVariantFilter(e.target.value)}
-          >
-            <option value="">Todas las variantes</option>
-            {variants.map((variant) => (
-              <option key={variant.id} value={variant.id}>
-                {variant.sku} - {variant.product_name || "N/A"}
-              </option>
-            ))}
-          </select>
+            onChange={setVariantFilter}
+            options={[
+              { value: "", label: "Todas las variantes" },
+              ...variants.map((variant) => ({
+                value: variant.id,
+                label: `${variant.sku} - ${variant.product_name || "N/A"}`,
+              })),
+            ]}
+          />
         </div>
         <div className="col-md-3">
           <label className="form-label small text-muted text-uppercase">
             Filtrar por Tipo de Transacción
           </label>
-          <select
-            className="form-select"
+          <AppSelect
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="">Todos los tipos</option>
-            {transactionTypes.map((type) => (
-              <option key={type.name} value={type.name}>
-                {type.name} ({type.factor === 1 ? "Entrada" : "Salida"})
-              </option>
-            ))}
-          </select>
+            onChange={setTypeFilter}
+            options={[
+              { value: "", label: "Todos los tipos" },
+              ...transactionTypes.map((type) => ({
+                value: type.name,
+                label: `${type.name} (${type.factor === 1 ? "Entrada" : "Salida"})`,
+              })),
+            ]}
+          />
         </div>
       </div>
 

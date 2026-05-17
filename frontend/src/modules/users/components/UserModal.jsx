@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 
 const UserModal = ({ user, roles, onClose, onSave }) => {
     const isEditing = !!user;
@@ -103,19 +104,16 @@ const UserModal = ({ user, roles, onClose, onSave }) => {
                 
                 <div className="mb-3">
                     <label className="form-label" htmlFor="userRoleSelect">Rol de Acceso *</label>
-                    <select 
+                    <AppSelect
                         id="userRoleSelect"
                         name="role_id"
-                        autoComplete="off"
-                        className="form-select" 
                         value={formData.role_id}
-                        onChange={handleChange}
-                    >
-                        <option value="">Selecciona un rol...</option>
-                        {roles.map(role => (
-                            <option key={role.id} value={role.id}>{role.name}</option>
-                        ))}
-                    </select>
+                        onChange={(roleId) => handleChange({ target: { name: 'role_id', value: roleId } })}
+                        options={[
+                            { value: '', label: 'Selecciona un rol...' },
+                            ...roles.map(role => ({ value: role.id, label: role.name })),
+                        ]}
+                    />
                 </div>
                 
                 <div className="mb-3">

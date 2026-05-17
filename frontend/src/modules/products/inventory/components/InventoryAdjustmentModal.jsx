@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 import { inventoryService } from '../services/inventoryService';
 
 const InventoryAdjustmentModal = ({
@@ -155,23 +156,16 @@ const InventoryAdjustmentModal = ({
                         Cargando variantes...
                     </div>
                 ) : hasVariants ? (
-                    <select
+                    <AppSelect
                         id="inventoryAdjustmentVariantSelect"
                         name="inventory_adjustment_variant"
-                        autoComplete="off"
-                        className="form-select"
                         value={selectedVariant}
-                        onChange={(e) => setSelectedVariant(e.target.value)}
-                    >
-                        {variants.map(v => (
-                            <option key={v.id} value={v.id}>
-                                {v.sku}
-                                {v.size_name ? ` | Talla: ${v.size_name}` : ''}
-                                {v.color_name ? ` | Color: ${v.color_name}` : ''}
-                                {' | Stock: '}{v.quantity_available ?? 0}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={setSelectedVariant}
+                        options={variants.map(v => ({
+                            value: v.id,
+                            label: `${v.sku}${v.size_name ? ` | Talla: ${v.size_name}` : ''}${v.color_name ? ` | Color: ${v.color_name}` : ''} | Stock: ${v.quantity_available ?? 0}`,
+                        }))}
+                    />
                 ) : (
                     <div className="form-control text-muted">
                         Este producto no tiene variantes configuradas
@@ -193,20 +187,16 @@ const InventoryAdjustmentModal = ({
                     {isAddStock ? 'Tipo de Entrada' : 'Tipo de Salida'}
                 </label>
                 {filteredTypes.length > 0 ? (
-                    <select
+                    <AppSelect
                         id="inventoryAdjustmentTypeSelect"
                         name="inventory_adjustment_type"
-                        autoComplete="off"
-                        className="form-select"
                         value={selectedType}
-                        onChange={(e) => setSelectedType(e.target.value)}
-                    >
-                        {filteredTypes.map(t => (
-                            <option key={t.name} value={t.name}>
-                                {t.name} {t.description ? `- ${t.description}` : ''}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={setSelectedType}
+                        options={filteredTypes.map(t => ({
+                            value: t.name,
+                            label: `${t.name} ${t.description ? `- ${t.description}` : ''}`,
+                        }))}
+                    />
                 ) : (
                     <div className="form-control text-danger">
                         No hay tipos de {isAddStock ? 'entrada' : 'salida'} configurados.

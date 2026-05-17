@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 import { CustomerSearch } from './CustomerSearch';
 import { normalizeList } from '../helpers/normalizeList';
 import { orderService } from '~/modules/orders/orders/services/orderService';
@@ -165,20 +166,19 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, isSubmitting, initialCus
 
             <div className="mb-3">
                 <label className="form-label">Método de Pago</label>
-                <select
-                    className="form-select"
+                <AppSelect
                     name="payment_method_id"
                     value={formData.payment_method_id}
-                    onChange={handleChange}
+                    onChange={(paymentMethodId) => handleChange({ target: { name: 'payment_method_id', value: paymentMethodId } })}
                     disabled={isLoading}
-                >
-                    <option value="">(Ninguno / Por definir)</option>
-                    {paymentMethods.map(pm => (
-                        <option key={pm.id} value={pm.id}>
-                            {pm.name || pm.code || `Método #${pm.id}`}
-                        </option>
-                    ))}
-                </select>
+                    options={[
+                        { value: '', label: '(Ninguno / Por definir)' },
+                        ...paymentMethods.map(pm => ({
+                            value: pm.id,
+                            label: pm.name || pm.code || `Método #${pm.id}`,
+                        })),
+                    ]}
+                />
             </div>
 
             <div className="mb-3">

@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
+import { AppSelect } from '~/core/components';
 import { useBillingReports } from '../hooks/useBillingReports';
 import { userService } from '~/modules/users/services/userService';
 import { entrepreneurService } from '~/modules/crm/entrepreneurs/services/entrepreneurService';
@@ -232,31 +233,27 @@ const BillingReportsPage = () => {
                             </div>
                             <div className="col-md-3">
                                 <label htmlFor="billing-report-entrepreneur" className="form-label small text-muted">Emprendedor</label>
-                                <select
+                                <AppSelect
                                     id="billing-report-entrepreneur"
-                                    className="form-select form-select-sm"
                                     value={entrepreneurId}
-                                    onChange={(e) => setEntrepreneurId(e.target.value)}
-                                >
-                                    <option value="">Todos los emprendedores</option>
-                                    {entrepreneurs.map(e => (
-                                        <option key={e.id} value={e.id}>{e.company_name}</option>
-                                    ))}
-                                </select>
+                                    onChange={setEntrepreneurId}
+                                    options={[
+                                        { value: '', label: 'Todos los emprendedores' },
+                                        ...entrepreneurs.map(e => ({ value: e.id, label: e.company_name })),
+                                    ]}
+                                />
                             </div>
                             <div className="col-md-3">
                                 <label htmlFor="billing-report-user" className="form-label small text-muted">Usuario</label>
-                                <select
+                                <AppSelect
                                     id="billing-report-user"
-                                    className="form-select form-select-sm"
                                     value={userId}
-                                    onChange={(e) => setUserId(e.target.value)}
-                                >
-                                    <option value="">Todos los usuarios</option>
-                                    {users.map(u => (
-                                        <option key={u.id} value={u.id}>{u.name}</option>
-                                    ))}
-                                </select>
+                                    onChange={setUserId}
+                                    options={[
+                                        { value: '', label: 'Todos los usuarios' },
+                                        ...users.map(u => ({ value: u.id, label: u.name })),
+                                    ]}
+                                />
                             </div>
                             <div className="col-md-2 d-flex align-items-end">
                                 <button

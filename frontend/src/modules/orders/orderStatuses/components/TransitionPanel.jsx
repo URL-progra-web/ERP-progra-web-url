@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { FiSend, FiShuffle, FiUser, FiPhone, FiMapPin, FiDollarSign } from 'react-icons/fi';
 import AppCard from '~/core/components/AppCard';
+import { AppSelect } from '~/core/components';
 import { orderService } from '../../orders/services/orderService';
 
 export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflow }) => {
@@ -156,19 +157,15 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                         )}
                         <div className="col-md-4">
                             <label className="form-label small text-muted">Nuevo estado *</label>
-                            <select
-                                className="form-select text-uppercase"
+                            <AppSelect
                                 name="target_status"
                                 value={form.target_status}
-                                onChange={handleChange}
-                            >
-                                <option value="">Selecciona...</option>
-                                {statusOptions.map((status) => (
-                                    <option key={status.value} value={status.value}>
-                                        {status.label}
-                                    </option>
-                                ))}
-                            </select>
+                                onChange={(targetStatus) => handleChange({ target: { name: 'target_status', value: targetStatus } })}
+                                options={[
+                                    { value: '', label: 'Selecciona...' },
+                                    ...statusOptions,
+                                ]}
+                            />
                         </div>
                         <div className="col-md-4">
                             <label className="form-label small text-muted">Notas</label>

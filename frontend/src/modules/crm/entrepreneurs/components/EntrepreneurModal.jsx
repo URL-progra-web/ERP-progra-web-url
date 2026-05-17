@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 
 const DEFAULT_FORM = {
     company_name: '',
@@ -122,22 +123,17 @@ export const EntrepreneurModal = ({ entrepreneur, users, onSave, onClose }) => {
             </div>
             <div className="mb-3">
                 <label className="form-label" htmlFor="entrepreneurUserSelect">Usuario asignado</label>
-                <select
+                <AppSelect
                     id="entrepreneurUserSelect"
-                    className="form-select"
                     name="user_id"
-                    autoComplete="off"
                     value={form.user_id}
-                    onChange={handleChange}
+                    onChange={(userId) => handleChange({ target: { name: 'user_id', value: userId } })}
                     disabled
-                >
-                    <option value="">Sin asignar</option>
-                    {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                            {user.name} ({user.email})
-                        </option>
-                    ))}
-                </select>
+                    options={[
+                        { value: '', label: 'Sin asignar' },
+                        ...users.map((user) => ({ value: user.id, label: `${user.name} (${user.email})` })),
+                    ]}
+                />
                 <div className="alert alert-warning py-2 px-3 mt-2 mb-0 small" role="alert">
                     La asignación de usuarios no se ha implementado aún.
                 </div>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { FiPlus, FiShoppingCart } from 'react-icons/fi';
+import { AppSelect } from '~/core/components';
 
 const formatMoney = (value) => `Q ${Number(value ?? 0).toLocaleString(undefined, {
     minimumFractionDigits: 2,
@@ -79,18 +80,14 @@ export const OrderCatalogTable = ({ variants, isLoading, onAdd, cartItems = [], 
                                     <label className="visually-hidden" htmlFor={`orderCreateVariantUom-${variant.id}`}>
                                         Seleccionar UOM para {variant.product_name || `variante ${variant.id}`}
                                     </label>
-                                    <select
+                                    <AppSelect
                                         id={`orderCreateVariantUom-${variant.id}`}
                                         name={`order_create_variant_uom_${variant.id}`}
-                                        autoComplete="off"
-                                        className="form-select form-select-sm mb-2"
+                                        className="mb-2"
                                         value={selectedUomId || ''}
-                                        onChange={(e) => setSelectedUoms((prev) => ({ ...prev, [variant.id]: e.target.value }))}
-                                    >
-                                        {availableUoms.map((uom) => (
-                                            <option key={`${variant.id}-${uom.id}`} value={uom.id}>{uom.name}</option>
-                                        ))}
-                                    </select>
+                                        onChange={(uomId) => setSelectedUoms((prev) => ({ ...prev, [variant.id]: uomId }))}
+                                        options={availableUoms.map((uom) => ({ value: uom.id, label: uom.name }))}
+                                    />
                                     <div className="small text-muted mb-2 text-start">
                                         UOM de operacion. 1 {selectedUom?.name || variant.base_uom_name} = {selectedMultiplier} {variant.base_uom_name || 'unidad base'}.
                                     </div>

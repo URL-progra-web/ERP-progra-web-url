@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiPlus, FiSave, FiTrash2, FiClock } from 'react-icons/fi';
 import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
+import { AppSelect } from '~/core/components';
 import { useAuth } from '~/core/auth/AuthContext';
 import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import { useOrders } from './hooks/useOrders';
@@ -328,20 +329,17 @@ const OrderDetailPage = () => {
 
                         <div className="col-md-6">
                             <label className="form-label" htmlFor="orderDetailPaymentMethod">Método de Pago</label>
-                            <select
+                            <AppSelect
                                 id="orderDetailPaymentMethod"
-                                className="form-select"
                                 name="payment_method_id"
-                                autoComplete="off"
                                 value={formData.payment_method_id}
-                                onChange={handleChange}
+                                onChange={(paymentMethodId) => handleChange({ target: { name: 'payment_method_id', value: paymentMethodId } })}
                                 disabled={!canMutateOrder}
-                            >
-                                <option value="">(Ninguno / Por definir)</option>
-                                {catalogs.payment_methods.map((pm) => (
-                                    <option key={pm.id} value={pm.id}>{pm.name}</option>
-                                ))}
-                            </select>
+                                options={[
+                                    { value: '', label: '(Ninguno / Por definir)' },
+                                    ...catalogs.payment_methods.map((pm) => ({ value: pm.id, label: pm.name })),
+                                ]}
+                            />
                         </div>
 
                         <div className="col-md-6">

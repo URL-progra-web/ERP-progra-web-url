@@ -5,6 +5,7 @@ import PageHeader from '~/core/components/PageHeader';
 import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
 import AppPagination from '~/core/components/AppPagination';
+import { AppSelect } from '~/core/components';
 import { useAuth } from '~/core/auth/AuthContext';
 import { getDashboardPath } from '~/core/registry/dashboardPaths';
 import { CustomerSearch } from './components/CustomerSearch';
@@ -273,20 +274,20 @@ const OrderCreatePage = () => {
 
                                     <div>
                                         <label className="form-label" htmlFor="orderCreatePaymentMethod">Metodo de Pago</label>
-                                        <select
+                                        <AppSelect
                                             id="orderCreatePaymentMethod"
-                                            className="form-select"
                                             name="payment_method_id"
-                                            autoComplete="off"
                                             value={formData.payment_method_id}
-                                            onChange={handleChange}
+                                            onChange={(paymentMethodId) => handleChange({ target: { name: 'payment_method_id', value: paymentMethodId } })}
                                             disabled={isLoadingCatalogs}
-                                        >
-                                            <option value="">(Ninguno / Por definir)</option>
-                                            {paymentMethods.map((pm) => (
-                                                <option key={pm.id} value={pm.id}>{pm.name || pm.code || `Metodo #${pm.id}`}</option>
-                                            ))}
-                                        </select>
+                                            options={[
+                                                { value: '', label: '(Ninguno / Por definir)' },
+                                                ...paymentMethods.map((pm) => ({
+                                                    value: pm.id,
+                                                    label: pm.name || pm.code || `Metodo #${pm.id}`,
+                                                })),
+                                            ]}
+                                        />
                                     </div>
 
                                     <div>

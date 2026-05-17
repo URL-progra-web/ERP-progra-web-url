@@ -8,6 +8,8 @@ const OrderDetailPage = React.lazy(() => import('./orders/OrderDetailPage'));
 const OrderCreatePage = React.lazy(() => import('./orders/OrderCreatePage'));
 const OrdersChartPage = React.lazy(() => import('./orders/OrdersChartPage'));
 export const ordersFeature = {
+    id: 'orders',
+    group: 'Pedidos',
     items: [
         {
             text: 'Pedidos',

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
+import { AppSelect } from '~/core/components';
 
 const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, onLeafChange }) => {
     const handleSubmit = (e) => {
@@ -35,18 +36,18 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
                     </form>
                 </div>
                 <div className="col-md-auto">
-                    <select
+                    <AppSelect
                         id="categoriesLeafFilter"
                         name="categories_leaf_filter"
-                        aria-label="Filtrar categorías por tipo"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar categorías por tipo"
                         value={leafFilter}
-                        onChange={(e) => onLeafChange(e.target.value)}
-                    >
-                        <option value="">Todas</option>
-                        <option value="leaf">Solo finales (se asignan a productos)</option>
-                        <option value="parent">Solo agrupadoras (contienen subcategorías)</option>
-                    </select>
+                        onChange={onLeafChange}
+                        options={[
+                            { value: '', label: 'Todas' },
+                            { value: 'leaf', label: 'Solo finales (se asignan a productos)' },
+                            { value: 'parent', label: 'Solo agrupadoras (contienen subcategorías)' },
+                        ]}
+                    />
                 </div>
             </div>
         </div>

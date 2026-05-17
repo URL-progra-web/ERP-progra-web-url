@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiSearch, FiRefreshCcw } from 'react-icons/fi';
+import { AppSelect } from '~/core/components';
 
 const VariantsFilters = ({
     searchInput,
@@ -60,120 +61,101 @@ const VariantsFilters = ({
                 <div className="row g-3">
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsProductFilter">Producto</label>
-                        <select
+                        <AppSelect
                             id="variantsProductFilter"
                             name="variants_product_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={productFilter}
-                            onChange={(e) => onProductChange(e.target.value)}
-                        >
-                            <option value="">Todos</option>
-                            {products.map(product => (
-                                <option key={product.id} value={product.id}>{product.name}</option>
-                            ))}
-                        </select>
+                            onChange={onProductChange}
+                            options={[
+                                { value: '', label: 'Todos' },
+                                ...products.map(product => ({ value: product.id, label: product.name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsColorFilter">Color</label>
-                        <select
+                        <AppSelect
                             id="variantsColorFilter"
                             name="variants_color_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={colorFilter}
-                            onChange={(e) => onColorChange(e.target.value)}
-                        >
-                            <option value="">Todos</option>
-                            {colors.map(color => (
-                                <option key={color.id} value={color.id}>{color.name}</option>
-                            ))}
-                        </select>
+                            onChange={onColorChange}
+                            options={[
+                                { value: '', label: 'Todos' },
+                                ...colors.map(color => ({ value: color.id, label: color.name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsEntrepreneurFilter">Emprendedor/Proveedor</label>
-                        <select
+                        <AppSelect
                             id="variantsEntrepreneurFilter"
                             name="variants_entrepreneur_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={entrepreneurFilter}
-                            onChange={(e) => onEntrepreneurChange(e.target.value)}
-                        >
-                            <option value="">Todos</option>
-                            {entrepreneurs.map((entrepreneur) => (
-                                <option key={entrepreneur.id} value={entrepreneur.id}>{entrepreneur.company_name}</option>
-                            ))}
-                        </select>
+                            onChange={onEntrepreneurChange}
+                            options={[
+                                { value: '', label: 'Todos' },
+                                ...entrepreneurs.map((entrepreneur) => ({ value: entrepreneur.id, label: entrepreneur.company_name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsBusinessUnitFilter">Sede</label>
-                        <select
+                        <AppSelect
                             id="variantsBusinessUnitFilter"
                             name="variants_business_unit_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={businessUnitFilter}
-                            onChange={(e) => onBusinessUnitChange(e.target.value)}
-                        >
-                            <option value="">Todas</option>
-                            {businessUnits.map((businessUnit) => (
-                                <option key={businessUnit.id} value={businessUnit.id}>{businessUnit.name}</option>
-                            ))}
-                        </select>
+                            onChange={onBusinessUnitChange}
+                            options={[
+                                { value: '', label: 'Todas' },
+                                ...businessUnits.map((businessUnit) => ({ value: businessUnit.id, label: businessUnit.name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsSizeFilter">Talla</label>
-                        <select
+                        <AppSelect
                             id="variantsSizeFilter"
                             name="variants_size_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={sizeFilter}
-                            onChange={(e) => onSizeChange(e.target.value)}
-                        >
-                            <option value="">Todas</option>
-                            {sizes.map(size => (
-                                <option key={size.id} value={size.id}>{size.name}</option>
-                            ))}
-                        </select>
+                            onChange={onSizeChange}
+                            options={[
+                                { value: '', label: 'Todas' },
+                                ...sizes.map(size => ({ value: size.id, label: size.name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsUomFilter">UOM base</label>
-                        <select
+                        <AppSelect
                             id="variantsUomFilter"
                             name="variants_uom_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={uomFilter}
-                            onChange={(e) => onUomChange(e.target.value)}
-                        >
-                            <option value="">Todas</option>
-                            {uoms.map(uom => (
-                                <option key={uom.id} value={uom.id}>{uom.name}</option>
-                            ))}
-                        </select>
+                            onChange={onUomChange}
+                            options={[
+                                { value: '', label: 'Todas' },
+                                ...uoms.map(uom => ({ value: uom.id, label: uom.name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4">
                         <label className="form-label small text-muted mb-1" htmlFor="variantsActiveFilter">Estado</label>
-                        <select
+                        <AppSelect
                             id="variantsActiveFilter"
                             name="variants_active_filter"
-                            autoComplete="off"
-                            className="form-select bg-body shadow-none text-body"
                             value={activeFilter}
-                            onChange={(e) => onActiveChange(e.target.value)}
-                        >
-                            <option value="">Todas</option>
-                            <option value="true">Solo activas</option>
-                            <option value="false">Solo inactivas</option>
-                        </select>
+                            onChange={onActiveChange}
+                            options={[
+                                { value: '', label: 'Todas' },
+                                { value: 'true', label: 'Solo activas' },
+                                { value: 'false', label: 'Solo inactivas' },
+                            ]}
+                        />
                     </div>
 
                     <div className="col-12 col-md-6 col-xl-4 d-flex align-items-end">

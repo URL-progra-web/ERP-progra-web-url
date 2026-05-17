@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiEdit2, FiTrash2, FiRefreshCw, FiArrowRight } from 'react-icons/fi';
+import { AppSelect } from '~/core/components';
 import TableActions from '~/core/components/TableActions';
 
 /**
@@ -20,37 +21,31 @@ export function ConversionsTab({
             <div className="px-4 py-3 border-bottom d-flex gap-3 flex-wrap align-items-end">
                 <div style={{ minWidth: 200 }}>
                     <label className="form-label small fw-semibold mb-1" htmlFor="conversionsFromUomFilter">UOM Origen</label>
-                    <select
+                    <AppSelect
                         id="conversionsFromUomFilter"
                         name="conversions_from_uom_filter"
-                        autoComplete="off"
-                        aria-label="Filtrar conversiones por UOM origen"
-                        className="form-select form-select-sm"
+                        ariaLabel="Filtrar conversiones por UOM origen"
                         value={fromUomFilter}
-                        onChange={e => setFromUomFilter(e.target.value)}
-                    >
-                        <option value="">Todas</option>
-                        {uoms.map(u => (
-                            <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
-                        ))}
-                    </select>
+                        onChange={setFromUomFilter}
+                        options={[
+                            { value: '', label: 'Todas' },
+                            ...uoms.map(u => ({ value: u.id, label: `${u.name} (${u.code})` })),
+                        ]}
+                    />
                 </div>
                 <div style={{ minWidth: 200 }}>
                     <label className="form-label small fw-semibold mb-1" htmlFor="conversionsToUomFilter">UOM Destino</label>
-                    <select
+                    <AppSelect
                         id="conversionsToUomFilter"
                         name="conversions_to_uom_filter"
-                        autoComplete="off"
-                        aria-label="Filtrar conversiones por UOM destino"
-                        className="form-select form-select-sm"
+                        ariaLabel="Filtrar conversiones por UOM destino"
                         value={toUomFilter}
-                        onChange={e => setToUomFilter(e.target.value)}
-                    >
-                        <option value="">Todas</option>
-                        {uoms.map(u => (
-                            <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
-                        ))}
-                    </select>
+                        onChange={setToUomFilter}
+                        options={[
+                            { value: '', label: 'Todas' },
+                            ...uoms.map(u => ({ value: u.id, label: `${u.name} (${u.code})` })),
+                        ]}
+                    />
                 </div>
                 {hasFilter && (
                     <button

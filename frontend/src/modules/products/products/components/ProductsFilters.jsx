@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
-import { RecursiveHierarchySelector } from '~/core/components';
+import { AppSelect, RecursiveHierarchySelector } from '~/core/components';
 
 const ProductsFilters = ({ 
     searchInput, onSearchChange, onSearch, 
@@ -41,47 +41,41 @@ const ProductsFilters = ({
                             Buscar
                         </button>
                     </form>
-                    <select
+                    <AppSelect
                         id="productsEntrepreneurFilter"
                         name="products_entrepreneur_filter"
-                        aria-label="Filtrar productos por emprendedor"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar productos por emprendedor"
                         value={entrepreneurFilter}
-                        onChange={(e) => onEntrepreneurChange(e.target.value)}
-                    >
-                        <option value="">Todos los emprendedores</option>
-                        {entrepreneurs.map(ent => (
-                            <option key={ent.id} value={ent.id}>{ent.company_name}</option>
-                        ))}
-                    </select>
+                        onChange={onEntrepreneurChange}
+                        options={[
+                            { value: '', label: 'Todos los emprendedores' },
+                            ...entrepreneurs.map(ent => ({ value: ent.id, label: ent.company_name })),
+                        ]}
+                    />
 
-                    <select
+                    <AppSelect
                         id="productsBusinessUnitFilter"
                         name="products_business_unit_filter"
-                        aria-label="Filtrar productos por sede"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar productos por sede"
                         value={businessUnitFilter}
-                        onChange={(e) => onBusinessUnitChange(e.target.value)}
-                    >
-                        <option value="">Todas las sedes</option>
-                        {businessUnits.map(bu => (
-                            <option key={bu.id} value={bu.id}>{bu.name}</option>
-                        ))}
-                    </select>
+                        onChange={onBusinessUnitChange}
+                        options={[
+                            { value: '', label: 'Todas las sedes' },
+                            ...businessUnits.map(bu => ({ value: bu.id, label: bu.name })),
+                        ]}
+                    />
 
-                    <select
+                    <AppSelect
                         id="productsUomFilter"
                         name="products_uom_filter"
-                        aria-label="Filtrar productos por unidad base"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar productos por unidad base"
                         value={baseUomFilter}
-                        onChange={(e) => onBaseUomChange(e.target.value)}
-                    >
-                        <option value="">Todas las UOM base</option>
-                        {uoms.map((uom) => (
-                            <option key={uom.id} value={uom.id}>{uom.name}</option>
-                        ))}
-                    </select>
+                        onChange={onBaseUomChange}
+                        options={[
+                            { value: '', label: 'Todas las UOM base' },
+                            ...uoms.map((uom) => ({ value: uom.id, label: uom.name })),
+                        ]}
+                    />
                 </div>
 
                 <div className="col-12 col-lg-7 d-flex justify-content-lg-end">

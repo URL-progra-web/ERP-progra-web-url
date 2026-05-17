@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
 import AppAlert from '~/core/components/AppAlert';
+import { AppSelect } from '~/core/components';
 import { FiTrash2 } from 'react-icons/fi';
 
 const TransactionTypeModal = ({
@@ -101,18 +102,17 @@ const TransactionTypeModal = ({
                     <label className="form-label fw-semibold" htmlFor="transactionTypeFactorSelect">
                         Factor <span className="text-danger">*</span>
                     </label>
-                    <select
+                    <AppSelect
                         id="transactionTypeFactorSelect"
                         name="transaction_type_factor"
-                        autoComplete="off"
-                        className="form-select"
                         value={factor}
-                        onChange={(e) => setFactor(e.target.value)}
-                    >
-                        <option value="">Seleccione...</option>
-                        <option value="1">+1 (Entrada de stock)</option>
-                        <option value="-1">-1 (Salida de stock)</option>
-                    </select>
+                        onChange={setFactor}
+                        options={[
+                            { value: '', label: 'Seleccione...' },
+                            { value: '1', label: '+1 (Entrada de stock)' },
+                            { value: '-1', label: '-1 (Salida de stock)' },
+                        ]}
+                    />
                     <small className="text-muted">
                         +1 para entradas, -1 para salidas de inventario
                     </small>

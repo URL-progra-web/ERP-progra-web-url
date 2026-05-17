@@ -7,8 +7,8 @@ import TableActions from '~/core/components/TableActions';
  */
 export function UomsTable({ uoms, isLoading, onEdit, onDelete }) {
     return (
-        <div className="table-responsive bg-white text-dark rounded-3" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <table className="table table-hover mb-0 align-middle text-dark" style={{ minWidth: '100%' }}>
+        <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table className="table table-hover mb-0 align-middle" style={{ minWidth: '100%' }}>
                 <thead className="bg-body-tertiary text-muted small text-uppercase">
                     <tr>
                         <th className="border-0 px-4 py-3">Código</th>

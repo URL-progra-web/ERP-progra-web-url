@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
-import { RecursiveHierarchySelector } from '~/core/components';
+import { AppSelect, RecursiveHierarchySelector } from '~/core/components';
 
 const emptyForm = {
     name: '',
@@ -247,19 +247,16 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
 
                 <div className="mb-3">
                     <label className="form-label fw-semibold" htmlFor="productEntrepreneurSelect">Emprendedor / Proveedor *</label>
-                    <select
+                    <AppSelect
                         id="productEntrepreneurSelect"
                         name="entrepreneur"
-                        autoComplete="off"
-                        className="form-select"
                         value={formData.entrepreneur}
-                        onChange={handleChange}
-                    >
-                        <option value="">Seleccionar...</option>
-                        {entrepreneurs.map(e => (
-                            <option key={e.id} value={e.id}>{e.company_name}</option>
-                        ))}
-                    </select>
+                        onChange={(entrepreneurId) => handleChange({ target: { name: 'entrepreneur', value: entrepreneurId } })}
+                        options={[
+                            { value: '', label: 'Seleccionar...' },
+                            ...entrepreneurs.map(e => ({ value: e.id, label: e.company_name })),
+                        ]}
+                    />
                     <div className="form-text">
                         Persona o empresa que suministra este producto.
                     </div>
@@ -267,19 +264,16 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
 
                 <div className="mb-3">
                     <label className="form-label fw-semibold" htmlFor="productBaseUomSelect">Unidad base *</label>
-                    <select
+                    <AppSelect
                         id="productBaseUomSelect"
                         name="base_uom"
-                        autoComplete="off"
-                        className="form-select"
                         value={formData.base_uom}
-                        onChange={handleChange}
-                    >
-                        <option value="">Seleccionar...</option>
-                        {uoms.map((uom) => (
-                            <option key={uom.id} value={uom.id}>{uom.name}</option>
-                        ))}
-                    </select>
+                        onChange={(uomId) => handleChange({ target: { name: 'base_uom', value: uomId } })}
+                        options={[
+                            { value: '', label: 'Seleccionar...' },
+                            ...uoms.map((uom) => ({ value: uom.id, label: uom.name })),
+                        ]}
+                    />
                     <div className="form-text">
                         Unidad atómica del stock. Las conversiones de venta y kardex se calculan desde esta base.
                     </div>
@@ -287,19 +281,16 @@ const ProductModal = ({ product, categories, entrepreneurs, businessUnits, uoms,
 
                 <div className="mb-3">
                     <label className="form-label fw-semibold" htmlFor="productBusinessUnitSelect">Sede / Punto de venta *</label>
-                    <select
+                    <AppSelect
                         id="productBusinessUnitSelect"
                         name="business_unit"
-                        autoComplete="off"
-                        className="form-select"
                         value={formData.business_unit}
-                        onChange={handleChange}
-                    >
-                        <option value="">Seleccionar...</option>
-                        {businessUnits.map(bu => (
-                            <option key={bu.id} value={bu.id}>{bu.name}</option>
-                        ))}
-                    </select>
+                        onChange={(businessUnitId) => handleChange({ target: { name: 'business_unit', value: businessUnitId } })}
+                        options={[
+                            { value: '', label: 'Seleccionar...' },
+                            ...businessUnits.map(bu => ({ value: bu.id, label: bu.name })),
+                        ]}
+                    />
                     <div className="form-text">
                         Lugar donde se vende o almacena este producto.
                     </div>

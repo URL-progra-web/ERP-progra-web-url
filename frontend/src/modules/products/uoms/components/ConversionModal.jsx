@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 
 export function ConversionModal({ conversion, uoms, onClose, onSave }) {
     const [fromUomId, setFromUomId] = useState(conversion?.from_uom_id?.toString() ?? '');
@@ -47,37 +48,29 @@ export function ConversionModal({ conversion, uoms, onClose, onSave }) {
             {error && <div className="alert alert-danger py-2 small">{error}</div>}
             <div className="mb-3">
                 <label className="form-label fw-semibold small" htmlFor="conversionFromUomSelect">UOM Origen <span className="text-danger">*</span></label>
-                <select
+                <AppSelect
                     id="conversionFromUomSelect"
                     name="conversion_from_uom"
-                    autoComplete="off"
-                    className="form-select"
                     value={fromUomId}
-                    onChange={e => setFromUomId(e.target.value)}
-                    required
-                >
-                    <option value="">Seleccionar...</option>
-                    {uoms.map(u => (
-                        <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
-                    ))}
-                </select>
+                    onChange={setFromUomId}
+                    options={[
+                        { value: '', label: 'Seleccionar...' },
+                        ...uoms.map(u => ({ value: u.id, label: `${u.name} (${u.code})` })),
+                    ]}
+                />
             </div>
             <div className="mb-3">
                 <label className="form-label fw-semibold small" htmlFor="conversionToUomSelect">UOM Destino <span className="text-danger">*</span></label>
-                <select
+                <AppSelect
                     id="conversionToUomSelect"
                     name="conversion_to_uom"
-                    autoComplete="off"
-                    className="form-select"
                     value={toUomId}
-                    onChange={e => setToUomId(e.target.value)}
-                    required
-                >
-                    <option value="">Seleccionar...</option>
-                    {uoms.map(u => (
-                        <option key={u.id} value={u.id}>{u.name} ({u.code})</option>
-                    ))}
-                </select>
+                    onChange={setToUomId}
+                    options={[
+                        { value: '', label: 'Seleccionar...' },
+                        ...uoms.map(u => ({ value: u.id, label: `${u.name} (${u.code})` })),
+                    ]}
+                />
             </div>
             <div className="mb-3">
                 <label className="form-label fw-semibold small" htmlFor="conversionMultiplierInput">Multiplicador <span className="text-danger">*</span></label>
