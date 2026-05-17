@@ -1,12 +1,14 @@
 import React from 'react';
 import { RecursiveHierarchySelector } from '~/core/components';
 
+const EMPTY_ARRAY = [];
+
 const CategoryCascadeSelector = ({
-    categories = [],
+    categories = EMPTY_ARRAY,
     value = '',
     onChange,
     disabled = false,
-    excludeIds = [],
+    excludeIds = EMPTY_ARRAY,
 }) => {
     return (
         <RecursiveHierarchySelector
@@ -18,10 +20,11 @@ const CategoryCascadeSelector = ({
             getId={(item) => item?.id}
             getParentId={(item) => item?.parent}
             getLabel={(item) => item?.name}
+            getIsLeaf={(item) => item?.is_leaf}
             rootOptionLabel="Ninguna (categoría raíz)"
             levelRootLabel="Selecciona la categoría principal"
             levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
-            selectionMode="any"
+            selectionMode="branch"
         />
     );
 };

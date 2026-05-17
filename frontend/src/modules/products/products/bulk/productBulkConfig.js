@@ -8,8 +8,7 @@ export const BULK_TEMPLATE_COLUMNS = [
 ];
 
 export const REQUIRED_FIELDS = BULK_TEMPLATE_COLUMNS
-    .filter((column) => column.required)
-    .map((column) => column.key);
+    .flatMap((column) => column.required ? [column.key] : []);
 
 export const createEmptyBulkRow = (index = 0) => ({
     rowId: `${Date.now()}-${index}-${Math.random().toString(16).slice(2)}`,
@@ -37,7 +36,7 @@ export const getOptionLabel = (item, fallback = 'name') => (
 );
 
 export const buildDatalistValues = (items, fallback = 'name') => (
-    items.map((item) => getOptionLabel(item, fallback)).filter(Boolean)
+    items.flatMap((item) => { const l = getOptionLabel(item, fallback); return l ? [l] : []; })
 );
 
 export const getCategoryPathLabel = (category, categories) => {
@@ -57,7 +56,10 @@ export const getCategoryPathLabel = (category, categories) => {
 };
 
 export const buildCategoryDatalistValues = (categories) => (
-    categories.map((category) => getCategoryPathLabel(category, categories)).filter(Boolean)
+    categories.flatMap((category) => {
+        const label = getCategoryPathLabel(category, categories);
+        return label ? [label] : [];
+    })
 );
 
 export const resolveCategoryId = (value, categories) => {

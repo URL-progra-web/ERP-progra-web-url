@@ -1,5 +1,6 @@
 import React from "react";
 import { FiEye } from "react-icons/fi";
+import { AppSelect } from "~/core/components";
 import TableActions from "~/core/components/TableActions";
 
 const TransactionHistoryTab = ({
@@ -48,10 +49,11 @@ const TransactionHistoryTab = ({
     <div>
       <div className="row g-3 mb-3">
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryDateFrom">
             Fecha Desde
           </label>
           <input
+            id="txHistoryDateFrom"
             type="date"
             className="form-control"
             value={dateFromFilter}
@@ -59,10 +61,11 @@ const TransactionHistoryTab = ({
           />
         </div>
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryDateTo">
             Fecha Hasta
           </label>
           <input
+            id="txHistoryDateTo"
             type="date"
             className="form-control"
             value={dateToFilter}
@@ -70,45 +73,45 @@ const TransactionHistoryTab = ({
           />
         </div>
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryVariantFilter">
             Filtrar por Variante (SKU)
           </label>
-          <select
-            className="form-select"
+          <AppSelect
+            id="txHistoryVariantFilter"
             value={variantFilter}
-            onChange={(e) => setVariantFilter(e.target.value)}
-          >
-            <option value="">Todas las variantes</option>
-            {variants.map((variant) => (
-              <option key={variant.id} value={variant.id}>
-                {variant.sku} - {variant.product_name || "N/A"}
-              </option>
-            ))}
-          </select>
+            onChange={setVariantFilter}
+            options={[
+              { value: "", label: "Todas las variantes" },
+              ...variants.map((variant) => ({
+                value: variant.id,
+                label: `${variant.sku} - ${variant.product_name || "N/A"}`,
+              })),
+            ]}
+          />
         </div>
         <div className="col-md-3">
-          <label className="form-label small text-muted text-uppercase">
+          <label className="form-label small text-muted text-uppercase" htmlFor="txHistoryTypeFilter">
             Filtrar por Tipo de Transacción
           </label>
-          <select
-            className="form-select"
+          <AppSelect
+            id="txHistoryTypeFilter"
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="">Todos los tipos</option>
-            {transactionTypes.map((type) => (
-              <option key={type.name} value={type.name}>
-                {type.name} ({type.factor === 1 ? "Entrada" : "Salida"})
-              </option>
-            ))}
-          </select>
+            onChange={setTypeFilter}
+            options={[
+              { value: "", label: "Todos los tipos" },
+              ...transactionTypes.map((type) => ({
+                value: type.name,
+                label: `${type.name} (${type.factor === 1 ? "Entrada" : "Salida"})`,
+              })),
+            ]}
+          />
         </div>
       </div>
 
       {isLoading ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-          <span className="text-muted">Cargando transacciones...</span>
+          <span className="text-muted">Cargando transacciones…</span>
         </div>
       ) : transactions.length === 0 ? (
         <div className="text-center py-5">

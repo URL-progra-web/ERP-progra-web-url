@@ -4,6 +4,14 @@ import AppModal from '~/core/components/AppModal';
 const getColorCode = (color) =>
     color?.code || color?.hex_code || color?.color_code || color?.codigo || '';
 
+const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6})$/;
+
+const normalizeHexColor = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    return trimmed.startsWith('#') ? trimmed.toUpperCase() : `#${trimmed.toUpperCase()}`;
+};
+
 const ColorModal = ({ color, onClose, onSave }) => {
     const isEditing = !!color;
 
@@ -32,6 +40,13 @@ const ColorModal = ({ color, onClose, onSave }) => {
         }));
     };
 
+    const handlePickerChange = (e) => {
+        setFormData(prev => ({
+            ...prev,
+            code: e.target.value.toUpperCase(),
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -41,13 +56,19 @@ const ColorModal = ({ color, onClose, onSave }) => {
             return;
         }
 
+        const normalizedCode = normalizeHexColor(formData.code);
+        if (normalizedCode && !HEX_COLOR_REGEX.test(normalizedCode)) {
+            setError('El código del color debe estar en formato HEX de 6 caracteres, por ejemplo #FF0000.');
+            return;
+        }
+
         try {
             setIsSubmitting(true);
 
             const dataToSubmit = {
                 name: formData.name,
-                code: formData.code || null,
-                hex_code: formData.code || null,
+                code: normalizedCode || null,
+                hex_code: normalizedCode || null,
             };
 
             await onSave(dataToSubmit);
@@ -63,6 +84,10 @@ const ColorModal = ({ color, onClose, onSave }) => {
             setIsSubmitting(false);
         }
     };
+
+    const normalizedCode = normalizeHexColor(formData.code);
+    const hasValidColor = HEX_COLOR_REGEX.test(normalizedCode);
+    const pickerValue = hasValidColor ? normalizedCode : '#1F2937';
 
     return (
         <AppModal
@@ -95,37 +120,33 @@ const ColorModal = ({ color, onClose, onSave }) => {
 
                 <div className="mb-3">
                     <label className="form-label fw-semibold" htmlFor="colorCodeInput">Código del color</label>
-                    <input
-                        id="colorCodeInput"
-                        type="text"
-                        name="code"
-                        autoComplete="off"
-                        className="form-control"
-                        value={formData.code}
-                        onChange={handleChange}
-                        placeholder="Ej. #FF0000"
-                    />
+                    <div className="d-flex align-items-stretch gap-3">
+                        <input
+                            id="colorPickerInput"
+                            type="color"
+                            className="form-control form-control-color flex-shrink-0"
+                            value={pickerValue}
+                            onChange={handlePickerChange}
+                            aria-label="Seleccionar color"
+                            title="Seleccionar color"
+                            style={{ width: '56px', minWidth: '56px', height: '48px' }}
+                        />
+                        <input
+                            id="colorCodeInput"
+                            type="text"
+                            name="code"
+                            autoComplete="off"
+                            className="form-control"
+                            value={formData.code}
+                            onChange={handleChange}
+                            placeholder="Ej. #FF0000"
+                        />
+                    </div>
                     <div className="form-text">
-                        Puedes ingresar un código HEX para mostrar una vista previa del color.
+                        Puedes elegir el color visualmente o ajustar el HEX manualmente.
                     </div>
                 </div>
 
-                {formData.code && (
-                    <div className="mb-3">
-                        <div className="form-label fw-semibold">Vista previa</div>
-                        <div>
-                            <span
-                                className="d-inline-block rounded border"
-                                style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    backgroundColor: formData.code,
-                                }}
-                                title={formData.code}
-                            />
-                        </div>
-                    </div>
-                )}
             </div>
         </AppModal>
     );

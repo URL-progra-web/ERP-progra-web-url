@@ -1,12 +1,14 @@
 import React from 'react';
 import { useRecursiveHierarchy } from './hooks/useRecursiveHierarchy';
 
+const EMPTY_ITEMS = [];
+
 const RecursiveHierarchySelector = ({
-    items = [],
+    items = EMPTY_ITEMS,
     value = '',
     onChange,
     disabled = false,
-    excludeIds = [],
+    excludeIds = EMPTY_ITEMS,
     getId = (item) => item?.id,
     getParentId = (item) => item?.parent,
     getLabel = (item) => item?.name,

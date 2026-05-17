@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '~/core/auth/AuthContext';
 import { getNavigationConfig } from '~/core/registry/registryUtils';
@@ -7,7 +7,7 @@ import { getNavigationConfig } from '~/core/registry/registryUtils';
 
 const WelcomeCard = ({ user }) => {
     const initial = user?.name?.charAt(0)?.toUpperCase() || 'U';
-    const hour = new Date().getHours();
+    const hour = useMemo(() => new Date().getHours(), []);
     const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
 
     return (
@@ -45,7 +45,7 @@ const WelcomeCard = ({ user }) => {
                 <h2 style={{
                     margin: '0 0 4px',
                     fontSize: '1.4rem',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '-0.02em',
                     color: 'var(--bs-body-color)',
                 }}>
@@ -85,7 +85,7 @@ const QuickNavItem = ({ item }) => {
                 border: '1px solid var(--bs-border-color)',
                 borderRadius: 'var(--radius-md)',
                 textDecoration: 'none',
-                transition: 'all var(--transition)',
+                transition: 'border-color var(--transition), transform var(--transition)',
             }}
             onMouseOver={e => {
                 e.currentTarget.style.borderColor = 'rgba(var(--bs-primary-rgb),0.4)';
@@ -128,8 +128,7 @@ const OverviewHome = () => {
     const userRole = user?.role?.name || 'VISITOR';
 
     const allItems = navigationConfig
-        .flatMap(g => g.items)
-        .filter(item => !item.roles || item.roles.includes(userRole))
+        .flatMap(g => g.items.filter(item => !item.roles || item.roles.includes(userRole)))
         .slice(0, 8);
 
     return (
@@ -154,8 +153,8 @@ const OverviewHome = () => {
                         gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
                         gap: '12px',
                     }}>
-                        {allItems.map((item, i) => (
-                            <QuickNavItem key={i} item={item} />
+                        {allItems.map((item) => (
+                            <QuickNavItem key={item.path} item={item} />
                         ))}
                     </div>
                 </div>

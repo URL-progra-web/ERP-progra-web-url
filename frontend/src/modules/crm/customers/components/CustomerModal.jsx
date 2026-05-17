@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 
 const DEFAULT_FORM = {
     name: '',
@@ -118,17 +119,16 @@ export const CustomerModal = ({ customer, onSave, onClose }) => {
             </div>
             <div className="mb-3 mt-3">
                 <label className="form-label" htmlFor="customerTypeSelect">Tipo de cliente *</label>
-                <select
+                <AppSelect
                     id="customerTypeSelect"
-                    className="form-select"
                     name="customer_type"
-                    autoComplete="off"
                     value={form.customer_type}
-                    onChange={handleChange}
-                >
-                    <option value="RETAIL">Minorista</option>
-                    <option value="WHOLESALE">Mayorista</option>
-                </select>
+                    onChange={(customerType) => handleChange({ target: { name: 'customer_type', value: customerType } })}
+                    options={[
+                        { value: 'RETAIL', label: 'Minorista' },
+                        { value: 'WHOLESALE', label: 'Mayorista' },
+                    ]}
+                />
             </div>
         </AppModal>
     );

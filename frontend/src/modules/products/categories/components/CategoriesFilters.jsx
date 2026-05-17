@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
+import { AppSelect } from '~/core/components';
 
 const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, onLeafChange }) => {
     const handleSubmit = (e) => {
@@ -10,7 +11,7 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-md">
+                <div className="col-12 col-lg-9">
                     <form onSubmit={handleSubmit} className="input-group">
                         <span className="input-group-text bg-body border-end-0 text-muted">
                             <FiSearch size={14} />
@@ -34,19 +35,19 @@ const CategoriesFilters = ({ searchInput, onSearchChange, onSearch, leafFilter, 
                         </button>
                     </form>
                 </div>
-                <div className="col-md-auto">
-                    <select
+                <div className="col-12 col-md-6 col-lg-3">
+                    <AppSelect
                         id="categoriesLeafFilter"
                         name="categories_leaf_filter"
-                        aria-label="Filtrar categorías por tipo"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar categorías por tipo"
                         value={leafFilter}
-                        onChange={(e) => onLeafChange(e.target.value)}
-                    >
-                        <option value="">Todas</option>
-                        <option value="leaf">Solo finales (se asignan a productos)</option>
-                        <option value="parent">Solo agrupadoras (contienen subcategorías)</option>
-                    </select>
+                        onChange={onLeafChange}
+                        options={[
+                            { value: '', label: 'Todas' },
+                            { value: 'leaf', label: 'Finales' },
+                            { value: 'parent', label: 'Categorias' },
+                        ]}
+                    />
                 </div>
             </div>
         </div>

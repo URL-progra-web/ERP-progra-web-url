@@ -122,7 +122,7 @@ const BrandPanel = () => (
 
             {/* Headline */}
             <h1 style={{
-                fontFamily: 'var(--font-display)', fontWeight: 800,
+                fontFamily: 'var(--font-display)', fontWeight: 700,
                 fontSize: 'clamp(2rem, 2.8vw, 3rem)', lineHeight: 1.08,
                 letterSpacing: '-0.04em', color: '#f0f6fc', margin: '0 0 18px',
                 animation: 'fadeSlideUp 0.6s 0.2s both',
@@ -146,13 +146,13 @@ const BrandPanel = () => (
                 margin: '0 0 28px', maxWidth: '360px',
                 animation: 'fadeSlideUp 0.6s 0.3s both',
             }}>
-                Control de pedidos, inventario, clientes y reportes — todo en un solo lugar.
+                Control de pedidos, inventario, clientes y reportes: todo en un solo lugar.
             </p>
 
             {/* Feature list */}
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {FEATURES.map((feat, i) => (
-                    <li key={i} style={{
+                    <li key={feat} style={{
                         display: 'flex', alignItems: 'center', gap: '10px',
                         fontSize: '13px', color: 'rgba(221,230,244,0.65)',
                         animation: `fadeSlideUp 0.5s ${0.4 + i * 0.1}s both`,
@@ -212,7 +212,7 @@ const FormField = ({ icon: Icon, type, placeholder, value, onChange, required, a
                 style={{
                     flex: 1, border: 'none', background: 'transparent',
                     color: 'var(--bs-body-color)', fontFamily: 'var(--font-body)',
-                    fontSize: '15px', padding: '13px 0', outline: 'none',
+                    fontSize: '15px', padding: '13px 0', outline: '0',
                 }}
             />
         </div>
@@ -239,7 +239,7 @@ const ThemeToggle = ({ theme, onToggle }) => {
                 cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: hovered ? 'var(--bs-body-color)' : 'var(--bs-secondary-color)',
-                transition: 'all 0.2s',
+                transition: 'background-color 0.2s, color 0.2s',
                 animation: 'fadeIn 0.5s 0.5s both',
             }}
         >
@@ -315,7 +315,7 @@ const Login = () => {
 
                     {/* Headline */}
                     <div style={{ animation: 'slideInRight 0.45s cubic-bezier(0.4,0,0.2,1) 0.15s both' }}>
-                        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.85rem', letterSpacing: '-0.03em', margin: '0 0 6px', color: 'var(--bs-body-color)' }}>
+                        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.85rem', letterSpacing: '-0.03em', margin: '0 0 6px', color: 'var(--bs-body-color)' }}>
                             Bienvenido de vuelta
                         </h2>
                         <p style={{ margin: '0 0 32px', fontSize: '14px', color: 'var(--bs-secondary-color)' }}>
@@ -370,7 +370,7 @@ const Login = () => {
                                         animation: 'spinnerRotate 0.7s linear infinite',
                                         flexShrink: 0,
                                     }} />
-                                    Verificando...
+                                    Verificando…
                                 </>
                             ) : (
                                 <>Continuar <FiArrowRight size={17} /></>

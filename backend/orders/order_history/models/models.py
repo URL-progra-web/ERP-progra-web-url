@@ -5,7 +5,7 @@ from orders.order_status.models.models import OrderStatus
 
 class OrderStatusHistory(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='history')
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True)
     status = models.ForeignKey(OrderStatus, on_delete=models.RESTRICT)
     notes = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

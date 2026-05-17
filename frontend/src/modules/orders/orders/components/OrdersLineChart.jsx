@@ -17,6 +17,8 @@ function getStatusColor(name, index) {
 }
 
 const PADDING = { top: 28, right: 20, bottom: 44, left: 52 };
+const EMPTY_SERIES = [];
+const EMPTY_STATUSES = [];
 const DOT_R = 4;
 
 /**
@@ -27,7 +29,7 @@ const DOT_R = 4;
  *  - statuses   ['STATUS1', 'STATUS2', ...]
  *  - height     canvas height in px (default 320)
  */
-const OrdersLineChart = ({ series = [], statuses = [], height = 320 }) => {
+const OrdersLineChart = ({ series = EMPTY_SERIES, statuses = EMPTY_STATUSES, height = 320 }) => {
     const canvasRef = useRef(null);
 
     const draw = useCallback(() => {

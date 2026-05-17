@@ -1,5 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+
+const CURRENT_YEAR = new Date().getFullYear();
 import { FiLogIn, FiMessageCircle, FiMoon, FiShield, FiSun, FiTerminal, FiTruck } from 'react-icons/fi';
 import { useTheme } from '~/core/theme/ThemeContext';
 import { CartIcon } from '../components/CartIcon';
@@ -133,7 +135,7 @@ export const PublicLayout = () => {
               margin: '0 auto',
               fontFamily: 'var(--font-mono)'
             }}>
-              &copy; {new Date().getFullYear()} Sistema ERP · Imágenes mock temporales
+              &copy; {CURRENT_YEAR} Sistema ERP · Imágenes mock temporales
             </div>
           </div>
         </div>

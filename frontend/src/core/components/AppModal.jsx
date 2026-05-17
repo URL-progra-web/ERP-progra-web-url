@@ -10,7 +10,7 @@ const TONE_SUBMIT = {
     danger:    'btn btn-danger fw-semibold',
 };
 
-const SIZE_MAX = { sm: 400, md: 540, lg: 700, xl: 900 };
+const SIZE_MAX = { sm: 460, md: 760, lg: 940, xl: 1120 };
 
 const AppModal = ({
     isOpen,
@@ -50,33 +50,18 @@ const AppModal = ({
 
     return ReactDOM.createPortal(
         <div
+            role="presentation"
             onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
-            style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(4px)',
-                WebkitBackdropFilter: 'blur(4px)',
-                zIndex: 1100,
-                overflowY: 'auto',
-                padding: 'max(5vh, 28px) 16px 40px',
-                animation: 'fadeIn 0.15s ease both',
-            }}
+            onKeyDown={(e) => { if (e.key === 'Escape') onClose?.(); }}
+            className="app-modal-backdrop"
         >
-            <div style={{
-                width: '100%',
-                maxWidth,
-                margin: '0 auto',
-                animation: 'scaleIn 0.18s cubic-bezier(0.4,0,0.2,1) both',
-            }}>
+            <div className="app-modal-dialog" style={{ '--app-modal-max-width': `${maxWidth}px` }}>
                 <Container
-                    className="rounded-4 overflow-hidden border shadow-lg bg-body"
-                    style={{ display: 'flex', flexDirection: 'column' }}
+                    className="app-modal"
                     onSubmit={onSubmit}
                 >
-                    {/* Header */}
                     <div
-                        className="section-header d-flex align-items-center justify-content-between"
+                        className="app-modal__header section-header"
                         style={accent ? {
                             '--card-accent': accent,
                             background: `color-mix(in srgb, ${accent} 12%, var(--bs-tertiary-bg))`,
@@ -86,36 +71,24 @@ const AppModal = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="d-flex align-items-center justify-content-center p-1 border-0 bg-transparent rounded-2"
-                            style={{
-                                color: 'var(--card-accent, var(--bs-secondary-color))',
-                                cursor: 'pointer',
-                                transition: 'opacity 0.15s',
-                                lineHeight: 1,
-                            }}
-                            onMouseOver={e => e.currentTarget.style.opacity = '0.7'}
-                            onMouseOut={e => e.currentTarget.style.opacity = '1'}
+                            className="app-modal__close"
+                            aria-label="Cerrar"
                         >
                             <FiX size={15} strokeWidth={2.5} />
                         </button>
                     </div>
 
-                    {/* Body */}
-                    <div className="p-4">
+                    <div className="app-modal__body">
                         {children}
                     </div>
 
-                    {/* Footer */}
                     {footer ?? (
-                        <div
-                            className="d-flex justify-content-end gap-2 px-4 py-3"
-                            style={{ borderTop: '1px solid var(--bs-border-color)' }}
-                        >
-                            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={onClose}>
+                        <div className="app-modal__footer">
+                            <button type="button" className="btn btn-outline-secondary app-modal__footer-button" onClick={onClose}>
                                 {cancelLabel}
                             </button>
                             {onSubmit && (
-                                <button type="submit" className={`${submitClass} btn-sm`} disabled={submitDisabled}>
+                                <button type="submit" className={`${submitClass} app-modal__footer-button`} disabled={submitDisabled}>
                                     {submitLabel}
                                 </button>
                             )}

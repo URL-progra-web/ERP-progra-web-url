@@ -43,4 +43,19 @@ class UomService:
                 "Esta UOM tiene conversiones asociadas. "
                 "Elimina las conversiones primero antes de borrar la UOM."
             )
+        if self.repository.is_used_by_products(uom_id):
+            raise ValueError(
+                "Esta UOM está asignada a uno o más productos. "
+                "No se puede eliminar mientras siga en uso."
+            )
+        if self.repository.is_used_by_transactions(uom_id):
+            raise ValueError(
+                "Esta UOM está referenciada por movimientos de inventario. "
+                "No se puede eliminar."
+            )
+        if self.repository.is_used_by_order_items(uom_id):
+            raise ValueError(
+                "Esta UOM está referenciada por items de pedido. "
+                "No se puede eliminar."
+            )
         self.repository.delete(uom)

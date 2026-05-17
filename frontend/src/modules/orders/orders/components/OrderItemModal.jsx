@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 import { variantService } from '~/modules/products/variants/services/variantService';
 import { normalizeList } from '../helpers/normalizeList';
 import { formatCurrency } from '../helpers/formatCurrency';
@@ -160,27 +161,20 @@ export const OrderItemModal = ({
 
                     <div className="mb-3">
                         <label className="form-label" htmlFor="orderItemVariantSelect">Variante *</label>
-                        <select
+                        <AppSelect
                             id="orderItemVariantSelect"
-                            className="form-select"
                             name="variant_id"
-                            autoComplete="off"
                             value={formData.variant_id}
-                            onChange={handleVariantChange}
+                            onChange={(variantId) => handleVariantChange({ target: { value: variantId } })}
                             disabled={isLoadingVariants}
-                        >
-                            <option value="">
-                                {isLoadingVariants ? 'Cargando variantes...' : '(Selecciona una variante)'}
-                            </option>
-                            {variantOptions.map((variant) => (
-                                <option
-                                    key={variant.id}
-                                    value={String(variant.id)}
-                                >
-                                    {variant.sku} - {variant.product_name || 'Sin producto'}
-                                </option>
-                            ))}
-                        </select>
+                            options={[
+                                { value: '', label: isLoadingVariants ? 'Cargando variantes...' : '(Selecciona una variante)' },
+                                ...variantOptions.map((variant) => ({
+                                    value: String(variant.id),
+                                    label: `${variant.sku} - ${variant.product_name || 'Sin producto'}`,
+                                })),
+                            ]}
+                        />
                         <div className="form-text">
                             Filtra con el buscador y luego selecciona una variante. Resultados: {variantOptions.length}
                         </div>
@@ -199,16 +193,15 @@ export const OrderItemModal = ({
                     {selectedVariant && (
                         <div className="mb-3">
                             <label className="form-label" htmlFor="orderItemSelectedUom">UOM de operacion *</label>
-                            <select
+                            <AppSelect
                                 id="orderItemSelectedUom"
-                                className="form-select"
                                 name="selected_uom_id"
-                                autoComplete="off"
                                 value={formData.selected_uom_id || selectedVariant.base_uom || ''}
-                                onChange={handleChange}
-                            >
-                                <option value={selectedVariant.base_uom}>{selectedVariant.base_uom_name}</option>
-                            </select>
+                                onChange={(uomId) => handleChange({ target: { name: 'selected_uom_id', value: uomId } })}
+                                options={[
+                                    { value: selectedVariant.base_uom, label: selectedVariant.base_uom_name },
+                                ]}
+                            />
                             <div className="form-text">
                                 Por ahora el item usa la UOM base del producto. Luego puedes ampliar a conversiones configuradas.
                             </div>
@@ -233,19 +226,16 @@ export const OrderItemModal = ({
 
             <div className="mb-0">
                 <label className="form-label" htmlFor="orderItemStatus">Estado del Item</label>
-                <select
+                <AppSelect
                     id="orderItemStatus"
-                    className="form-select"
                     name="status_id"
-                    autoComplete="off"
                     value={formData.status_id}
-                    onChange={handleChange}
-                >
-                    <option value="">(Estado por defecto)</option>
-                    {statusOptions.map((status) => (
-                        <option key={status.id} value={status.id}>{status.name}</option>
-                    ))}
-                </select>
+                    onChange={(statusId) => handleChange({ target: { name: 'status_id', value: statusId } })}
+                    options={[
+                        { value: '', label: '(Estado por defecto)' },
+                        ...statusOptions.map((status) => ({ value: status.id, label: status.name })),
+                    ]}
+                />
             </div>
         </AppModal>
     );

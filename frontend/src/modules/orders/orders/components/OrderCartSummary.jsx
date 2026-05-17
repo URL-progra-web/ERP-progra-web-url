@@ -20,6 +20,8 @@ export const OrderCartSummary = ({
     onQuantityChange,
     onRemove,
     onClear,
+    readinessIssues = [],
+    readinessSuggestions = [],
 }) => {
     const subtotal = items.reduce((sum, item) => sum + (Number(item.unit_price ?? 0) * Number(item.quantity ?? 0)), 0);
     const shipping = Number(shippingCost || 0);
@@ -105,9 +107,31 @@ export const OrderCartSummary = ({
                 </div>
             )}
 
-            <div className="border rounded-4 p-3 bg-dark text-white">
+            {!!readinessIssues.length && (
+                <div className="order-create-readiness order-create-readiness--danger">
+                    <div className="fw-semibold mb-2">No puedes enviar todavía</div>
+                    <ul className="mb-0 ps-3">
+                        {readinessIssues.map((issue) => (
+                            <li key={issue}>{issue}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            {!!readinessSuggestions.length && (
+                <div className="order-create-readiness order-create-readiness--info">
+                    <div className="fw-semibold mb-2">Sugerencias antes de confirmar</div>
+                    <ul className="mb-0 ps-3">
+                        {readinessSuggestions.map((suggestion) => (
+                            <li key={suggestion}>{suggestion}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            <div className="order-create-total-card">
                 <div className="mb-3">
-                    <label className="form-label small text-white-50" htmlFor="orderCartShippingCost">Costo de envio</label>
+                    <label className="form-label small order-create-total-card__label" htmlFor="orderCartShippingCost">Costo de envio</label>
                     <input
                         id="orderCartShippingCost"
                         type="number"
@@ -128,7 +152,7 @@ export const OrderCartSummary = ({
                     <span>Envio</span>
                     <span>{formatMoney(shipping)}</span>
                 </div>
-                <div className="d-flex justify-content-between pt-2 border-top border-secondary fw-semibold fs-5">
+                <div className="d-flex justify-content-between pt-2 border-top order-create-total-card__total fw-semibold fs-5">
                     <span>Total</span>
                     <span>{formatMoney(total)}</span>
                 </div>

@@ -11,7 +11,7 @@ class Receipt(models.Model):
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
     notes = models.TextField(null=True, blank=True)
     issued_at = models.DateTimeField(auto_now_add=True)
-    issued_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    issued_by = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.RESTRICT)
 
     class Meta:

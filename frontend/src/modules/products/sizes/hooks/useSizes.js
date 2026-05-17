@@ -35,6 +35,12 @@ export function useSizes() {
         }
     }, [searchTerm, page]);
 
+    const parseError = (err, fallback) => (
+        err?.response?.data?.error
+        || err?.response?.data?.message
+        || fallback
+    );
+
     useEffect(() => {
         fetchSizes();
     }, [fetchSizes]);
@@ -54,8 +60,14 @@ export function useSizes() {
     };
 
     const deleteSize = async (id) => {
-        await sizeService.deleteSize(id);
-        fetchSizes();
+        try {
+            await sizeService.deleteSize(id);
+            await fetchSizes();
+            return true;
+        } catch (err) {
+            setError(parseError(err, 'No se pudo eliminar la talla.'));
+            return false;
+        }
     };
 
     return {

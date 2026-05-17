@@ -12,6 +12,8 @@ from inventory.business_unit.models.models import BusinessUnit
 from inventory.uom.models.models import UoM
 from inventory.transaction_type.models.models import TransactionType
 from inventory.transaction.models.models import InventoryTransaction
+from products.category.models.models import Category
+from products.category.serializers.serializers import CategorySerializer
 from products.product.models.models import Product
 from products.product.serializers.serializers import ProductSerializer
 from products.size.models.models import Size
@@ -187,3 +189,35 @@ class ProductSerializerTests(ProductSerializerBaseTestCase):
 
         self.assertFalse(product.image)
         self.assertFalse(os.path.exists(image_path))
+
+
+class CategorySerializerTests(TestCase):
+    def test_rejects_assigning_a_child_to_a_leaf_parent(self):
+        leaf_parent = Category.objects.create(name='Cítricos', is_leaf=True)
+        serializer = CategorySerializer(data={
+            'name': 'Naranjas',
+            'parent': leaf_parent.id,
+            'is_leaf': True,
+        })
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors['parent'][0],
+            'Una categoría final no puede tener subcategorías.',
+        )
+
+    def test_rejects_marking_a_category_with_children_as_leaf(self):
+        parent = Category.objects.create(name='Frutas', is_leaf=False)
+        Category.objects.create(name='Tropicales', parent=parent, is_leaf=True)
+
+        serializer = CategorySerializer(
+            instance=parent,
+            data={'is_leaf': True},
+            partial=True,
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors['is_leaf'][0],
+            'Una categoría con subcategorías debe ser agrupadora.',
+        )

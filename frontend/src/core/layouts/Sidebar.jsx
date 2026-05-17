@@ -1,6 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { FiTerminal, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
+import { NavLink, useLocation } from 'react-router-dom';
+import { FiActivity, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
 import { useAuth } from '../auth/AuthContext';
 import { getNavigationConfig } from '../registry/registryUtils';
 
@@ -9,10 +9,13 @@ import { getNavigationConfig } from '../registry/registryUtils';
 const SidebarBrand = ({ isCollapsed }) => (
     <div className="sidebar-brand">
         <div className="sidebar-brand-icon">
-            <FiTerminal size={16} color="white" />
+            <FiActivity size={16} />
         </div>
         {!isCollapsed && (
-            <span className="sidebar-brand-text">ERP System</span>
+            <div className="sidebar-brand-copy">
+                <span className="sidebar-brand-text">ERP System</span>
+                <span className="sidebar-brand-subtitle">Control operativo</span>
+            </div>
         )}
     </div>
 );
@@ -34,12 +37,15 @@ const SidebarNavItem = ({ item, isCollapsed, onItemClick, userRole }) => {
             >
                 {({ isActive }) => (
                     <>
-                        <Icon size={18} style={{ flexShrink: 0, opacity: isActive ? 1 : 0.65 }} />
+                        <span className="sidebar-nav-icon">
+                            <Icon size={17} aria-hidden="true" />
+                        </span>
                         {!isCollapsed && (
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span className="sidebar-nav-text">
                                 {item.text}
                             </span>
                         )}
+                        {!isCollapsed && isActive && <span className="sidebar-nav-active-dot" />}
                     </>
                 )}
             </NavLink>
@@ -49,24 +55,22 @@ const SidebarNavItem = ({ item, isCollapsed, onItemClick, userRole }) => {
 
 /* ── SidebarNavGroup ──────────────────────────────────────── */
 
-const SidebarNavGroup = ({ group, isCollapsed, onItemClick, userRole, isFirst }) => (
-    <div style={{ marginBottom: isCollapsed ? '4px' : '6px' }}>
+const SidebarNavGroup = ({ group, isCollapsed, onItemClick, userRole, isFirst, isGroupActive }) => (
+    <div className={`sidebar-nav-group ${isGroupActive ? 'is-active' : ''}`}>
         {isCollapsed ? (
-            /* Collapsed: thin divider between groups (skip before first) */
             !isFirst && (
-                <div style={{
-                    height: '1px',
-                    background: 'var(--bs-border-color)',
-                    margin: '6px 14px 8px',
-                }} />
+                <div className="sidebar-nav-divider" />
             )
         ) : (
-            <div className="sidebar-nav-label">{group.title}</div>
+            <div className="sidebar-nav-label">
+                <span>{group.title}</span>
+                {isGroupActive && <span className="sidebar-nav-label-pulse" />}
+            </div>
         )}
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {group.items.map((item, i) => (
+        <ul className="sidebar-nav-list">
+            {group.items.map((item) => (
                 <SidebarNavItem
-                    key={i}
+                    key={item.path}
                     item={item}
                     isCollapsed={isCollapsed}
                     onItemClick={onItemClick}
@@ -81,34 +85,11 @@ const SidebarNavGroup = ({ group, isCollapsed, onItemClick, userRole, isFirst })
 
 const SidebarCollapseBtn = ({ isCollapsed, onToggle }) => (
     <button
+        type="button"
         onClick={onToggle}
+        className="sidebar-collapse-btn"
         title={isCollapsed ? 'Expandir menú' : 'Compactar menú'}
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: isCollapsed ? 'center' : 'flex-start',
-            gap: '8px',
-            width: '100%',
-            padding: isCollapsed ? '11px' : '10px 18px',
-            border: 'none',
-            borderTop: '1px solid var(--bs-border-color)',
-            background: 'transparent',
-            color: 'var(--bs-tertiary-color)',
-            cursor: 'pointer',
-            transition: 'color var(--transition), background var(--transition)',
-            fontFamily: 'var(--font-display)',
-            fontSize: '12px',
-            fontWeight: 600,
-            letterSpacing: '0.03em',
-        }}
-        onMouseEnter={e => {
-            e.currentTarget.style.color = 'var(--bs-body-color)';
-            e.currentTarget.style.background = 'rgba(var(--bs-primary-rgb),0.06)';
-        }}
-        onMouseLeave={e => {
-            e.currentTarget.style.color = 'var(--bs-tertiary-color)';
-            e.currentTarget.style.background = 'transparent';
-        }}
+        aria-label={isCollapsed ? 'Expandir menú' : 'Compactar menú'}
     >
         {isCollapsed
             ? <FiChevronsRight size={16} />
@@ -121,15 +102,16 @@ const SidebarCollapseBtn = ({ isCollapsed, onToggle }) => (
 
 const SidebarUserCard = ({ user, userRole, isCollapsed }) => {
     const initials = user?.name?.charAt(0)?.toUpperCase() || 'U';
+    const displayName = user?.name || 'Usuario';
 
     return (
-        <div className={`sidebar-profile ${isCollapsed ? 'justify-content-center' : ''}`}>
-            <div className="topbar-avatar" style={{ flexShrink: 0 }}>
+        <div className={`sidebar-profile ${isCollapsed ? 'is-collapsed' : ''}`}>
+            <div className="topbar-avatar sidebar-profile-avatar">
                 {initials}
             </div>
             {!isCollapsed && (
-                <div style={{ overflow: 'hidden', minWidth: 0 }}>
-                    <div className="sidebar-profile-name">{user?.name}</div>
+                <div className="sidebar-profile-copy">
+                    <div className="sidebar-profile-name">{displayName}</div>
                     <div className="sidebar-profile-role">{userRole}</div>
                 </div>
             )}
@@ -141,34 +123,37 @@ const SidebarUserCard = ({ user, userRole, isCollapsed }) => {
 
 const Sidebar = ({ onItemClick, isCollapsed = false, onToggleCollapse }) => {
     const { user } = useAuth();
+    const location = useLocation();
     const navigationConfig = getNavigationConfig();
     const userRole = user?.role?.name || 'VISITOR';
 
     return (
         <aside
             className={`sidebar d-flex flex-column h-100 w-100 ${isCollapsed ? 'sidebar--collapsed' : ''}`}
-            style={{
-                borderRight: '1px solid var(--bs-border-color)',
-                background: 'var(--bs-secondary-bg)',
-                overflow: 'hidden',
-            }}
         >
             <SidebarBrand isCollapsed={isCollapsed} />
 
-            <nav className="flex-grow-1 overflow-auto py-3" style={{ overflowX: 'hidden' }}>
-                {navigationConfig.map((group, i) => (
-                    <SidebarNavGroup
-                        key={i}
-                        group={group}
-                        isCollapsed={isCollapsed}
-                        onItemClick={onItemClick}
-                        userRole={userRole}
-                        isFirst={i === 0}
-                    />
-                ))}
+            <nav className="sidebar-nav" aria-label="Navegación principal">
+                {navigationConfig.map((group, i) => {
+                    const isGroupActive = group.items.some(item => (
+                        (!item.roles || item.roles.includes(userRole))
+                        && (location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))
+                    ));
+
+                    return (
+                        <SidebarNavGroup
+                            key={group.title}
+                            group={group}
+                            isCollapsed={isCollapsed}
+                            onItemClick={onItemClick}
+                            userRole={userRole}
+                            isFirst={i === 0}
+                            isGroupActive={isGroupActive}
+                        />
+                    );
+                })}
             </nav>
 
-            {/* Collapse toggle — desktop only */}
             <div className="d-none d-md-block">
                 <SidebarCollapseBtn isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
             </div>

@@ -20,6 +20,7 @@ const CategoriesPage = () => {
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [initialParentId, setInitialParentId] = useState('');
     const [alertConfig, setAlertConfig] = useState(null);
     const [activeRoot, setActiveRoot] = useState('all');
 
@@ -72,8 +73,21 @@ const CategoriesPage = () => {
         }
     }, [activeRoot, rootCategories]);
 
-    const handleOpenModal = (category = null) => { setSelectedCategory(category); setIsModalOpen(true); };
-    const handleCloseModal = () => { setSelectedCategory(null); setIsModalOpen(false); };
+    const handleOpenModal = (category = null) => {
+        setSelectedCategory(category);
+        setInitialParentId('');
+        setIsModalOpen(true);
+    };
+    const handleOpenCreateChildModal = (parentCategory) => {
+        setSelectedCategory(null);
+        setInitialParentId(parentCategory?.id || '');
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setSelectedCategory(null);
+        setInitialParentId('');
+        setIsModalOpen(false);
+    };
 
     const handleSave = async (data) => {
         await saveCategory(data, selectedCategory?.id);
@@ -84,7 +98,7 @@ const CategoriesPage = () => {
         setAlertConfig({
             type: 'danger',
             header: '¿Eliminar esta categoría?',
-            content: `Se eliminará "${category.name}" y los productos que la usen quedarán sin categoría. Esta acción no se puede deshacer.`,
+            content: `Se eliminará "${category.name}" si no tiene subcategorías ni productos asociados. Esta acción no se puede deshacer.`,
             confirmLabel: 'Sí, eliminar',
             onConfirm: async () => {
                 await deleteCategory(category.id);
@@ -137,12 +151,14 @@ const CategoriesPage = () => {
                                     <th className="border-0 px-4 py-3">Categoría</th>
                                     <th className="border-0 py-3">Tipo</th>
                                     <th className="border-0 py-3">Creada</th>
-                                    <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                    <th className="border-0 py-3 text-end">Acciones</th>
+                                    <th className="border-0 px-4 py-3 text-end">Eliminar</th>
                                 </tr>
                             </thead>
                             <CategoriesTable
                                 categories={filteredCategories}
                                 isLoading={isLoading}
+                                onCreateChild={handleOpenCreateChildModal}
                                 onEdit={handleOpenModal}
                                 onDelete={handleConfirmDelete}
                             />
@@ -155,6 +171,7 @@ const CategoriesPage = () => {
                 <CategoryModal
                     category={selectedCategory}
                     categories={categories}
+                    initialParentId={initialParentId}
                     onClose={handleCloseModal}
                     onSave={handleSave}
                 />

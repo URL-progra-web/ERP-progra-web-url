@@ -24,24 +24,22 @@ const ProductImageBulkPanel = ({ images, productNames, onImagesChange, onClearIm
     }, []);
 
     const handleFiles = (files) => {
-        const nextImages = Array.from(files || [])
-            .filter((file) => file.type.startsWith('image/'))
-            .map((file) => {
-                const stem = getStem(file.name);
-                const normalizedStem = normalize(stem);
-                const matches = visibleProductNames.filter((name) => {
-                    const normalizedName = normalize(name);
-                    return normalizedName.includes(normalizedStem) || normalizedStem.includes(normalizedName);
-                });
-
-                return {
-                    id: `${file.name}-${file.lastModified}-${Math.random().toString(16).slice(2)}`,
-                    file,
-                    fileName: file.name,
-                    productNames: matches,
-                    previewUrl: URL.createObjectURL(file),
-                };
+        const nextImages = Array.from(files || []).flatMap((file) => {
+            if (!file.type.startsWith('image/')) return [];
+            const stem = getStem(file.name);
+            const normalizedStem = normalize(stem);
+            const matches = visibleProductNames.filter((name) => {
+                const normalizedName = normalize(name);
+                return normalizedName.includes(normalizedStem) || normalizedStem.includes(normalizedName);
             });
+            return [{
+                id: `${file.name}-${file.lastModified}-${Math.random().toString(16).slice(2)}`,
+                file,
+                fileName: file.name,
+                productNames: matches,
+                previewUrl: URL.createObjectURL(file),
+            }];
+        });
 
         onImagesChange([...images, ...nextImages]);
         if (inputRef.current) inputRef.current.value = '';
@@ -93,8 +91,7 @@ const ProductImageBulkPanel = ({ images, productNames, onImagesChange, onClearIm
         const search = normalize(searchByImage[image.id]);
         const assigned = new Set(image.productNames || []);
         return visibleProductNames
-            .filter((name) => !assigned.has(name))
-            .filter((name) => !search || normalize(name).includes(search))
+            .filter((name) => !assigned.has(name) && (!search || normalize(name).includes(search)))
             .slice(0, 8);
     };
 

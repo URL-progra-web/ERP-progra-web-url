@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppModal from '~/core/components/AppModal';
+import { AppSelect } from '~/core/components';
 
 const emptyForm = {
     product: '',
@@ -144,19 +145,16 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
             <div>
                 <div className="mb-3">
                     <label className="form-label fw-semibold" htmlFor="variantProductSelect">Producto *</label>
-                    <select
+                    <AppSelect
                         id="variantProductSelect"
                         name="product"
-                        autoComplete="off"
-                        className="form-select"
                         value={formData.product}
-                        onChange={handleChange}
-                    >
-                        <option value="">Selecciona un producto</option>
-                        {products.map(item => (
-                            <option key={item.id} value={item.id}>{item.name}</option>
-                        ))}
-                    </select>
+                        onChange={(productId) => handleChange({ target: { name: 'product', value: productId } })}
+                        options={[
+                            { value: '', label: 'Selecciona un producto' },
+                            ...products.map(item => ({ value: item.id, label: item.name })),
+                        ]}
+                    />
                     <div className="form-text">
                         La unidad base y el stock se gestionan desde el producto y el kardex, no desde la variante.
                     </div>
@@ -222,36 +220,30 @@ const VariantModal = ({ variant, products, colors, sizes, onClose, onSave }) => 
                 <div className="row g-3">
                     <div className="col-md-6">
                         <label className="form-label fw-semibold" htmlFor="variantColorSelect">Color</label>
-                        <select
+                        <AppSelect
                             id="variantColorSelect"
                             name="color"
-                            autoComplete="off"
-                            className="form-select"
                             value={formData.color}
-                            onChange={handleChange}
-                        >
-                            <option value="">Sin color</option>
-                            {colors.map(item => (
-                                <option key={item.id} value={item.id}>{item.name}</option>
-                            ))}
-                        </select>
+                            onChange={(colorId) => handleChange({ target: { name: 'color', value: colorId } })}
+                            options={[
+                                { value: '', label: 'Sin color' },
+                                ...colors.map(item => ({ value: item.id, label: item.name })),
+                            ]}
+                        />
                     </div>
 
                     <div className="col-md-6">
                         <label className="form-label fw-semibold" htmlFor="variantSizeSelect">Talla</label>
-                        <select
+                        <AppSelect
                             id="variantSizeSelect"
                             name="size"
-                            autoComplete="off"
-                            className="form-select"
                             value={formData.size}
-                            onChange={handleChange}
-                        >
-                            <option value="">Sin talla</option>
-                            {sizes.map(item => (
-                                <option key={item.id} value={item.id}>{item.name}</option>
-                            ))}
-                        </select>
+                            onChange={(sizeId) => handleChange({ target: { name: 'size', value: sizeId } })}
+                            options={[
+                                { value: '', label: 'Sin talla' },
+                                ...sizes.map(item => ({ value: item.id, label: item.name })),
+                            ]}
+                        />
                     </div>
                 </div>
 

@@ -2,7 +2,7 @@ from django.db import models
 from users.user.models.models import User
 
 class Entrepreneur(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True)
     company_name = models.CharField(max_length=255)
     contact_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=50, null=True, blank=True)

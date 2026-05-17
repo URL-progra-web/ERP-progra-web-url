@@ -105,7 +105,7 @@ export const CheckoutPage = () => {
           <FiCheck size={38} />
         </div>
         <span className="store-kicker">SOLICITUD ENVIADA</span>
-        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
           Tu pedido está en revisión
         </h2>
         <p className="store-lead mx-auto mb-4">
@@ -150,7 +150,7 @@ export const CheckoutPage = () => {
     return (
       <div className="store-empty-state">
         <span className="store-kicker">CHECKOUT VACÍO</span>
-        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
           No hay productos para solicitar
         </h2>
         <p className="store-lead mx-auto mb-4">
@@ -174,7 +174,7 @@ export const CheckoutPage = () => {
         <div className="store-hero__layout">
           <div className="store-hero__content d-grid gap-3">
             <span className="store-kicker">CONFIRMACIÓN DEL PEDIDO</span>
-            <h1 className="store-display" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+            <h1 className="store-display" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
               Finaliza tu <span>solicitud</span>
             </h1>
             <p className="store-lead mb-0">
@@ -335,7 +335,7 @@ export const CheckoutPage = () => {
                 {loading ? (
                   <>
                     <span className="store-spinner" aria-hidden="true" />
-                    Procesando...
+                    Procesando…
                   </>
                 ) : (
                   <>

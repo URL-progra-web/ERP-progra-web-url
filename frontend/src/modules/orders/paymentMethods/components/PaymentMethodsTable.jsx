@@ -2,6 +2,18 @@ import React from 'react';
 import { FiPower, FiEdit2, FiTrash2, FiLock } from 'react-icons/fi';
 import TableActions from '~/core/components/TableActions';
 
+const DeleteActionButton = ({ onClick, title = 'Eliminar', disabled = false }) => (
+    <button
+        type="button"
+        title={title}
+        onClick={onClick}
+        disabled={disabled}
+        className="table-action-btn table-action-btn--danger"
+    >
+        <FiTrash2 size={15} />
+    </button>
+);
+
 export const PaymentMethodsTable = ({
     records,
     isLoading,
@@ -13,7 +25,7 @@ export const PaymentMethodsTable = ({
         return (
             <div className="text-center py-5">
                 <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Cargando...</span>
+                    <span className="visually-hidden">Cargando…</span>
                 </div>
             </div>
         );
@@ -30,7 +42,8 @@ export const PaymentMethodsTable = ({
                     <tr>
                         <th className="border-0 px-4">Nombre</th>
                         <th className="border-0">Estado</th>
-                        <th className="border-0 text-end px-4">Acciones</th>
+                        <th className="border-0 text-end">Acciones</th>
+                        <th className="border-0 text-end px-4">Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,7 +62,7 @@ export const PaymentMethodsTable = ({
                                     {method.is_active ? 'Activo' : 'Inactivo'}
                                 </span>
                             </td>
-                            <td className="text-end px-4">
+                            <td className="text-end">
                                 <TableActions actions={[
                                     {
                                         icon: FiPower,
@@ -58,14 +71,14 @@ export const PaymentMethodsTable = ({
                                         variant: method.is_active ? 'warning' : 'success',
                                     },
                                     { icon: FiEdit2,  onClick: () => onEdit(method),   title: 'Editar',   variant: 'primary' },
-                                    {
-                                        icon: FiTrash2,
-                                        onClick: () => onDelete(method),
-                                        title: method.is_protected ? 'No se puede eliminar un método de sistema' : 'Eliminar',
-                                        variant: 'danger',
-                                        disabled: method.is_protected,
-                                    },
                                 ]} />
+                            </td>
+                            <td className="text-end px-4">
+                                <DeleteActionButton
+                                    onClick={() => onDelete(method)}
+                                    title={method.is_protected ? 'No se puede eliminar un método de sistema' : 'Eliminar'}
+                                    disabled={method.is_protected}
+                                />
                             </td>
                         </tr>
                     ))}

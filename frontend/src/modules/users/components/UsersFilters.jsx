@@ -1,11 +1,12 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
+import { AppSelect } from '~/core/components';
 
 const UsersFilters = ({ searchInput, onSearchChange, roleFilter, onRoleChange, statusFilter, onStatusChange, roles }) => {
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-md-5">
+                <div className="col-12 col-lg-6">
                     <div className="input-group">
                         <label className="visually-hidden" htmlFor="usersSearchInput">
                             Buscar usuarios por nombre o email
@@ -26,38 +27,34 @@ const UsersFilters = ({ searchInput, onSearchChange, roleFilter, onRoleChange, s
                         />
                     </div>
                 </div>
-                <div className="col-md-3 col-6">
+                <div className="col-12 col-md-6 col-lg-3">
                     <label className="visually-hidden" htmlFor="usersRoleFilter">Filtrar usuarios por rol</label>
-                    <select
+                    <AppSelect
                         id="usersRoleFilter"
                         name="users_role_filter"
-                        autoComplete="off"
-                        aria-label="Filtrar usuarios por rol"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar usuarios por rol"
                         value={roleFilter}
-                        onChange={(e) => onRoleChange(e.target.value)}
-                    >
-                        <option value="">Todos los Roles</option>
-                        {roles.map(role => (
-                            <option key={role.id} value={role.id}>{role.name}</option>
-                        ))}
-                    </select>
+                        onChange={onRoleChange}
+                        options={[
+                            { value: '', label: 'Todos los Roles' },
+                            ...roles.map(role => ({ value: role.id, label: role.name })),
+                        ]}
+                    />
                 </div>
-                <div className="col-md-3 col-6">
+                <div className="col-12 col-md-6 col-lg-3">
                     <label className="visually-hidden" htmlFor="usersStatusFilter">Filtrar usuarios por estado</label>
-                    <select
+                    <AppSelect
                         id="usersStatusFilter"
                         name="users_status_filter"
-                        autoComplete="off"
-                        aria-label="Filtrar usuarios por estado"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar usuarios por estado"
                         value={statusFilter}
-                        onChange={(e) => onStatusChange(e.target.value)}
-                    >
-                        <option value="">Todos los Estados</option>
-                        <option value="active">Activos</option>
-                        <option value="blocked">Bloqueados</option>
-                    </select>
+                        onChange={onStatusChange}
+                        options={[
+                            { value: '', label: 'Todos los Estados' },
+                            { value: 'active', label: 'Activos' },
+                            { value: 'blocked', label: 'Bloqueados' },
+                        ]}
+                    />
                 </div>
             </div>
         </div>

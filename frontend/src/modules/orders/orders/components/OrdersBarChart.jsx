@@ -23,6 +23,8 @@ const NAMED_COLORS = {
     CANCELADO:   '#ef4444',
     BORRADOR:    '#94a3b8',
 };
+const EMPTY_SERIES = [];
+const EMPTY_STATUSES = [];
 
 function getStatusColor(name, index) {
     return NAMED_COLORS[name.toUpperCase()] ?? STATUS_PALETTE[index % STATUS_PALETTE.length];
@@ -40,7 +42,7 @@ const GROUP_GAP = 12;  // gap between day groups
  *  - statuses   ['STATUS1', 'STATUS2', ...]
  *  - height     canvas height in px (default 320)
  */
-const OrdersBarChart = ({ series = [], statuses = [], height = 320 }) => {
+const OrdersBarChart = ({ series = EMPTY_SERIES, statuses = EMPTY_STATUSES, height = 320 }) => {
     const canvasRef = useRef(null);
 
     const draw = useCallback(() => {

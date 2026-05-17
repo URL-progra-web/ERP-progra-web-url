@@ -3,6 +3,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet
 from inventory.uom.models.models import UoM
 from inventory.uom_conversion.models.models import UoMConversion
+from inventory.transaction.models.models import InventoryTransaction
+from orders.order_item.models.models import OrderItem
+from products.product.models.models import Product
 
 
 class UomRepository:
@@ -37,4 +40,19 @@ class UomRepository:
         return (
             UoMConversion.objects.filter(from_uom_id=uom_id).exists()
             or UoMConversion.objects.filter(to_uom_id=uom_id).exists()
+        )
+
+    def is_used_by_products(self, uom_id: int) -> bool:
+        return Product.objects.filter(base_uom_id=uom_id).exists()
+
+    def is_used_by_transactions(self, uom_id: int) -> bool:
+        return (
+            InventoryTransaction.objects.filter(selected_uom_id=uom_id).exists()
+            or InventoryTransaction.objects.filter(base_uom_id=uom_id).exists()
+        )
+
+    def is_used_by_order_items(self, uom_id: int) -> bool:
+        return (
+            OrderItem.objects.filter(selected_uom_id=uom_id).exists()
+            or OrderItem.objects.filter(base_uom_id=uom_id).exists()
         )

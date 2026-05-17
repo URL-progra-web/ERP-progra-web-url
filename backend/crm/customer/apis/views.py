@@ -1,3 +1,4 @@
+from django.db.models.deletion import RestrictedError
 from datetime import datetime
 
 from django.utils.dateparse import parse_date, parse_datetime
@@ -62,6 +63,11 @@ class CustomerViewSet(viewsets.ViewSet, PaginationMixin):
             self.service.delete_customer(self._parse_pk(pk))
         except CustomerNotFound as exc:
             return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+        except RestrictedError:
+            return Response(
+                {'error': 'No se puede eliminar el cliente porque tiene pedidos u otros registros asociados.'},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @staticmethod

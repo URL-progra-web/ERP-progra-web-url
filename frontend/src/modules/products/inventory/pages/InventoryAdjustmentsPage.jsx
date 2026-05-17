@@ -269,7 +269,7 @@ const InventoryAdjustmentsPage = () => {
                           role="status"
                           aria-hidden="true"
                         ></span>
-                        Exportando...
+                        Exportando…
                       </>
                     ) : (
                       <>
@@ -312,10 +312,6 @@ const InventoryAdjustmentsPage = () => {
                   ? setTypesPage
                   : setTransactionsPage
             }
-            page={activeTab === "adjustments" ? productsPage : typesPage}
-            numPages={activeTab === "adjustments" ? productsNumPages : typesNumPages}
-            count={activeTab === "adjustments" ? productsCount : typesCount}
-            onPageChange={activeTab === "adjustments" ? setProductsPage : setTypesPage}
           />
         </AppCard.Section>
       </AppCard>

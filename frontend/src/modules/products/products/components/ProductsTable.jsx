@@ -2,14 +2,25 @@ import React from 'react';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import TableActions from '~/core/components/TableActions';
 
+const DeleteActionButton = ({ onClick, title = 'Eliminar' }) => (
+    <button
+        type="button"
+        title={title}
+        onClick={onClick}
+        className="table-action-btn table-action-btn--danger"
+    >
+        <FiTrash2 size={15} />
+    </button>
+);
+
 const ProductsTable = ({ products, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
         return (
             <tbody>
                 <tr>
-                        <td colSpan="6" className="text-center py-5">
+                        <td colSpan="7" className="text-center py-5">
                         <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-                        <span className="text-muted">Cargando...</span>
+                        <span className="text-muted">Cargando…</span>
                     </td>
                 </tr>
             </tbody>
@@ -20,7 +31,7 @@ const ProductsTable = ({ products, isLoading, onEdit, onDelete }) => {
         <tbody>
             {products.length === 0 ? (
                 <tr>
-                    <td colSpan="6" className="text-center py-5 text-muted">
+                    <td colSpan="7" className="text-center py-5 text-muted">
                         No se encontraron productos. Crea uno nuevo para empezar.
                     </td>
                 </tr>
@@ -61,19 +72,21 @@ const ProductsTable = ({ products, isLoading, onEdit, onDelete }) => {
                         }
                     </td>
                     <td className="py-3 text-secondary">
-                        {product.entrepreneur_name || <span className="text-muted fst-italic">—</span>}
+                        {product.entrepreneur_name || <span className="text-muted fst-italic">-</span>}
                     </td>
                     <td className="py-3 text-secondary">
-                        {product.business_unit_name || <span className="text-muted fst-italic">—</span>}
+                        {product.business_unit_name || <span className="text-muted fst-italic">-</span>}
                     </td>
                     <td className="py-3 text-secondary">
-                        {product.base_uom_name || <span className="text-muted fst-italic">—</span>}
+                        {product.base_uom_name || <span className="text-muted fst-italic">-</span>}
                     </td>
-                    <td className="px-4 py-3 text-end">
+                    <td className="py-3 text-end">
                         <TableActions actions={[
                             { icon: FiEdit2,  onClick: () => onEdit(product),   title: 'Editar',   variant: 'primary' },
-                            { icon: FiTrash2, onClick: () => onDelete(product), title: 'Eliminar', variant: 'danger'  },
                         ]} />
+                    </td>
+                    <td className="px-4 py-3 text-end">
+                        <DeleteActionButton onClick={() => onDelete(product)} />
                     </td>
                 </tr>
             ))}

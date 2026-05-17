@@ -5,14 +5,25 @@ import TableActions from '~/core/components/TableActions';
 const getColorCode = (color) =>
     color.code || color.hex_code || color.color_code || color.codigo || '';
 
+const DeleteActionButton = ({ onClick, title = 'Eliminar' }) => (
+    <button
+        type="button"
+        title={title}
+        onClick={onClick}
+        className="table-action-btn table-action-btn--danger"
+    >
+        <FiTrash2 size={15} />
+    </button>
+);
+
 const ColorsTable = ({ colors, isLoading, onEdit, onDelete }) => {
     if (isLoading) {
         return (
             <tbody>
                 <tr>
-                    <td colSpan="5" className="text-center py-5">
+                    <td colSpan="6" className="text-center py-5">
                         <div className="spinner-border text-primary spinner-border-sm me-2"></div>
-                        <span className="text-muted">Cargando...</span>
+                        <span className="text-muted">Cargando…</span>
                     </td>
                 </tr>
             </tbody>
@@ -23,7 +34,7 @@ const ColorsTable = ({ colors, isLoading, onEdit, onDelete }) => {
         <tbody>
             {colors.length === 0 ? (
                 <tr>
-                    <td colSpan="5" className="text-center py-5 text-muted">
+                    <td colSpan="6" className="text-center py-5 text-muted">
                         No se encontraron colores. Crea uno nuevo para empezar.
                     </td>
                 </tr>
@@ -65,12 +76,14 @@ const ColorsTable = ({ colors, isLoading, onEdit, onDelete }) => {
                                         ? new Date(color.createdAt).toLocaleDateString()
                                         : '—'}
                         </td>
-
-                        <td className="px-4 py-3 text-end">
+                        <td className="py-3 text-end">
                             <TableActions actions={[
                                 { icon: FiEdit2,  onClick: () => onEdit(color),   title: 'Editar',   variant: 'primary' },
-                                { icon: FiTrash2, onClick: () => onDelete(color), title: 'Eliminar', variant: 'danger'  },
                             ]} />
+                        </td>
+
+                        <td className="px-4 py-3 text-end">
+                            <DeleteActionButton onClick={() => onDelete(color)} />
                         </td>
                     </tr>
                 );

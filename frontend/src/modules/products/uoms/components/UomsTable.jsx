@@ -2,53 +2,62 @@ import React from 'react';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import TableActions from '~/core/components/TableActions';
 
+const DeleteActionButton = ({ onClick, title = 'Eliminar' }) => (
+    <button
+        type="button"
+        title={title}
+        onClick={onClick}
+        className="table-action-btn table-action-btn--danger"
+    >
+        <FiTrash2 size={15} />
+    </button>
+);
+
 /**
  * Tabla de Unidades de Medida con filas de carga, vacío y datos.
  */
 export function UomsTable({ uoms, isLoading, onEdit, onDelete }) {
+    if (isLoading) {
+        return (
+            <tbody>
+                <tr>
+                    <td colSpan={4} className="text-center py-5">
+                        <div className="spinner-border text-primary spinner-border-sm me-2" />
+                        <span className="text-muted">Cargando…</span>
+                    </td>
+                </tr>
+            </tbody>
+        );
+    }
+
     return (
-        <div className="table-responsive bg-white text-dark rounded-3" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <table className="table table-hover mb-0 align-middle text-dark" style={{ minWidth: '100%' }}>
-                <thead className="bg-body-tertiary text-muted small text-uppercase">
-                    <tr>
-                        <th className="border-0 px-4 py-3">Código</th>
-                        <th className="border-0 py-3">Nombre</th>
-                        <th className="border-0 px-4 py-3 text-end">Acciones</th>
+        <tbody>
+            {uoms.length === 0 ? (
+                <tr>
+                    <td colSpan={4} className="text-center py-5 text-muted">
+                        No hay unidades registradas. Crea la primera UOM para comenzar.
+                    </td>
+                </tr>
+            ) : (
+                uoms.map((uom) => (
+                    <tr key={uom.id} className="border-bottom border-light-subtle">
+                        <td className="px-4 py-3">
+                            <span className="uoms-code-chip">
+                                {uom.code}
+                            </span>
+                        </td>
+                        <td className="py-3 fw-semibold">{uom.name}</td>
+                        <td className="py-3 text-end">
+                            <TableActions actions={[
+                                { icon: FiEdit2, onClick: () => onEdit(uom), title: 'Editar', variant: 'primary' },
+                            ]} />
+                        </td>
+                        <td className="px-4 py-3 text-end">
+                            <DeleteActionButton onClick={() => onDelete(uom)} />
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {isLoading ? (
-                        <tr>
-                            <td colSpan={3} className="text-center py-5 text-muted">
-                                <div className="spinner-border spinner-border-sm me-2" /> Cargando...
-                            </td>
-                        </tr>
-                    ) : uoms.length === 0 ? (
-                        <tr>
-                            <td colSpan={3} className="text-center py-5 text-muted">
-                                No hay unidades de medida. Crea la primera.
-                            </td>
-                        </tr>
-                    ) : (
-                        uoms.map(uom => (
-                            <tr key={uom.id}>
-                                <td className="px-4">
-                                    <span className="badge bg-primary-subtle text-primary-emphasis fw-bold fs-6">
-                                        {uom.code}
-                                    </span>
-                                </td>
-                                <td className="fw-semibold">{uom.name}</td>
-                                <td className="px-4 text-end">
-                                    <TableActions actions={[
-                                        { icon: FiEdit2,  onClick: () => onEdit(uom),   title: 'Editar',   variant: 'primary' },
-                                        { icon: FiTrash2, onClick: () => onDelete(uom), title: 'Eliminar', variant: 'danger'  },
-                                    ]} />
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-        </div>
+                ))
+            )}
+        </tbody>
     );
 }

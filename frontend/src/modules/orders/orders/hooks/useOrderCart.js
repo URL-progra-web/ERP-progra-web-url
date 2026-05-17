@@ -68,11 +68,11 @@ const normalizeStoredItems = (payload) => {
     }, {});
 
     return Object.values(mergedByVariant)
-        .map((item) => {
+        .flatMap((item) => {
             const allowedBaseQty = clampBaseQuantity(item.desired_base_quantity, item.stock);
-            if (allowedBaseQty <= 0) return null;
+            if (allowedBaseQty <= 0) return [];
 
-            return {
+            return [{
                 variant_id: item.variant_id,
                 sku: item.sku,
                 product_name: item.product_name,
@@ -87,9 +87,8 @@ const normalizeStoredItems = (payload) => {
                 quantity: allowedBaseQty,
                 unit_price: item.unit_price,
                 stock: item.stock,
-            };
-        })
-        .filter(Boolean);
+            }];
+        });
 };
 
 const loadInitialItems = () => {

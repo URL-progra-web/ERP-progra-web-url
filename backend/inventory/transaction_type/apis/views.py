@@ -1,3 +1,4 @@
+from django.db.models.deletion import RestrictedError
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -53,4 +54,9 @@ class TransactionTypeViewSet(viewsets.ViewSet, PaginationMixin):
             self.service.delete_transaction_type(pk)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
+        except RestrictedError:
+            return Response(
+                {'error': 'No se puede eliminar el tipo de transacción porque está referenciado por movimientos.'},
+                status=status.HTTP_409_CONFLICT,
+            )

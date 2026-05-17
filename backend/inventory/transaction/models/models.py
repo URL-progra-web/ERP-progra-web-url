@@ -6,7 +6,7 @@ from inventory.transaction_type.models.models import TransactionType
 
 class InventoryTransaction(models.Model):
     variant = models.ForeignKey(ProductVariant, on_delete=models.RESTRICT)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True)
     transaction_type = models.ForeignKey(TransactionType, on_delete=models.RESTRICT)
     selected_uom = models.ForeignKey(UoM, on_delete=models.RESTRICT, related_name='inventory_transactions_selected')
     base_uom = models.ForeignKey(UoM, on_delete=models.RESTRICT, related_name='inventory_transactions_base')

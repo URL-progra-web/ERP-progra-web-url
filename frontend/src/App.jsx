@@ -4,6 +4,7 @@ import { AuthProvider } from '~/core/auth/AuthContext';
 import { ThemeProvider } from '~/core/theme/ThemeContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Added for dropdowns/modals
+import './index.css';
 
 const ProtectedRoute = lazy(() => import('~/core/auth/ProtectedRoute'));
 const DashboardLayout = lazy(() => import('~/core/layouts/DashboardLayout'));
@@ -30,7 +31,7 @@ const RouteLoader = () => (
                 }}
             />
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--bs-secondary-color)' }}>
-                Cargando modulo...
+                Cargando modulo…
             </span>
         </div>
     </div>

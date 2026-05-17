@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, use, useEffect } from 'react';
 import api from '../api/api';
 
 const AuthContext = createContext();
@@ -17,13 +17,13 @@ export const AuthProvider = ({ children }) => {
         api.get('/users/users/me/')
             .then(res => {
                 setUser(res.data);
-                localStorage.setItem('user', JSON.stringify(res.data));
+                localStorage.setItem('user:v1', JSON.stringify(res.data));
             })
             .catch(() => {
                 // Token invalid, expired, or user blocked - clear everything
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
-                localStorage.removeItem('user');
+                localStorage.removeItem('user:v1');
             })
             .finally(() => setLoading(false));
     }, []);
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
         
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user:v1', JSON.stringify(userData));
         
         setUser(userData);
         return userData;
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
+        localStorage.removeItem('user:v1');
         setUser(null);
     };
 
@@ -59,4 +59,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => use(AuthContext);

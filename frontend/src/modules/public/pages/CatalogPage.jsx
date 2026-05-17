@@ -229,7 +229,7 @@ export const CatalogPage = () => {
             </div>
 
             {filtersLoading ? (
-              <div className="store-muted" style={{ fontSize: '0.8rem' }}>Cargando filtros...</div>
+              <div className="store-muted" style={{ fontSize: '0.8rem' }}>Cargando filtros…</div>
             ) : (
               <FilterSidebar
                 filters={filters}
@@ -329,7 +329,7 @@ export const CatalogPage = () => {
                 <span className="store-kicker">
                   <FiSliders size={11} /> CATÁLOGO ACTIVO
                 </span>
-                <h2 className="store-section__title mt-2" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                <h2 className="store-section__title mt-2" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
                   {params.category ? categoryPath[categoryPath.length - 1]?.name : 'Toda la colección'}
                 </h2>
                 <p className="store-section__subtitle mb-0 d-flex align-items-center gap-2" style={{ fontSize: '0.875rem' }}>
@@ -360,7 +360,7 @@ export const CatalogPage = () => {
               {error && (
                 <div className="store-empty-state">
                   <span className="store-kicker">ERROR DE CARGA</span>
-                  <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                  <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
                     No pudimos cargar el catálogo
                   </h3>
                   <p className="store-lead mx-auto mb-4">{error}</p>
@@ -378,7 +378,7 @@ export const CatalogPage = () => {
                         <FiSearch size={28} />
                       </div>
                       <span className="store-kicker mt-3">SIN RESULTADOS</span>
-                      <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                      <h3 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
                         No encontramos productos
                       </h3>
                       <p className="store-lead mx-auto mb-4">
@@ -412,7 +412,7 @@ export const CatalogPage = () => {
     {/* Panel móvil de filtros */}
     {showMobileFilters && (
         <div className="store-cart-sheet d-lg-none">
-          <div className="store-cart-sheet__backdrop" onClick={() => setShowMobileFilters(false)} />
+          <div className="store-cart-sheet__backdrop" role="presentation" onClick={() => setShowMobileFilters(false)} onKeyDown={(e) => { if (e.key === 'Escape') setShowMobileFilters(false); }} />
           <aside className="store-cart-sheet__panel" aria-label="Filtros del catalogo">
             <div className="store-cart-sheet__header">
               <div className="store-inline-between align-items-start">

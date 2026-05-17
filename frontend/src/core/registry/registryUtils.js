@@ -7,9 +7,11 @@ export const getNavigationConfig = () => {
     const groups = {};
 
     REGISTERED_FEATURES.forEach(feature => {
-        if (!groups[feature.group]) {
-            groups[feature.group] = {
-                title: feature.group,
+        const groupTitle = feature.group || feature.title || feature.id || 'General';
+
+        if (!groups[groupTitle]) {
+            groups[groupTitle] = {
+                title: groupTitle,
                 items: []
             };
         }
@@ -20,7 +22,7 @@ export const getNavigationConfig = () => {
             // Tip: podemos añadir logic para que si el item es para admin se ponga /dashboard/admin/item.path
             const primaryRole = item.roles[0].toLowerCase(); // e.g., 'admin'
             
-            groups[feature.group].items.push({
+            groups[groupTitle].items.push({
                 ...item,
                 path: `/dashboard/${primaryRole}/${item.path}`
             });

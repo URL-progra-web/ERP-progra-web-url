@@ -85,7 +85,7 @@ export const ProductDetailPage = () => {
     return (
       <div className="store-empty-state">
         <span className="store-kicker">PRODUCTO NO DISPONIBLE</span>
-        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
           No pudimos cargar este producto
         </h2>
         <p className="store-lead mx-auto mb-4">{error || 'Producto no encontrado'}</p>
@@ -151,7 +151,7 @@ export const ProductDetailPage = () => {
             </div>
 
             <div>
-              <h1 className="store-product-panel__title" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+              <h1 className="store-product-panel__title" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
                 {product.name}
               </h1>
             </div>
@@ -176,9 +176,9 @@ export const ProductDetailPage = () => {
               {/* Colores disponibles */}
               {(() => {
                 const uniqueColors = [...new Map(
-                  product.variants
-                    .filter(v => v.color_name)
-                    .map(v => [v.color_name, { name: v.color_name, hex: v.color_hex }])
+                  product.variants.flatMap(v =>
+                    v.color_name ? [[v.color_name, { name: v.color_name, hex: v.color_hex }]] : []
+                  )
                 ).values()];
 
                 if (uniqueColors.length > 0) {
@@ -230,9 +230,7 @@ export const ProductDetailPage = () => {
               {/* Tallas disponibles */}
               {(() => {
                 const uniqueSizes = [...new Set(
-                  product.variants
-                    .filter(v => v.size_name)
-                    .map(v => v.size_name)
+                  product.variants.flatMap(v => v.size_name ? [v.size_name] : [])
                 )];
 
                 if (uniqueSizes.length > 0) {
@@ -338,7 +336,7 @@ export const ProductDetailPage = () => {
                 onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
                 min="1"
               />
-              <button type="button" onClick={() => setQuantity(quantity + 1)} aria-label="Aumentar cantidad">
+              <button type="button" onClick={() => setQuantity(prev => prev + 1)} aria-label="Aumentar cantidad">
                 <FiPlus size={14} />
               </button>
             </div>
@@ -404,7 +402,7 @@ export const ProductDetailPage = () => {
       {/* FILA 2: Contexto/Descripción (A) - Debajo de la foto */}
       <section className="store-panel mt-4">
         <span className="store-kicker">DESCRIPCIÓN</span>
-        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+        <h2 className="store-section__title mt-2 mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
           Contexto del producto
         </h2>
         <p className="store-lead mb-0">
@@ -451,7 +449,7 @@ export const ProductDetailPage = () => {
 
           {/* Colores disponibles */}
           {(() => {
-            const uniqueColors = [...new Set(product.variants?.map(v => v.color_name).filter(Boolean))];
+            const uniqueColors = [...new Set(product.variants?.flatMap(v => v.color_name ? [v.color_name] : []))];
             if (uniqueColors.length > 0) {
               return (
                 <div className="col-md-6 col-lg-4">
@@ -467,7 +465,7 @@ export const ProductDetailPage = () => {
 
           {/* Tallas disponibles */}
           {(() => {
-            const uniqueSizes = [...new Set(product.variants?.map(v => v.size_name).filter(Boolean))];
+            const uniqueSizes = [...new Set(product.variants?.flatMap(v => v.size_name ? [v.size_name] : []))];
             if (uniqueSizes.length > 0) {
               return (
                 <div className="col-md-6 col-lg-4">

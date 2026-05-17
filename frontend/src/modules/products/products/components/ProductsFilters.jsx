@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
-import { RecursiveHierarchySelector } from '~/core/components';
+import { AppSelect, RecursiveHierarchySelector } from '~/core/components';
 
 const ProductsFilters = ({ 
     searchInput, onSearchChange, onSearch, 
@@ -18,7 +18,25 @@ const ProductsFilters = ({
     return (
         <div className="card-body bg-body-tertiary border-bottom p-3">
             <div className="row g-3">
-                <div className="col-12 col-lg-5 d-flex flex-column gap-2">
+                <div className="col-12 col-lg-6">
+                    <div className="h-100">
+                        <RecursiveHierarchySelector
+                            items={categories}
+                            value={categoryFilter}
+                            onChange={onCategoryChange}
+                            getId={(item) => item?.id}
+                            getParentId={(item) => item?.parent}
+                            getLabel={(item) => item?.name}
+                            getIsLeaf={(item) => item?.is_leaf}
+                            rootOptionLabel="Todas las categorías"
+                            levelRootLabel="Filtrar por categoría"
+                            levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
+                            selectionMode="any"
+                        />
+                    </div>
+                </div>
+
+                <div className="col-12 col-lg-6 d-flex flex-column gap-2">
                     <form onSubmit={handleSubmit} className="input-group">
                         <span className="input-group-text bg-body border-end-0 text-muted">
                             <FiSearch size={14} />
@@ -34,72 +52,49 @@ const ProductsFilters = ({
                             value={searchInput}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
-                        <button 
-                            className="btn btn-primary" 
+                        <button
+                            className="btn btn-primary"
                             type="submit"
                         >
                             Buscar
                         </button>
                     </form>
-                    <select
+
+                    <AppSelect
                         id="productsEntrepreneurFilter"
                         name="products_entrepreneur_filter"
-                        aria-label="Filtrar productos por emprendedor"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar productos por emprendedor"
                         value={entrepreneurFilter}
-                        onChange={(e) => onEntrepreneurChange(e.target.value)}
-                    >
-                        <option value="">Todos los emprendedores</option>
-                        {entrepreneurs.map(ent => (
-                            <option key={ent.id} value={ent.id}>{ent.company_name}</option>
-                        ))}
-                    </select>
+                        onChange={onEntrepreneurChange}
+                        options={[
+                            { value: '', label: 'Todos los emprendedores' },
+                            ...entrepreneurs.map(ent => ({ value: ent.id, label: ent.company_name })),
+                        ]}
+                    />
 
-                    <select
+                    <AppSelect
                         id="productsBusinessUnitFilter"
                         name="products_business_unit_filter"
-                        aria-label="Filtrar productos por sede"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar productos por sede"
                         value={businessUnitFilter}
-                        onChange={(e) => onBusinessUnitChange(e.target.value)}
-                    >
-                        <option value="">Todas las sedes</option>
-                        {businessUnits.map(bu => (
-                            <option key={bu.id} value={bu.id}>{bu.name}</option>
-                        ))}
-                    </select>
+                        onChange={onBusinessUnitChange}
+                        options={[
+                            { value: '', label: 'Todas las sedes' },
+                            ...businessUnits.map(bu => ({ value: bu.id, label: bu.name })),
+                        ]}
+                    />
 
-                    <select
+                    <AppSelect
                         id="productsUomFilter"
                         name="products_uom_filter"
-                        aria-label="Filtrar productos por unidad base"
-                        className="form-select bg-body shadow-none text-body"
+                        ariaLabel="Filtrar productos por unidad base"
                         value={baseUomFilter}
-                        onChange={(e) => onBaseUomChange(e.target.value)}
-                    >
-                        <option value="">Todas las UOM base</option>
-                        {uoms.map((uom) => (
-                            <option key={uom.id} value={uom.id}>{uom.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="col-12 col-lg-7 d-flex justify-content-lg-end">
-                    <div className="w-100" style={{ maxWidth: '700px' }}>
-                        <RecursiveHierarchySelector
-                            items={categories}
-                            value={categoryFilter}
-                            onChange={onCategoryChange}
-                            getId={(item) => item?.id}
-                            getParentId={(item) => item?.parent}
-                            getLabel={(item) => item?.name}
-                            getIsLeaf={(item) => item?.is_leaf}
-                            rootOptionLabel="Todas las categorías"
-                            levelRootLabel="Filtrar por categoría"
-                            levelChildLabel={(parentName) => `Subcategorías de "${parentName || 'Categoría'}"`}
-                            selectionMode="any"
-                        />
-                    </div>
+                        onChange={onBaseUomChange}
+                        options={[
+                            { value: '', label: 'Todas las UOM base' },
+                            ...uoms.map((uom) => ({ value: uom.id, label: uom.name })),
+                        ]}
+                    />
                 </div>
             </div>
         </div>
