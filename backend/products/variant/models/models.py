@@ -4,10 +4,10 @@ from products.size.models.models import Size
 from products.color.models.models import Color
 
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     sku = models.CharField(max_length=100, unique=True)
-    size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True, blank=True)
-    color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True, blank=True)
+    size = models.ForeignKey(Size, on_delete=models.RESTRICT, null=True, blank=True)
+    color = models.ForeignKey(Color, on_delete=models.RESTRICT, null=True, blank=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='product_variants/', null=True, blank=True)

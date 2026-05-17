@@ -79,7 +79,7 @@ class PaymentMethodViewSet(viewsets.ViewSet, PaginationMixin):
         except PaymentMethodNotFound as exc:
             return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
         except (ValueError, PaymentMethodInUse) as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @staticmethod

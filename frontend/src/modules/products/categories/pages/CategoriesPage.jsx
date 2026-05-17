@@ -98,7 +98,7 @@ const CategoriesPage = () => {
         setAlertConfig({
             type: 'danger',
             header: '¿Eliminar esta categoría?',
-            content: `Se eliminará "${category.name}" y los productos que la usen quedarán sin categoría. Esta acción no se puede deshacer.`,
+            content: `Se eliminará "${category.name}" si no tiene subcategorías ni productos asociados. Esta acción no se puede deshacer.`,
             confirmLabel: 'Sí, eliminar',
             onConfirm: async () => {
                 await deleteCategory(category.id);

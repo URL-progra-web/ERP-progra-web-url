@@ -1,8 +1,10 @@
 from django.db.models import Q
+from django.db.models.deletion import RestrictedError
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from products.category.models.models import Category
+from products.product.models.models import Product
 from products.category.serializers.serializers import CategorySerializer
 
 
@@ -44,4 +46,15 @@ class CategoryViewSet(ModelViewSet):
                 {'error': 'No puedes eliminar una categoría que tiene subcategorías.'},
                 status=status.HTTP_409_CONFLICT,
             )
-        return super().destroy(request, *args, **kwargs)
+        if Product.objects.filter(category=instance).exists():
+            return Response(
+                {'error': 'No puedes eliminar una categoría que está asignada a uno o más productos.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except RestrictedError:
+            return Response(
+                {'error': 'No se puede eliminar la categoría porque está referenciada por otros registros.'},
+                status=status.HTTP_409_CONFLICT,
+            )

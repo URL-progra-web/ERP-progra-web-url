@@ -31,6 +31,12 @@ export function useCategories() {
         }
     }, [searchTerm, leafFilter]);
 
+    const parseError = (err, fallback) => (
+        err?.response?.data?.error
+        || err?.response?.data?.message
+        || fallback
+    );
+
     useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
     const handleSearch = () => {
@@ -47,8 +53,14 @@ export function useCategories() {
     };
 
     const deleteCategory = async (id) => {
-        await categoryService.deleteCategory(id);
-        fetchCategories();
+        try {
+            await categoryService.deleteCategory(id);
+            await fetchCategories();
+            return true;
+        } catch (err) {
+            setError(parseError(err, 'No se pudo eliminar la categoría.'));
+            return false;
+        }
     };
 
     return {

@@ -1,3 +1,4 @@
+from django.db.models.deletion import RestrictedError
 from datetime import datetime
 
 from django.utils.dateparse import parse_date, parse_datetime
@@ -64,6 +65,11 @@ class EntrepreneurViewSet(viewsets.ViewSet, PaginationMixin):
             self.service.delete_entrepreneur(self._parse_pk(pk))
         except EntrepreneurNotFound as exc:
             return Response({'error': str(exc)}, status=status.HTTP_404_NOT_FOUND)
+        except RestrictedError:
+            return Response(
+                {'error': 'No se puede eliminar el emprendedor porque está asociado a productos u otros registros.'},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'], url_path='users')

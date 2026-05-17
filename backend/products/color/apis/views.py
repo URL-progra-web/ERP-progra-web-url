@@ -1,3 +1,4 @@
+from django.db.models.deletion import RestrictedError
 from rest_framework import status
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
@@ -19,4 +20,10 @@ class ColorViewSet(ModelViewSet):
                 {'error': 'No puedes eliminar un color que ya está asignado a una o más variantes.'},
                 status=status.HTTP_409_CONFLICT,
             )
-        return super().destroy(request, *args, **kwargs)
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except RestrictedError:
+            return Response(
+                {'error': 'No se puede eliminar el color porque está referenciado por otros registros.'},
+                status=status.HTTP_409_CONFLICT,
+            )
