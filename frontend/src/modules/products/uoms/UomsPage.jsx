@@ -11,6 +11,7 @@ import AppAlert from '~/core/components/AppAlert';
 import AppCard from '~/core/components/AppCard';
 import PageHeader from '~/core/components/PageHeader';
 import AppPagination from '~/core/components/AppPagination';
+import './uoms-ui.css';
 
 const UomsPage = () => {
     const {
@@ -39,7 +40,6 @@ const UomsPage = () => {
 
     return (
         <div className="container-fluid p-0">
-            {/* Header */}
             <PageHeader
                 title="Unidades de Medida"
                 subtitle="Administra UOMs y sus conversiones"
@@ -50,7 +50,6 @@ const UomsPage = () => {
                 isDark
             />
 
-            {/* Global error */}
             {error && (
                 <AppAlert
                     type="warning"
@@ -63,26 +62,60 @@ const UomsPage = () => {
             <AppCard accent="var(--bs-primary)">
                 <AppCard.Section label="Tipo">
                     <div className="p-3 p-md-4 border-bottom">
-                        <FilterTabs
-                            options={[
-                                { value: 'uoms',        label: 'Unidades de Medida', badge: uoms.length },
-                                { value: 'conversions', label: 'Conversiones',       badge: conversions.length },
-                            ]}
-                            value={activeTab}
-                            onChange={setActiveTab}
-                        />
+                        <div className="uoms-page-tabs-shell">
+                            <span className="uoms-page-tabs-shell__eyebrow">Espacio de trabajo</span>
+                            <div className="uoms-page-tabs-shell__copy">
+                                Alterna entre el catálogo base de unidades y la matriz de equivalencias que usa el inventario.
+                            </div>
+                            <FilterTabs
+                                options={[
+                                    { value: 'uoms', label: 'Unidades de Medida', badge: uomCount },
+                                    { value: 'conversions', label: 'Conversiones', badge: convCount },
+                                ]}
+                                value={activeTab}
+                                onChange={setActiveTab}
+                                size="lg"
+                            />
+                        </div>
                     </div>
                 </AppCard.Section>
 
                 <AppCard.Section label={activeTab === 'uoms' ? 'Unidades de Medida' : 'Conversiones'}>
                     <div className="p-3 p-md-4">
+                        <div className="uoms-page-section-intro">
+                            <div>
+                                <h3 className="uoms-page-section-intro__title">
+                                    {activeTab === 'uoms' ? 'Catálogo base de unidades' : 'Mapa de conversiones'}
+                                </h3>
+                                <p className="uoms-page-section-intro__text">
+                                    {activeTab === 'uoms'
+                                        ? 'Mantén códigos cortos y nombres claros para que el catálogo sea fácil de reutilizar en productos e inventario.'
+                                        : 'Define relaciones exactas entre unidades de origen y destino para que los movimientos y presentaciones mantengan consistencia.'}
+                                </p>
+                            </div>
+                            <span className="uoms-page-section-intro__pill">
+                                {activeTab === 'uoms' ? uomCount : convCount}
+                            </span>
+                        </div>
+
                         {activeTab === 'uoms' && (
-                            <UomsTable
-                                uoms={uoms}
-                                isLoading={isLoadingUoms}
-                                onEdit={setUomModal}
-                                onDelete={handleDeleteUom}
-                            />
+                            <div className="table-responsive bg-body">
+                                <table className="table table-hover mb-0 align-middle">
+                                    <thead className="text-uppercase text-muted small">
+                                        <tr>
+                                            <th className="border-0 px-4 py-3">Código</th>
+                                            <th className="border-0 py-3">Nombre</th>
+                                            <th className="border-0 px-4 py-3 text-end">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <UomsTable
+                                        uoms={uoms}
+                                        isLoading={isLoadingUoms}
+                                        onEdit={setUomModal}
+                                        onDelete={handleDeleteUom}
+                                    />
+                                </table>
+                            </div>
                         )}
 
                         {activeTab === 'conversions' && (
@@ -109,7 +142,6 @@ const UomsPage = () => {
                 </AppCard.Section>
             </AppCard>
 
-            {/* Modals */}
             {uomModal && (
                 <UomModal
                     uom={uomModal === 'new' ? null : uomModal}
@@ -126,7 +158,6 @@ const UomsPage = () => {
                 />
             )}
 
-            {/* AppAlert: confirmations and error messages */}
             {alertConfig && (
                 <AppAlert
                     type={alertConfig.type}

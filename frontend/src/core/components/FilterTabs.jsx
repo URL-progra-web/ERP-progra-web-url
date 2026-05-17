@@ -14,11 +14,23 @@ import React from 'react';
  */
 
 const FilterTabs = ({ options, value, onChange, size = 'sm' }) => {
-    const padding = size === 'sm' ? '5px 14px' : '7px 18px';
-    const fontSize = size === 'sm' ? '12px' : '13px';
+    const padding = size === 'sm'
+        ? '5px 14px'
+        : size === 'lg'
+            ? '11px 24px'
+            : '7px 18px';
+    const fontSize = size === 'sm'
+        ? '12px'
+        : size === 'lg'
+            ? '15px'
+            : '13px';
+    const badgeMinWidth = size === 'lg' ? 24 : 18;
+    const badgeHeight = size === 'lg' ? 24 : 18;
+    const badgeFontSize = size === 'lg' ? '12px' : '10px';
+    const gap = size === 'lg' ? '8px' : '6px';
 
     return (
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: size === 'lg' ? '8px' : '4px', flexWrap: 'wrap' }}>
             {options.map((opt) => {
                 const isActive = opt.value === value;
                 return (
@@ -46,7 +58,7 @@ const FilterTabs = ({ options, value, onChange, size = 'sm' }) => {
                             transition: 'background-color 0.15s, color 0.15s',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '6px',
+                            gap,
                             whiteSpace: 'nowrap',
                         }}
                     >
@@ -57,11 +69,11 @@ const FilterTabs = ({ options, value, onChange, size = 'sm' }) => {
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    minWidth: 18,
-                                    height: 18,
+                                    minWidth: badgeMinWidth,
+                                    height: badgeHeight,
                                     borderRadius: '9px',
                                     padding: '0 5px',
-                                    fontSize: '10px',
+                                    fontSize: badgeFontSize,
                                     fontWeight: 700,
                                     background: isActive
                                         ? 'var(--bs-primary)'
