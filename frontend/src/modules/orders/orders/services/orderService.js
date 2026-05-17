@@ -18,6 +18,11 @@ export const orderService = {
         return response.data;
     },
 
+    async getHistory(id) {
+        const response = await api.get(`${BASE_URL}${id}/history/`);
+        return response.data;
+    },
+
     async catalogs() {
         const response = await api.get(`${BASE_URL}catalogs/`);
         return response.data;
