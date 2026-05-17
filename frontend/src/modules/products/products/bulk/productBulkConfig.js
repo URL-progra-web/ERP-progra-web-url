@@ -37,7 +37,7 @@ export const getOptionLabel = (item, fallback = 'name') => (
 );
 
 export const buildDatalistValues = (items, fallback = 'name') => (
-    items.map((item) => getOptionLabel(item, fallback)).filter(Boolean)
+    items.flatMap((item) => { const l = getOptionLabel(item, fallback); return l ? [l] : []; })
 );
 
 export const getCategoryPathLabel = (category, categories) => {

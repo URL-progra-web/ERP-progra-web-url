@@ -86,6 +86,7 @@ export const PaymentMethodModal = ({ method, onSave, onClose }) => {
                     className="form-check-input ms-0 fs-4"
                     type="checkbox"
                     role="switch"
+                    aria-checked={form.is_active}
                     id="isActiveSwitch"
                     name="is_active"
                     checked={form.is_active}

@@ -94,8 +94,9 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                 <form className="d-flex flex-column gap-3" onSubmit={handleSubmit}>
                     <div className="row g-3">
                         <div className="col-md-4">
-                            <label className="form-label small text-muted">ID del pedido *</label>
+                            <label htmlFor="order-id-input" className="form-label small text-muted">ID del pedido *</label>
                             <input
+                                id="order-id-input"
                                 type="number"
                                 min="1"
                                 className="form-control"
@@ -156,8 +157,9 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                             </div>
                         )}
                         <div className="col-md-4">
-                            <label className="form-label small text-muted">Nuevo estado *</label>
+                            <label htmlFor="target-status-select" className="form-label small text-muted">Nuevo estado *</label>
                             <AppSelect
+                                id="target-status-select"
                                 name="target_status"
                                 value={form.target_status}
                                 onChange={(targetStatus) => handleChange({ target: { name: 'target_status', value: targetStatus } })}
@@ -168,8 +170,9 @@ export const TransitionPanel = ({ workflow, statuses, onSubmit, isLoadingWorkflo
                             />
                         </div>
                         <div className="col-md-4">
-                            <label className="form-label small text-muted">Notas</label>
+                            <label htmlFor="notes-input" className="form-label small text-muted">Notas</label>
                             <input
+                                id="notes-input"
                                 type="text"
                                 className="form-control"
                                 name="notes"

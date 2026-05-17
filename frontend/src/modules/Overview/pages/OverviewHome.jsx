@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '~/core/auth/AuthContext';
 import { getNavigationConfig } from '~/core/registry/registryUtils';
@@ -7,7 +7,7 @@ import { getNavigationConfig } from '~/core/registry/registryUtils';
 
 const WelcomeCard = ({ user }) => {
     const initial = user?.name?.charAt(0)?.toUpperCase() || 'U';
-    const hour = new Date().getHours();
+    const hour = useMemo(() => new Date().getHours(), []);
     const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
 
     return (

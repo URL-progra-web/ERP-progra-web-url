@@ -68,9 +68,9 @@ const SidebarNavGroup = ({ group, isCollapsed, onItemClick, userRole, isFirst, i
             </div>
         )}
         <ul className="sidebar-nav-list">
-            {group.items.map((item, i) => (
+            {group.items.map((item) => (
                 <SidebarNavItem
-                    key={i}
+                    key={item.path}
                     item={item}
                     isCollapsed={isCollapsed}
                     onItemClick={onItemClick}

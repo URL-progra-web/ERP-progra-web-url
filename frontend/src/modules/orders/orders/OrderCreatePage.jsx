@@ -110,7 +110,7 @@ const OrderCreatePage = () => {
             customer_id: String(preselectedCustomer.id),
             shipping_address: preselectedCustomer.address || prev.shipping_address || '',
         }));
-    }, [location.state]);
+    }, [location.state?.initialCustomer?.id]);
 
     const handleSelectCustomer = (customer) => {
         setSelectedCustomer(customer);

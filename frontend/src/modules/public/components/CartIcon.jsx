@@ -10,7 +10,7 @@ export const CartIcon = ({ count, onClick }) => {
         <span
           key={count}
           className="position-absolute top-0 start-100 translate-middle badge rounded-pill store-cart-badge"
-          style={{ fontSize: '0.65rem', background: '#f43f5e' }}
+          style={{ fontSize: '0.75rem', background: '#f43f5e' }}
         >
           {count > 99 ? '99+' : count}
         </span>
