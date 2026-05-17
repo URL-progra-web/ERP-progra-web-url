@@ -15,21 +15,20 @@ from inventory.transaction.serializers.serializers import (
 )
 from inventory.transaction.services.services import InventoryTransactionService
 
-
 class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
     permission_classes = [IsAuthenticated, HasRole]
-    allowed_roles = ["ADMIN"]
+    allowed_roles = ['ADMIN']
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.service = InventoryTransactionService()
 
     def list(self, request):
-        variant_id = request.query_params.get("variant_id")
-        transaction_type_name = request.query_params.get("transaction_type")
+        variant_id = request.query_params.get('variant_id')
+        transaction_type_name = request.query_params.get('transaction_type')
         date_from = request.query_params.get("date_from")
         date_to = request.query_params.get("date_to")
-
+        
         qs = self.service.list_transactions_filtered(
             variant_id=int(variant_id) if variant_id else None,
             transaction_type_name=transaction_type_name,
@@ -41,9 +40,7 @@ class InventoryTransactionViewSet(viewsets.ViewSet, PaginationMixin):
     def retrieve(self, request, pk=None):
         transaction = self.service.get_transaction(pk)
         if not transaction:
-            return Response(
-                {"error": "Transacción no encontrada"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'Transacción no encontrada'}, status=status.HTTP_404_NOT_FOUND)
         serializer = InventoryTransactionSerializer(transaction)
         return Response(serializer.data)
 

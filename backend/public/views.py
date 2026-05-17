@@ -316,8 +316,8 @@ class PublicOrderCreateView(APIView):
             if data['customer_name'] and customer.name != data['customer_name']:
                 customer.name = data['customer_name']
                 updated = True
-            if customer_email and not customer.email:
-                customer.email = customer_email
+            if data.get('customer_email') and not customer.email:
+                customer.email = data['customer_email']
                 updated = True
             if updated:
                 customer.save()
