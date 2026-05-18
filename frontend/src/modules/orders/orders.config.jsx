@@ -7,6 +7,8 @@ const OrdersPage = React.lazy(() => import('./orders/OrdersPage'));
 const OrderDetailPage = React.lazy(() => import('./orders/OrderDetailPage'));
 const OrderCreatePage = React.lazy(() => import('./orders/OrderCreatePage'));
 const OrdersChartPage = React.lazy(() => import('./orders/OrdersChartPage'));
+const OrdersReport = React.lazy(() => import('./ordersReport'));
+
 export const ordersFeature = {
     items: [
         {
@@ -52,6 +54,14 @@ export const ordersFeature = {
             icon: FiBarChart2,
             roles: ['MANAGER', 'ADMIN'],
             element: <OrdersChartPage />,
+        },
+
+        {
+            text: 'Reporte de Pedidos',
+            path: 'orders/report',
+            icon: FiBarChart2,
+            roles: ['MANAGER', 'ADMIN'],
+            element: <OrdersReport />,
         },
     ],
 };
