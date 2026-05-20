@@ -41,6 +41,7 @@ SECRET_KEY = os.environ.get(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool('DEBUG', True)
+ENABLE_API_DOCS = env_bool('ENABLE_API_DOCS', DEBUG)
 
 ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
 render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
