@@ -1,3 +1,7 @@
+import os
+
+from django.contrib.auth.hashers import make_password
+
 from core.seeds import BaseSeeder
 from users.role.services.services import RoleService
 from users.user.services.services import UserService
@@ -25,16 +29,26 @@ class UserSeeder(BaseSeeder):
                 role_objs[name] = role
                 print(f"{name} role already exists.")
 
-        # Create Admin user
+        # Create or update the demo admin user.
         admin_role = role_objs.get('ADMIN')
         if admin_role:
-            try:
+            admin_name = os.environ.get('DEMO_ADMIN_NAME', 'Super Admin')
+            admin_email = os.environ.get('DEMO_ADMIN_EMAIL', 'admin@admin.com')
+            admin_password = os.environ.get('DEMO_ADMIN_PASSWORD', 'admin')
+
+            existing_user = self.user_service.get_user_by_email(admin_email)
+            if existing_user:
+                existing_user.name = admin_name
+                existing_user.role = admin_role
+                existing_user.is_active = True
+                existing_user.password_hash = make_password(admin_password)
+                existing_user.save()
+                print(f"Updated {admin_email} user.")
+            else:
                 self.user_service.create_user(
-                    name='Super Admin',
+                    name=admin_name,
                     role_id=admin_role.id,
-                    email='admin@admin.com',
-                    password='admin'
+                    email=admin_email,
+                    password=admin_password
                 )
-                print("Created admin@erp.com user.")
-            except ValueError as e:
-                print(f"Admin user creation skipped: {e}")
+                print(f"Created {admin_email} user.")
