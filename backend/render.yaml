@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: erp-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT
+    disk:
+      name: erp-backend-data
+      mountPath: /opt/render/project/src/backend
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8

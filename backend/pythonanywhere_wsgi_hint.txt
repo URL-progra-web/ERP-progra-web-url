@@ -1,0 +1,17 @@
+Configuracion sugerida para PythonAnywhere
+
+1. Directorio de trabajo:
+   /home/TU_USUARIO/ERP-progra-web-url/backend
+
+2. WSGI file:
+   import os
+   import sys
+
+   path = '/home/TU_USUARIO/ERP-progra-web-url/backend'
+   if path not in sys.path:
+       sys.path.append(path)
+
+   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+
+   from django.core.wsgi import get_wsgi_application
+   application = get_wsgi_application()

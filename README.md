@@ -4,7 +4,7 @@ Sistema ERP moderno con backend Django REST Framework y frontend React + Vite.
 
 ## Tecnologias
 
-- **Backend**: Django 4.2+, Django REST Framework, PostgreSQL
+- **Backend**: Django 4.2+, Django REST Framework, SQLite
 - **Frontend**: React 19, Vite, React Router, Bootstrap
 - **Contenedores**: Docker, Docker Compose
 
@@ -14,7 +14,6 @@ Sistema ERP moderno con backend Django REST Framework y frontend React + Vite.
 - Opcional (para desarrollo local sin Docker):
   - Python 3.12+
   - Node.js 22+
-  - PostgreSQL 17+
 
 ---
 
@@ -34,7 +33,6 @@ docker-compose down
 **Servicios disponibles:**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8000/api
-- PostgreSQL: localhost:5432
 
 ---
 
@@ -52,13 +50,6 @@ source venv/bin/activate  # Linux/Mac
 
 # Instalar dependencias
 pip install -r requirements.txt
-
-# Configurar variables de entorno
-export POSTGRES_DB=erp_db
-export POSTGRES_USER=erp_user
-export POSTGRES_PASSWORD=erp_password
-export POSTGRES_HOST=localhost
-export POSTGRES_PORT=5432
 
 # Ejecutar migraciones
 python manage.py migrate
@@ -354,18 +345,67 @@ path('api/nombre_app/', include('nombre_app.urls')),
 
 ## Configuracion de Variables de Entorno
 
-### Backend (Docker)
+### Backend
 
-El backend usa las variables definidas en `docker-compose.yml`:
-- `POSTGRES_DB`: erp_db
-- `POSTGRES_USER`: erp_user
-- `POSTGRES_PASSWORD`: erp_password
-- `POSTGRES_HOST`: db
-- `POSTGRES_PORT`: 5432
+La base de datos ya no depende de `.env` ni de credenciales externas. Django usa SQLite en:
 
-### Frontend (Docker)
+- `backend/db.sqlite3`
 
-- `VITE_API_URL`: http://localhost:8000/api
+Las variables que siguen existiendo son opcionales y no afectan al motor de base de datos:
+
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `EMAIL_USE_TLS`
+- `EMAIL_HOST_USER`
+- `EMAIL_HOST_PASSWORD`
+- `DEFAULT_FROM_EMAIL`
+- `TURNSTILE_SECRET_KEY`
+
+### Frontend
+
+- `VITE_API_URL`: URL completa del backend con sufijo `/api`
+- Ejemplo local: `http://localhost:8000/api`
+- Ejemplo produccion: `https://tu-backend.onrender.com/api`
+
+---
+
+## Despliegue
+
+### Frontend en Vercel
+
+El frontend ya queda preparado para Vercel con SPA fallback en [frontend/vercel.json](/GitHub/ERP-progra-web-url/frontend/vercel.json:1).
+
+Configuracion recomendada en Vercel:
+
+1. Importa el repositorio.
+2. Define `Root Directory = frontend`.
+3. Framework preset: `Vite`.
+4. Build command: `npm run build`.
+5. Output directory: `dist`.
+6. Agrega `VITE_API_URL` cuando ya tengas publicado el backend.
+
+### Backend en Render
+
+Queda preparado con [backend/render.yaml](/ERP-progra-web-url/backend/render.yaml:1).
+
+Puntos clave:
+
+1. Usa SQLite.
+2. Monta un disco persistente para no perder `db.sqlite3`.
+3. Ejecuta migraciones y `collectstatic` en build.
+4. Arranca con `gunicorn`.
+
+### Backend en PythonAnywhere
+
+Deje una plantilla base en [backend/pythonanywhere_wsgi_hint.txt](/GitHub/ERP-progra-web-url/backend/pythonanywhere_wsgi_hint.txt:1).
+
+### Como unir frontend y backend
+
+1. Despliega primero el backend en Render o PythonAnywhere.
+2. Copia la URL publica del backend, por ejemplo `https://tu-backend.onrender.com`.
+3. En Vercel, crea la variable `VITE_API_URL=https://tu-backend.onrender.com/api`.
+4. Redepliega el frontend en Vercel para que Vite incruste esa URL en el build.
+5. Verifica login y catalogo publico desde el dominio de Vercel.
 
 ---
 

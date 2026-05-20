@@ -1,20 +1,4 @@
 services:
-  db:
-    image: postgres:17
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=erp_db
-      - POSTGRES_USER=erp_user
-      - POSTGRES_PASSWORD=erp_password
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U erp_user -d erp_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   backend:
     build: backend/
     command: >
@@ -24,15 +8,6 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      - POSTGRES_DB=erp_db
-      - POSTGRES_USER=erp_user
-      - POSTGRES_PASSWORD=erp_password
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
 
   frontend:
     build: frontend/
@@ -46,6 +21,3 @@ services:
       - VITE_API_URL=http://localhost:8000/api
     depends_on:
       - backend
-
-volumes:
-  postgres_data:
