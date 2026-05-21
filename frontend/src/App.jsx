@@ -12,10 +12,6 @@ const Login = lazy(() => import('~/modules/Auth/pages/Login'));
 const DynamicRoutes = lazy(() => import('~/core/registry/DynamicRoutes'));
 const ForbiddenPage = lazy(() => import('~/modules/misc/pages/ForbiddenPage'));
 const NotFoundPage = lazy(() => import('~/modules/misc/pages/NotFoundPage'));
-const PublicLayout = lazy(() => import('~/modules/public/layouts/PublicLayout').then((module) => ({ default: module.PublicLayout })));
-const CatalogPage = lazy(() => import('~/modules/public/pages/CatalogPage').then((module) => ({ default: module.CatalogPage })));
-const ProductDetailPage = lazy(() => import('~/modules/public/pages/ProductDetailPage').then((module) => ({ default: module.ProductDetailPage })));
-const CheckoutPage = lazy(() => import('~/modules/public/pages/CheckoutPage').then((module) => ({ default: module.CheckoutPage })));
 
 const RouteLoader = () => (
     <div className="min-vh-100 d-flex align-items-center justify-content-center bg-body text-body">
@@ -47,13 +43,6 @@ function App() {
                 <BrowserRouter>
                     <Suspense fallback={<RouteLoader />}> 
                         <Routes>
-                            {/* Public Store */}
-                            <Route path="/tienda" element={<PublicLayout />}>
-                                <Route index element={<CatalogPage />} />
-                                <Route path="producto/:id" element={<ProductDetailPage />} />
-                                <Route path="checkout" element={<CheckoutPage />} />
-                            </Route>
-
                             {/* Auth */}
                             <Route path="/login" element={<Login />} />
 

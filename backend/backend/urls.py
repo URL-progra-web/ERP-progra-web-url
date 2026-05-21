@@ -12,8 +12,10 @@ urlpatterns = [
     path('api/inventory/', include('inventory.urls')),
     path('api/orders/', include('orders.urls')),
     path('api/receipts/', include('receipts.urls')),
-    path('api/public/', include('public.urls')),
 ]
+
+if settings.ENABLE_PUBLIC_STOREFRONT:
+    urlpatterns.append(path('api/public/', include('public.urls')))
 
 if settings.ENABLE_API_DOCS:
     urlpatterns = [
