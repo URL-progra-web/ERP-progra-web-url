@@ -211,8 +211,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
+default_media_root = BASE_DIR / 'media' if DEBUG else Path('/tmp/media')
+MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', default_media_root))
+try:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+except PermissionError:
+    MEDIA_ROOT = Path('/tmp/media')
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS')
 CORS_ALLOW_ALL_ORIGINS = not CORS_ALLOWED_ORIGINS and DEBUG
 
