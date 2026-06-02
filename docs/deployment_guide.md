@@ -1,10 +1,11 @@
 # Guía Detallada de Despliegue - ERP Progra Web
 
-Esta guía contiene la documentación completa para desplegar el proyecto **ERP Progra Web** (Frontend en Vite y Backend en Django + PostgreSQL). Cubre dos escenarios principales:
+Esta guía contiene la documentación completa para desplegar el proyecto **ERP Progra Web** (Frontend en Vite y Backend en Django + PostgreSQL). Cubre los siguientes escenarios:
 
 1. **Despliegue en Plataformas como Servicio (PaaS)** utilizando **Vercel** (Frontend) y **Render** (Backend y Base de Datos).
-2. **Despliegue Autohospedado (Self-Hosted)** en una Máquina Virtual (VM) privada utilizando **Dokploy** y conectada de forma segura mediante **Tailscale**.
-3. **Casos Alternos y Resolución de Problemas** (incluyendo el bloqueo de DNS por parte de UFW en desarrollo local).
+2. **Despliegue Autohospedado en VM con Contenedores** utilizando **Dokploy** y conectado de forma segura mediante **Tailscale**.
+3. **Despliegue Autohospedado Directo en VM (Sin Contenedores)** configurando Nginx, Gunicorn y PostgreSQL directamente sobre el sistema operativo (opción alternativa, menos estable pero viable para recursos bajos).
+4. **Casos Alternos y Resolución de Problemas** (incluyendo el bloqueo de DNS por parte de UFW en desarrollo local).
 
 ---
 
@@ -77,6 +78,21 @@ graph TD
 
 ---
 
+### Opción C: Despliegue Directo en VM (Sin Contenedores / Nginx + Gunicorn + Systemd)
+
+Consiste en configurar e instalar todos los servicios (Django, PostgreSQL, Nginx y Gunicorn) directamente sobre el sistema operativo de la máquina virtual. Es **menos aislada, menos estable** y propensa a conflictos entre librerías o dependencias del sistema operativo, pero funciona bien en servidores con muy pocos recursos.
+
+```mermaid
+graph TD
+    User["Usuario Final (Internet Pública)"] -->|Acceso HTTP/HTTPS| Nginx["Nginx (Servidor Web y Proxy Reversible)"]
+    Nginx -->|Sirve archivos estáticos directamente| Dist["Carpeta frontend/dist (Estáticos Frontend)"]
+    Nginx -->|"Redirige peticiones API a Gunicorn (Sock/Puerto)"| Gunicorn["Gunicorn (Servidor WSGI para Django)"]
+    Gunicorn -->|Ejecuta código Django| Django["Django App (Python Virtualenv)"]
+    Django -->|Consultas locales/red| PG["PostgreSQL (Instancia Local/Servicio)"]
+```
+
+---
+
 ## 2. Gestión de Secretos y Variables de Entorno
 
 Nunca se deben subir credenciales o secretos al control de versiones (Git). A continuación, se detalla qué variables requiere cada componente y dónde se configuran.
@@ -98,7 +114,7 @@ Estas variables deben inyectarse en el contenedor de Django (Render o Dokploy):
 | `POSTGRES_HOST` | Dirección de red del servidor PostgreSQL. | `db` (interno de Dokploy) o la URL de Render. |
 | `POSTGRES_PORT` | Puerto de conexión a PostgreSQL. | `5432` |
 | `MEDIA_URL` | URL pública bajo la cual se servirán los archivos de medios (imágenes/recibos). | `/media/` |
-| `MEDIA_ROOT` | Ruta absoluta del sistema de archivos del servidor donde se guardarán los archivos de medios subidos. | `/tmp/media` o ruta persistente. |
+| `MEDIA_ROOT` | Ruta absoluta del sistema de archivos del servidor donde se guardarán los archivos de medios subidos. **Nota:** En Render el almacenamiento es efímero y se requiere configurar un servicio externo (ej. S3/Cloudinary) o un volumen persistente de pago. En VMs esto no ocurre (ver sección de almacenamiento). | `/tmp/media` o ruta persistente. |
 | `EMAIL_HOST` | Servidor SMTP utilizado para enviar correos automáticos. | `smtp.gmail.com` |
 | `EMAIL_PORT` | Puerto para la conexión SMTP. | `587` |
 | `EMAIL_USE_TLS` | Indica si se debe utilizar una conexión TLS segura para el servidor SMTP. | `True` |
@@ -142,6 +158,85 @@ Estas variables se compilan con la app al generar los archivos estáticos en Ver
    * `CORS_ALLOWED_ORIGINS`: La URL que te asigne Vercel en el frontend.
    * `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT`: Llena con los datos provistos por la base de datos creada en el Paso 1.
 5. Haz clic en **Deploy Web Service**.
+
+### Paso 2.5: Almacenamiento Efímero de Archivos (Imágenes/Medios) en Render
+
+> [!WARNING]
+> **El Problema del Almacenamiento Efímero**
+> Render utiliza contenedores con un **sistema de archivos efímero** (especialmente en la capa gratuita o Web Service estándar sin discos adjuntos). Cualquier archivo subido por los usuarios (como imágenes de productos o recibos de pago) se guardará en `/tmp/media` y **se eliminará por completo** cada vez que el contenedor de Render se reinicie, se suspenda por inactividad o se redespliegue con nuevo código.
+>
+> En un **despliegue en VM (Máquina Virtual / Dokploy)** (Sección 4), este problema **no ocurre** si se configuran volúmenes de Docker, ya que la VM posee un almacenamiento en disco persistente.
+
+Para solucionar la pérdida de imágenes en Render, debes modificar la configuración de Django para utilizar un servicio de almacenamiento externo u optar por discos persistentes de pago:
+
+#### Opción A: Usar un servicio de almacenamiento externo (Recomendado)
+Consiste en configurar Django para subir los archivos de medios a un proveedor en la nube compatible con S3 (como **Amazon S3**, **Supabase Storage**, **Backblaze B2**, o **Cloudflare R2**), o bien usar **Cloudinary**.
+
+**Pasos para implementar almacenamiento externo con S3 en Django:**
+
+1. **Instalar dependencias en el Backend**:
+   Añade al archivo `backend/requirements.txt`:
+   ```text
+   django-storages[amazon]>=1.14
+   boto3>=1.34
+   ```
+
+2. **Modificar `backend/backend/settings.py`**:
+   Configura el backend para alternar dinámicamente entre almacenamiento local (para desarrollo con `DEBUG=True`) y almacenamiento en S3 mediante variables de entorno:
+   ```python
+   # En backend/backend/settings.py
+   
+   USE_S3 = os.environ.get('USE_S3', 'False').lower() == 'true'
+
+   if USE_S3:
+       # Añadir 'storages' a las aplicaciones instaladas de forma dinámica
+       if 'storages' not in INSTALLED_APPS:
+           INSTALLED_APPS.append('storages')
+       
+       AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+       AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+       AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+       AWS_S3_SIGNATURE_VERSION = 's3v4'
+       AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+       
+       # Si usas Supabase o Cloudflare R2, inyecta su endpoint personalizado:
+       AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
+       
+       # Configurar Django >= 4.2 / 5.x / 6.0 para usar S3 para archivos de medios
+       STORAGES = {
+           "default": {
+               "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+           },
+           "staticfiles": {
+               "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+           },
+       }
+   else:
+       # Configuración local por defecto
+       MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
+       default_media_root = BASE_DIR / 'media' if DEBUG else Path('/tmp/media')
+       MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', default_media_root))
+   ```
+
+3. **Configurar las Variables de Entorno en el panel de Render**:
+   En el panel de control de tu Web Service en Render, agrega las siguientes variables de entorno:
+   * `USE_S3`: `True`
+   * `AWS_ACCESS_KEY_ID`: `*tu_access_key*`
+   * `AWS_SECRET_ACCESS_KEY`: `*tu_secret_key*`
+   * `AWS_STORAGE_BUCKET_NAME`: `*tu_nombre_de_bucket*`
+   * `AWS_S3_REGION_NAME`: `*ej_us-east-1*`
+   * `AWS_S3_ENDPOINT_URL`: `*url_endpoint*` (obligatorio para Supabase S3 API o Cloudflare R2; opcional para AWS S3)
+
+---
+
+#### Opción B: Usar Discos Persistentes de Render (De pago)
+Si prefieres mantener los archivos locales en lugar de usar un bucket externo, puedes pagar por un volumen en Render:
+1. En el panel del Web Service de Django en Render, haz clic en **Disks** > **Add Disk**.
+2. Asígnale un nombre (ej. `erp-media`), define el tamaño (ej. `1 GB`) y la ruta de montaje (Mount Path) como `/var/lib/erp/media`.
+3. Agrega la variable de entorno a tu servicio en Render:
+   * `MEDIA_ROOT`: `/var/lib/erp/media`
+
+---
 
 ### Paso 3: Desplegar el Frontend (Vite) en Vercel
 1. Inicia sesión en [Vercel.com](https://vercel.com/).
@@ -210,8 +305,9 @@ Dokploy es una alternativa auto-hospedable a Heroku/Render que gestiona contened
    * **Build Type**: `Dockerfile`
    * **Dockerfile Path**: `backend/Dockerfile`
 4. Ve a la pestaña **Environment Variables** y agrega las variables correspondientes descritas en la sección 2. Utiliza la dirección de red interna provista por Dokploy para conectar el backend al contenedor PostgreSQL (usualmente el nombre del servicio de base de datos dentro del clúster de Docker).
-5. Ve a la pestaña **Domains** para asociar un subdominio autogenerado o tu propio dominio (ej. `api.tudominio.com`). Dokploy/Traefik gestionará los certificados SSL automáticos de Let's Encrypt.
-6. Haz clic en **Deploy**.
+5. **Persistencia de Archivos (Medios/Imágenes)**: Dado que en una VM el almacenamiento del host es persistente, para evitar que las imágenes subidas se pierdan al recrear o actualizar el contenedor, ve a la pestaña **Volumes** en Dokploy, crea un volumen persistente de tipo local y configúralo para montar `/app/media` (o la ruta que definas en `MEDIA_ROOT`) en el contenedor.
+6. Ve a la pestaña **Domains** para asociar un subdominio autogenerado o tu propio dominio (ej. `api.tudominio.com`). Dokploy/Traefik gestionará los certificados SSL automáticos de Let's Encrypt.
+7. Haz clic en **Deploy**.
 
 ### Paso 5: Desplegar el Frontend (Vite) en Dokploy
 1. Crea otra **Application** en Dokploy para el Frontend.
@@ -226,7 +322,177 @@ Dokploy es una alternativa auto-hospedable a Heroku/Render que gestiona contened
 
 ---
 
-## 5. Casos Alternos y Solución de Problemas
+## 5. Despliegue Autohospedado Directo en VM (Sin Contenedores)
+
+> [!WARNING]
+> **Advertencia sobre Estabilidad y Mantenibilidad**
+> Ejecutar la aplicación directamente sobre el sistema operativo de la VM sin Docker ni Dokploy es una alternativa viable si la máquina virtual cuenta con recursos extremadamente limitados (como 512 MB de RAM). No obstante, es **menos estable**, ya que carece de aislamiento. Cualquier cambio en las dependencias globales del sistema o actualización del sistema operativo puede romper el entorno del backend o de la base de datos.
+
+### Paso 1: Configurar el Entorno del Servidor
+Conéctate por SSH a tu servidor e instala los paquetes necesarios para compilar y ejecutar Python, PostgreSQL y Nginx:
+```bash
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y python3-pip python3-venv python3-dev libpq-dev postgresql postgresql-contrib nginx curl git
+```
+
+### Paso 2: Configurar la Base de Datos PostgreSQL Local
+1. Inicia sesión en la consola de PostgreSQL:
+   ```bash
+   sudo -i -u postgres psql
+   ```
+2. Crea la base de datos, el usuario y asígnale privilegios:
+   ```sql
+   CREATE DATABASE erp_db;
+   CREATE USER erp_user WITH PASSWORD 'tu_contrasena_segura';
+   ALTER ROLE erp_user SET client_encoding TO 'utf8';
+   ALTER ROLE erp_user SET default_transaction_isolation TO 'read committed';
+   ALTER ROLE erp_user SET timezone TO 'UTC';
+   GRANT ALL PRIVILEGES ON DATABASE erp_db TO erp_user;
+   \q
+   ```
+
+### Paso 3: Configurar el Backend (Django)
+1. Clona el repositorio en el servidor (por ejemplo, en `/var/www/erp-progra-web`):
+   ```bash
+   sudo mkdir -p /var/www
+   sudo chown -R $USER:$USER /var/www
+   git clone https://github.com/tu-usuario/tu-repo.git /var/www/erp-progra-web
+   cd /var/www/erp-progra-web/backend
+   ```
+2. Crea y activa un entorno virtual de Python:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. Instala las dependencias:
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt gunicorn
+   ```
+4. Crea un archivo de configuración de variables de entorno `.env` en la carpeta `backend/` o configúralas a nivel de sistema. Se recomienda crear un archivo `.env` cargado por Django:
+   ```env
+   # /var/www/erp-progra-web/backend/.env
+   DEBUG=False
+   SECRET_KEY=clave_secreta_de_produccion_muy_larga
+   ALLOWED_HOSTS=api.tudominio.com,tu_ip_publica
+   CORS_ALLOWED_ORIGINS=https://app.tudominio.com
+   POSTGRES_DB=erp_db
+   POSTGRES_USER=erp_user
+   POSTGRES_PASSWORD=tu_contrasena_segura
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+   ```
+5. Corre las migraciones y recopila los archivos estáticos:
+   ```bash
+   python manage.py migrate
+   python manage.py collectstatic --noinput
+   ```
+
+### Paso 4: Configurar Gunicorn como un Servicio Systemd
+Para que Django corra en segundo plano de manera continua y se inicie automáticamente con el sistema operativo, crea un servicio de Systemd:
+1. Crea el archivo de servicio:
+   ```bash
+   sudo nano /etc/systemd/system/gunicorn.service
+   ```
+2. Añade el siguiente contenido (ajustando rutas y nombres de usuario):
+   ```ini
+   [Unit]
+   Description=Gunicorn daemon para ERP Django
+   After=network.target
+
+   [Service]
+   User=ubuntu
+   WorkingDirectory=/var/www/erp-progra-web/backend
+   ExecStart=/var/www/erp-progra-web/backend/venv/bin/gunicorn --access-logfile - --workers 3 --bind 127.0.0.1:8000 backend.wsgi:application
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+3. Inicia y habilita el servicio de Gunicorn:
+   ```bash
+   sudo systemctl start gunicorn
+   sudo systemctl enable gunicorn
+   ```
+
+### Paso 5: Compilar y Servir el Frontend (Vite)
+1. Instala Node.js (versión LTS) en el servidor utilizando Node Source o nvm.
+2. Navega al directorio del frontend e instala las dependencias:
+   ```bash
+   cd /var/www/erp-progra-web/frontend
+   npm install
+   ```
+3. Crea un archivo `.env.production` con la URL de tu API local:
+   ```env
+   VITE_API_URL=https://api.tudominio.com/api
+   ```
+4. Compila el frontend para producción:
+   ```bash
+   npm run build
+   ```
+   Esto generará una carpeta `dist/` en `frontend/` que contiene los archivos estáticos listos para ser servidos por Nginx.
+
+### Paso 6: Configurar Nginx como Servidor Web y Reverse Proxy
+Nginx servirá los archivos del frontend de forma directa y redirigirá las peticiones de la API `/api/` y el panel de administración `/admin/` hacia Gunicorn.
+1. Crea un archivo de configuración en Nginx:
+   ```bash
+   sudo nano /etc/nginx/sites-available/erp
+   ```
+2. Añade la configuración básica (reemplaza dominios e IPs):
+   ```nginx
+   server {
+       listen 80;
+       server_name app.tudominio.com;
+
+       # Frontend estático
+       location / {
+           root /var/www/erp-progra-web/frontend/dist;
+           try_files $uri $uri/ /index.html;
+       }
+   }
+
+   server {
+       listen 80;
+       server_name api.tudominio.com;
+
+       # Archivos estáticos de Django (admin, etc.)
+       location /static/ {
+           alias /var/www/erp-progra-web/backend/staticfiles/;
+       }
+
+       # Archivos subidos por los usuarios (Medios/Imágenes)
+       location /media/ {
+           alias /var/www/erp-progra-web/backend/media/;
+       }
+
+       # Proxy para Django Backend (Gunicorn)
+       location / {
+           proxy_set_header Host $http_host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_pass http://127.0.0.1:8000;
+       }
+   }
+   ```
+3. Habilita el sitio y recarga Nginx:
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/erp /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl restart nginx
+   ```
+4. **Seguridad SSL**: Se recomienda instalar Certbot para configurar certificados HTTPS de Let's Encrypt automáticos para ambos dominios:
+   ```bash
+   sudo apt install -y certbot python3-certbot-nginx
+   sudo certbot --nginx -d app.tudominio.com -d api.tudominio.com
+   ```
+
+### Nota sobre Persistencia de Imágenes en Despliegue Local Directo
+A diferencia de Render, dado que los servicios se ejecutan de manera directa en el disco físico de la VM, la carpeta `/media/` en `/var/www/erp-progra-web/backend/media/` es **100% persistente** por defecto. No requieres configurar almacenamiento en la nube externo (como S3 o Cloudinary) para evitar que se borren, a menos que decidas usarlo para liberar espacio del disco local de la VM.
+
+---
+
+## 6. Casos Alternos y Solución de Problemas
 
 ### Fallo local por Firewall (UFW) en Linux
 Si levantas el entorno de desarrollo local con `docker compose up --build` y observas el siguiente error en la terminal del backend:
@@ -283,7 +549,7 @@ Esto ocurre porque el cortafuegos **UFW** está bloqueando la comunicación a tr
 
 ---
 
-## 6. Sobrescribir Configuración de Docker para Producción (Sin Valores Hardcodeados)
+## 7. Sobrescribir Configuración de Docker para Producción (Sin Valores Hardcodeados)
 
 El archivo `docker-compose.yml` por defecto en la raíz está diseñado para **desarrollo local**. Tiene credenciales de prueba quemadas (*hardcoded*), monta carpetas locales usando `volumes` para recarga en caliente y ejecuta servidores de desarrollo (`runserver` de Django y `npm run dev` de Vite).
 
@@ -410,4 +676,278 @@ services:
   ```bash
   docker compose -f docker-compose.yml up -d --build
   ```
+
+---
+
+## 8. Automatización y CI/CD (Integración y Despliegue Continuo)
+
+Automatizar el flujo desde que guardas un cambio en Git hasta que se despliega en producción reduce errores humanos y garantiza que el código subido siempre sea funcional y compile sin errores.
+
+```mermaid
+graph TD
+    subgraph github ["Plataforma GitHub"]
+        Push["Cambio en Git (Push / PR)"] --> CI["GitHub Actions (CI)"]
+        
+        subgraph ci_jobs ["Validación de Integración (CI)"]
+            CI -->|Job: Frontend| FE_Val["Linter + Compilación (Vite)"]
+            CI -->|Job: Backend| BE_Val["Pruebas Unitarias (Django) + BD Postgres Temporal"]
+        end
+        
+        FE_Val & BE_Val -->|Éxito / Merge a main| CD_Trigger{"Estrategia de CD"}
+    end
+
+    subgraph entorno_paas_dokploy ["Plataformas Autogestionadas (PaaS / Dokploy)"]
+        CD_Trigger -->|Webhook de Git| Webhook["Auto-Deploy Webhook"]
+        Webhook -->|Build Interno| Deploy_Direct["Redespliegue Automático (Vercel/Render/Dokploy)"]
+    end
+
+    subgraph entorno_vps_ssh ["Servidor VM / VPS Manual"]
+        CD_Trigger -->|Acciones SSH| GHA_CD["GitHub Actions (CD Job)"]
+        GHA_CD -->|1. Build & Push| Registry["GitHub Container Registry (GHCR)"]
+        GHA_CD -->|2. SSH Command| VPS_Host["Servidor VPS (Docker Compose)"]
+        VPS_Host -->|3. Pull Image| Registry
+        VPS_Host -->|4. Recreate Contenedores| Containers["Contenedores Actualizados"]
+    end
+```
+
+### 7.1. Integración Continua (CI): Validación de Código
+
+Para asegurar la calidad del código, puedes configurar un workflow de GitHub Actions que valide el backend y frontend en cada Pull Request o push a `develop` y `main`.
+
+Crea el archivo `.github/workflows/ci.yml` con el siguiente contenido:
+
+```yaml
+name: CI (Integración Continua)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: erp_test_db
+          POSTGRES_USER: erp_test_user
+          POSTGRES_PASSWORD: erp_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Descargar Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Correr Pruebas Unitarias
+        env:
+          POSTGRES_DB: erp_test_db
+          POSTGRES_USER: erp_test_user
+          POSTGRES_PASSWORD: erp_test_password
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          SECRET_KEY: django-insecure-test-key
+          DEBUG: False
+        run: |
+          cd backend
+          python manage.py test
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalar Dependencias
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Validar Linter (ESLint)
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Validar Compilación de Producción
+        run: |
+          cd frontend
+          npm run build
+```
+
+---
+
+### 7.2. Despliegue Continuo (CD) en Entornos Administrados (PaaS / Dokploy)
+
+Tanto **Render**, **Vercel** como **Dokploy** cuentan con mecanismos integrados para redesplegar automáticamente cuando hay cambios en el repositorio de GitHub. No es necesario escribir pipelines complejos para esto.
+
+#### Opción A: Despliegue en Render y Vercel (Auto-deploy)
+1. **Render (Backend)**:
+   * Al crear tu Web Service en Render, por defecto la opción **Auto-Deploy** está configurada en `Yes`.
+   * Cada vez que hagas `git push` a la rama de origen (ej. `develop` o `main`), Render compilará tu Dockerfile y redesplegará el contenedor de forma automática sin caída de servicio (Zero-Downtime).
+2. **Vercel (Frontend)**:
+   * Vercel detecta de forma nativa los pushes al repositorio conectado de GitHub.
+   * Generará despliegues automáticos previos (Preview) para ramas de desarrollo y un despliegue final de Producción cuando se integren cambios en la rama principal (`main`).
+
+#### Opción B: Despliegue en Dokploy (Git Webhooks)
+Dokploy permite configurar un webhook para escuchar eventos de GitHub:
+1. En tu panel de Dokploy, navega a tu **Application** (ej. backend o frontend).
+2. Entra en la pestaña **Deployments** o **Git**.
+3. Activa la opción de **Autodeploy** o copia la **Webhook URL** generada por Dokploy.
+4. Ve a tu repositorio de GitHub > **Settings** > **Webhooks** > **Add webhook**.
+5. Pega la URL provista por Dokploy, selecciona `application/json` en Content type, y define el disparador en el evento de "Just the push event".
+6. Al presionar **Add webhook**, cada push a la rama iniciará un nuevo despliegue automático en Dokploy.
+
+---
+
+### 7.3. Despliegue Continuo (CD) Directo en VM/VPS (GitHub Actions + SSH)
+
+Si no utilizas Dokploy y estás administrando tu propia VM usando el archivo `docker-compose.yml` para producción, puedes automatizar el despliegue compilando las imágenes en GitHub y desplegándolas vía SSH.
+
+#### Requisitos en GitHub:
+Debes guardar las credenciales del servidor en **Settings** > **Secrets and variables** > **Actions** de tu repositorio en GitHub:
+* `SSH_HOST`: La IP pública de tu servidor (o la IP de Tailscale si configuras el Runner para conectarse a ella).
+* `SSH_USER`: El usuario del servidor (ej. `ubuntu`, `root`).
+* `SSH_KEY`: Tu clave privada SSH (contenido de tu archivo `id_rsa` o `id_ed25519` local que tenga acceso al servidor).
+
+#### Archivo `.github/workflows/deploy.yml`:
+```yaml
+name: CD (Despliegue Continuo)
+
+on:
+  push:
+    branches: [ main ]  # Solo desplegar al unir cambios en la rama principal
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar Código
+        uses: actions/checkout@v4
+
+      - name: Iniciar Sesión en GitHub Packages (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compilar y Subir Imagen Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/backend:latest
+
+      - name: Compilar y Subir Imagen Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ github.repository }}/frontend:latest
+
+      - name: Desplegar en Servidor vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /ruta/a/tu/proyecto
+            # Iniciar sesión en GHCR dentro del servidor si es privado
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Descargar nuevas imágenes de contenedores
+            docker compose pull
+            # Levantar de nuevo en segundo plano recreando los modificados
+            docker compose -f docker-compose.yml up -d --build
+```
+
+---
+
+## 9. Comparativa General de Arquitecturas (Serverless vs. VM)
+
+Para facilitar la toma de decisiones, a continuación se detallan las diferencias clave entre los tres esquemas de despliegue analizados en esta guía.
+
+### 9.1. Tabla Comparativa de Características
+
+| Característica | Opción A: PaaS (Vercel + Render) | Opción B: VM + Dokploy (Contenedores) | Opción C: VM Directo (Sin Contenedores) |
+| :--- | :--- | :--- | :--- |
+| **Tipo de Infraestructura** | Serverless / PaaS Gestionado | IaaS (Máquina Virtual) + Orquestador | IaaS (Máquina Virtual) Bare OS |
+| **Persistencia de Archivos** | **Efímera** (Se borra al reiniciar). Requiere almacenamiento externo (S3/Cloudinary) o disco de pago. | **Persistente** a través de Volúmenes de Docker vinculados al disco de la VM. | **Persistente** de forma nativa en el sistema de archivos del disco local. |
+| **Base de Datos** | Servidor gestionado por Render (cero administración). | Contenedor PostgreSQL dentro de la red interna de Docker. | Servicio nativo de PostgreSQL instalado en el sistema operativo. |
+| **Estabilidad del Entorno** | **Alta**: Aislado por Render, sin riesgos por actualizaciones del sistema operativo. | **Alta**: Los contenedores aíslan las dependencias y evitan "romper" otros servicios. | **Baja**: Menos estable. Cambios en paquetes del sistema operativo pueden dañar la app. |
+| **Escalabilidad** | **Sencilla**: Escala horizontal/vertical con unos clics en la interfaz de Render. | **Media**: Limitado por los recursos físicos de la VM (escala vertical fácilmente). | **Compleja**: Requiere reconfigurar Nginx, Gunicorn y la VM de forma manual. |
+| **Costo** | **Variable**: Gratis para pruebas, pero costoso al añadir persistencia, BD más grandes o tráfico. | **Fijo y Bajo**: Costo fijo de la VM (ej. $5-$10/mes en DigitalOcean/Hetzner). | **Fijo y Bajo**: Igual que Opción B, optimiza al máximo los recursos al no correr Docker. |
+| **Complejidad de Configuración** | **Baja**: Ideal para despliegues rápidos y bajo mantenimiento. | **Media**: Requiere configurar Dokploy y Tailscale una única vez. | **Alta**: Configuración manual de Nginx, Systemd, sockets y permisos. |
+
+---
+
+### 9.2. Flujos de Almacenamiento y Persistencia de Medios
+
+Los siguientes diagramas ilustran cómo maneja cada arquitectura las subidas de archivos (imágenes, recibos, fotos de productos):
+
+#### A. Almacenamiento en Render (Serverless / Contenedores Efímeros)
+En Render, el almacenamiento es **efímero** por defecto. Si guardas un archivo en el disco del contenedor, se perderá. Debes configurar un almacenamiento persistente externo (ej. AWS S3) o adquirir un volumen de pago.
+
+```mermaid
+graph TD
+    subgraph render_platform ["Render (PaaS Serverless)"]
+        UserA["Usuario / Navegador"] -->|1. Sube Imagen| DjangoA["Django Web Service"]
+        DjangoA -->|2. Escribe en local /tmp/media| LocalA["Carpeta Local (Efímera)"]
+        LocalA -.->|3. Reinicio o Despliegue| WipedA["¡Datos Eliminados!"]
+    end
+    
+    subgraph external_cloud ["Servicio en la Nube Externo"]
+        DjangoA -->|Alternative: Escribe vía API| S3["AWS S3 / Supabase Storage / Cloudinary"]
+        S3 -->|4. Persistente e ilimitado| S3Bucket[("Bucket en la Nube (Seguro)")]
+    end
+```
+
+#### B. Almacenamiento en VM con Dokploy (Docker Volumes)
+Al usar Docker en una VM, el almacenamiento del contenedor es efímero, pero Docker permite montar un **Volumen** local. El volumen mapea la carpeta del contenedor al disco persistente de la VM.
+
+```mermaid
+graph TD
+    subgraph vm_dokploy ["Máquina Virtual (Con Docker/Dokploy)"]
+        UserB["Usuario / Navegador"] -->|1. Sube Imagen| DjangoB["Contenedor Django (/app/media)"]
+        DjangoB -->|2. Mapeado automático| VolB["Docker Volume (Local)"]
+        VolB -->|3. Escribe en disco host| DiskB[("Disco Físico de la VM (Persistente)")]
+    end
+```
+
+#### C. Almacenamiento en VM Directa (Sin Contenedores)
+Al correr Django directamente en el sistema operativo con Gunicorn y Nginx, la carpeta `/media/` está en el disco duro físico de la VM, por lo que es **persistente por defecto** sin configuraciones adicionales.
+
+```mermaid
+graph TD
+    subgraph vm_directa ["Máquina Virtual (Nativo / Bare Metal)"]
+        UserC["Usuario / Navegador"] -->|1. Sube Imagen| NginxC["Nginx Web Server"]
+        NginxC -->|2. Redirige peticiones| GunicornC["Proceso Django / Gunicorn"]
+        GunicornC -->|3. Guarda en /var/www/.../media| DirC[("Directorio Físico en Disco (Persistente)")]
+    end
+```
+
+
 
