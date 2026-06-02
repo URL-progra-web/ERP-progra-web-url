@@ -88,13 +88,27 @@ Estas variables deben inyectarse en el contenedor de Django (Render o Dokploy):
 | :--- | :--- | :--- |
 | `SECRET_KEY` | Clave secreta para hashes y sesiones en Django. | Un string largo y aleatorio. |
 | `DEBUG` | Activa/Desactiva el modo de depuración. **Debe ser False en producción**. | `False` |
+| `ENABLE_API_DOCS` | Habilita/Deshabilita la generación de la documentación interactiva Swagger/Redoc. | `True` (Por defecto sigue a `DEBUG`) |
+| `ENABLE_PUBLIC_STOREFRONT` | Habilita/Deshabilita el portal de tienda pública (Storefront). | `False` |
 | `ALLOWED_HOSTS` | Dominios o IPs desde los cuales el servidor acepta peticiones. | `api.tudominio.com,tu-app.onrender.com` |
-| `CORS_ALLOWED_ORIGINS` | Dominios autorizados para consumir el backend desde el navegador. | `https://tudominio.com,https://tu-app.vercel.app` |
+| `CORS_ALLOWED_ORIGINS` | Dominios autorizados para consumir el backend desde el navegador (CORS). | `https://tudominio.com,https://tu-app.vercel.app` |
 | `POSTGRES_DB` | Nombre de la base de datos SQL. | `erp_db` |
 | `POSTGRES_USER` | Usuario de la base de datos. | `erp_user` |
 | `POSTGRES_PASSWORD` | Contraseña del usuario SQL. | *[Generar una contraseña fuerte]* |
 | `POSTGRES_HOST` | Dirección de red del servidor PostgreSQL. | `db` (interno de Dokploy) o la URL de Render. |
 | `POSTGRES_PORT` | Puerto de conexión a PostgreSQL. | `5432` |
+| `MEDIA_URL` | URL pública bajo la cual se servirán los archivos de medios (imágenes/recibos). | `/media/` |
+| `MEDIA_ROOT` | Ruta absoluta del sistema de archivos del servidor donde se guardarán los archivos de medios subidos. | `/tmp/media` o ruta persistente. |
+| `EMAIL_HOST` | Servidor SMTP utilizado para enviar correos automáticos. | `smtp.gmail.com` |
+| `EMAIL_PORT` | Puerto para la conexión SMTP. | `587` |
+| `EMAIL_USE_TLS` | Indica si se debe utilizar una conexión TLS segura para el servidor SMTP. | `True` |
+| `EMAIL_HOST_USER` | Usuario/Correo de autenticación del servidor SMTP. | `soporte@tudominio.com` |
+| `EMAIL_HOST_PASSWORD` | Contraseña (o contraseña de aplicación) del servidor SMTP. | *[Token de aplicación o password]* |
+| `DEFAULT_FROM_EMAIL` | Dirección de correo del remitente por defecto de la aplicación. | `alertas@tudominio.com` |
+| `TURNSTILE_SECRET_KEY` | Clave secreta para la verificación en backend del CAPTCHA de Cloudflare Turnstile. | *[Clave secreta provista por Cloudflare]* |
+| `DEMO_ADMIN_NAME` | Nombre inicial asignado al usuario Administrador creado mediante las semillas de base de datos. | `Super Admin` |
+| `DEMO_ADMIN_EMAIL` | Correo electrónico inicial del Super Admin del sistema (semilla). | `admin@admin.com` |
+| `DEMO_ADMIN_PASSWORD` | Contraseña inicial de acceso del Super Admin (semilla). | `admin` |
 
 ### Variables del Frontend (Vite)
 Estas variables se compilan con la app al generar los archivos estáticos en Vercel o Dokploy:
@@ -266,3 +280,134 @@ Esto ocurre porque el cortafuegos **UFW** está bloqueando la comunicación a tr
   sh -c "python manage.py migrate && gunicorn core.wsgi:application"
   ```
   *(Reemplaza `core.wsgi` por el nombre de la carpeta de configuración de tu Django, por ejemplo `backend.wsgi`).*
+
+---
+
+## 6. Sobrescribir Configuración de Docker para Producción (Sin Valores Hardcodeados)
+
+El archivo `docker-compose.yml` por defecto en la raíz está diseñado para **desarrollo local**. Tiene credenciales de prueba quemadas (*hardcoded*), monta carpetas locales usando `volumes` para recarga en caliente y ejecuta servidores de desarrollo (`runserver` de Django y `npm run dev` de Vite).
+
+Para desplegar en producción sin quemar credenciales en el código y sin depender de carpetas compartidas del host, se recomiendan las siguientes técnicas de sobrescritura:
+
+### Estrategia A: Interpolación con Archivo `.env` (Recomendado)
+
+En lugar de definir credenciales directamente en el bloque `environment`, utiliza la sintaxis `${VARIABLE}` en tu `docker-compose.yml`. Docker Compose leerá automáticamente un archivo `.env` ubicado en el mismo directorio e inyectará esos valores al levantar los contenedores.
+
+#### Modificación del `docker-compose.yml` para Producción:
+```yaml
+services:
+  db:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    # En producción se recomienda no exponer el puerto 5432 a internet abierta
+    # ports:
+    #   - "5432:5432"
+
+  backend:
+    build: backend/
+    command: sh -c "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+```
+
+En el servidor de producción, se crea un archivo `.env` privado al lado de `docker-compose.yml`:
+```env
+POSTGRES_DB=erp_prod_db
+POSTGRES_USER=admin_seguro
+POSTGRES_PASSWORD=contrasena_altamente_segura_123
+SECRET_KEY=clave_secreta_de_produccion_muy_larga_y_compleja
+DEBUG=False
+CORS_ALLOWED_ORIGINS=https://app.tudominio.com
+```
+
+---
+
+### Estrategia B: Composición de Archivos (Multi-file Compose)
+
+Para mantener limpios ambos entornos sin duplicar código, puedes separar la configuración en múltiples archivos YAML. Docker Compose permite fusionar múltiples archivos al ejecutar comandos.
+
+1. **`docker-compose.yml` (Base de Producción)**: Contiene la definición pura de servicios sin montajes locales y configurado con comandos seguros (ej. Gunicorn).
+2. **`docker-compose.override.yml` (Desarrollo Local)**: Añade las configuraciones de desarrollo (volúmenes locales, puertos expuestos y comandos `runserver`/`dev`). *Por defecto, Docker Compose carga este archivo de forma automática localmente*.
+
+#### 1. Archivo Base (`docker-compose.yml`)
+```yaml
+services:
+  db:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  backend:
+    build: backend/
+    command: sh -c "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=False
+
+  frontend:
+    build: frontend/
+    # En producción se compilaría a estáticos y se serviría mediante Nginx/Caddy
+```
+
+#### 2. Sobrescritura Local (`docker-compose.override.yml`)
+Este archivo agrega montajes locales y comandos de desarrollo en la máquina local:
+```yaml
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  backend:
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+
+  frontend:
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+```
+
+#### Instrucciones de Ejecución:
+* **En desarrollo local**: Ejecuta simplemente `docker compose up --build`. Docker Compose fusionará automáticamente `docker-compose.yml` y `docker-compose.override.yml`.
+* **En el servidor de producción**: Sube únicamente `docker-compose.yml` y tu archivo `.env`. Ejecuta el comando especificando el archivo base para evitar que busque configuraciones de desarrollo:
+  ```bash
+  docker compose -f docker-compose.yml up -d --build
+  ```
+
